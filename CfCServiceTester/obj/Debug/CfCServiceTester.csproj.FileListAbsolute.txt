@@ -1,0 +1,5 @@
+C:\Gedimino\Norman\CfCServiceTester\CfCServiceTester\obj\Debug\ResolveAssemblyReference.cache
+C:\Gedimino\Norman\CfCServiceTester\CfCServiceTester\bin\CfCServiceTester.dll
+C:\Gedimino\Norman\CfCServiceTester\CfCServiceTester\bin\CfCServiceTester.pdb
+C:\Gedimino\Norman\CfCServiceTester\CfCServiceTester\obj\Debug\CfCServiceTester.dll
+C:\Gedimino\Norman\CfCServiceTester\CfCServiceTester\obj\Debug\CfCServiceTester.pdb
