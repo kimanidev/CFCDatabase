@@ -117,10 +117,11 @@ namespace CfCServiceTester.WEBservice
         /// <summary>
         /// Makes DB connection
         /// </summary>
-        /// <param name="serverName">SQL server's name</param>
-        /// <param name="namePattern">Name pattern</param>
-        /// <param name="accessibleOnly"><code>true</code> - return accessible databases only</param>
-        /// <returns>List of available databases</returns>
+        /// <param name="dataSource">SQL server's name</param>
+        /// <param name="initialCatalog">Database name</param>
+        /// <param name="encUsername">Encrypted login name</param>
+        /// <param name="encPassword">Encrypted password</param>
+        /// <returns>List with roles, <see cref="CreateDbConnectionResponse"/>.</returns>
         [WebMethod(EnableSession = true)]
         public CreateDbConnectionResponse CreateDbConnection(string dataSource, string initialCatalog, string encUsername, string encPassword)
         {
