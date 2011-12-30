@@ -32,4 +32,19 @@ namespace CfCServiceTester.WEBservice.DataObjects
         public string ErrorMessage { get; set; }
     }
 
+    [DataContract(Namespace = "CfCServiceNS")]
+    public class RenameTableStatus : RestoreStatus
+    {
+        /// <summary>
+        /// List of database objects that were modified (views, procedures, functions, triggers)
+        /// </summary>
+        [DataMember]
+        public IList<AlteredDependencyDbo> AlteredDependencies { get; set; }
+
+        public RenameTableStatus()
+        {
+            this.AlteredDependencies = new List<AlteredDependencyDbo>();
+        }
+    }
+
 }

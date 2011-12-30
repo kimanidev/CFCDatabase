@@ -7,72 +7,90 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CfCServiceTester {
+namespace CfCServiceTester.CustomControls {
     
     
-    public partial class _Default {
+    public partial class ModifyTableContent {
         
         /// <summary>
-        /// form1 control.
+        /// txtServerName2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.WebControls.TextBox txtServerName2;
         
         /// <summary>
-        /// ScriptManager1 control.
+        /// txtDatabaseName2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.ScriptManager ScriptManager1;
+        protected global::System.Web.UI.WebControls.TextBox txtDatabaseName2;
         
         /// <summary>
-        /// Wizard1 control.
+        /// chkSingleMode2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Wizard Wizard1;
+        protected global::System.Web.UI.WebControls.CheckBox chkSingleMode2;
         
         /// <summary>
-        /// ConnectionStep control.
+        /// txtTable2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.WizardStep ConnectionStep;
+        protected global::System.Web.UI.WebControls.TextBox txtTable2;
         
         /// <summary>
-        /// StartPageContent control.
+        /// btnPickImage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::CfCServiceTester.CustomControls.StartPageContent StartPageContent;
+        protected global::System.Web.UI.WebControls.ImageButton btnPickImage;
         
         /// <summary>
-        /// BackupPageContent control.
+        /// WaitImage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::CfCServiceTester.CustomControls.DatabaseBackupContent BackupPageContent;
+        protected global::System.Web.UI.WebControls.Image WaitImage;
         
         /// <summary>
-        /// ModifyTablePageContent control.
+        /// txtNewTable2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::CfCServiceTester.CustomControls.ModifyTableContent ModifyTablePageContent;
+        protected global::System.Web.UI.WebControls.TextBox txtNewTable2;
+        
+        /// <summary>
+        /// spnRenameTableError2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl spnRenameTableError2;
+        
+        /// <summary>
+        /// spnRenameTableOK2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl spnRenameTableOK2;
     }
 }

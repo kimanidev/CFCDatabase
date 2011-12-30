@@ -3,10 +3,12 @@ function BackupDatabase(overwrite) {
     var manager = $find('CfcTestManager');
 
     var overWriteMode = $('#' + overwrite).attr('checked') == 'checked';
+    var singleUserMode = $(manager.get_chkSingleModeId()).attr('checked') == 'checked';
     var directory = $(manager.get_txtBackupDirectoryId()).val();
     var file = $(manager.get_txtBackupFileNameId()).val();
 
-    CfCServiceTester.WEBservice.CfcWebService.BackupDatabase(directory, file, overWriteMode, onSuccess_BackupDatabase, onFailure_BackupDatabase);
+    CfCServiceTester.WEBservice.CfcWebService.BackupDatabase(directory, file,
+                        overWriteMode, singleUserMode, onSuccess_BackupDatabase, onFailure_BackupDatabase);
     return false;
 }
 
@@ -52,6 +54,7 @@ function RestoreDatabase(chkOverwriteId) {
     var directory = $(manager.get_txtBackupDirectoryId()).val();
     var fileName = $(manager.get_txtFileName1Id()).val();
     var overWriteMode = $('#' + chkOverwriteId).attr('checked') == 'checked';
+    var singleUserMode = $(manager.get_chkSingleModeId()).attr('checked') == 'checked';
 
     if (!dbName) {
         alert('Data base name is not defined.');
@@ -66,8 +69,8 @@ function RestoreDatabase(chkOverwriteId) {
         return false;
     }
 
-    CfCServiceTester.WEBservice.CfcWebService.RestoreDatabase(
-                dbName, directory, fileName, overWriteMode, onSuccess_RestoreDatabase, onFailure_PickDatabases);
+    CfCServiceTester.WEBservice.CfcWebService.RestoreDatabase(dbName, directory, fileName, 
+                overWriteMode, singleUserMode, onSuccess_RestoreDatabase, onFailure_PickDatabases);
 
     $('span#RestoreDatabase1 span.Pauser').show();
     return false;

@@ -22,6 +22,15 @@ CfcServiceTestManager.CfcComponent = function () {
     this._txtFileName1Id = '';              // Text box with backup file name (Restore part)
     this._spnRestoreOK1Id = '';             // Span with OK message (Restore part)
     this._spnRestoreError1Id = '';          // Span with error message (Restore part)
+    this._chkSingleModeId = '';             // Checkbox for switching to single user mode (Common part)
+
+    this._txtServerName2Id = '';            // Text box with SQL server's name (Modify table tab)
+    this._txtDatabaseName2Id = '';          // Text box with Database name (Modify table tab)
+    this._txtTable2Id = '';                 // Text box with table name (Modify table tab)
+    this._txtNewTable2Id = '';              // Text box with new table name (Modify table tab)
+    this._spnRenameTableError2Id = '';      // Span with error message (Modify table part)
+    this._spnRenameTableOK2Id = '';         // Span with OK message (Modify table part)
+    this._chkSingleMode2Id = '';            // Checkbox for switching to single user mode (Modify table part)
 
     this._localServersOnly = true;          // true - look for local servers only, false - all available SQL servers
     this._accessibleDatabasesOnly = true;   // true - enumerate accessable databases only, false - all databases on the server
@@ -157,11 +166,67 @@ CfcServiceTestManager.CfcComponent.prototype = {
         this._spnRestoreError1Id = value;
     },
 
+    get_chkSingleModeId: function () {
+        return this._chkSingleModeId;
+    },
+    set_chkSingleModeId: function (value) {
+        this._chkSingleModeId = value;
+    },
+
+    get_txtServerName2Id: function () {
+        return this._txtServerName2Id;
+    },
+    set_txtServerName2Id: function (value) {
+        this._txtServerName2Id = value;
+    },
+
+    get_txtDatabaseName2Id: function () {
+        return this._txtDatabaseName2Id;
+    },
+    set_txtDatabaseName2Id: function (value) {
+        this._txtDatabaseName2Id = value;
+    },
+
+    get_txtTable2Id: function () {
+        return this._txtTable2Id;
+    },
+    set_txtTable2Id: function (value) {
+        this._txtTable2Id = value;
+    },
+
+    get_txtNewTable2Id: function () {
+        return this._txtNewTable2Id;
+    },
+    set_txtNewTable2Id: function (value) {
+        this._txtNewTable2Id = value;
+    },
+
+    get_spnRenameTableOK2Id: function () {
+        return this._spnRenameTableOK2Id;
+    },
+    set_spnRenameTableOK2Id: function (value) {
+        this._spnRenameTableOK2Id = value;
+    },
+
+    get_chkSingleMode2Id: function () {
+        return this._chkSingleMode2Id;
+    },
+    set_chkSingleMode2Id: function (value) {
+        this._chkSingleMode2Id = value;
+    },
+
     get_localServersOnly: function () {
         return this._localServersOnly;
     },
     set_localServersOnly: function (value) {
         this._localServersOnly = value;
+    },
+
+    get_spnRenameTableError2Id: function () {
+        return this._spnRenameTableError2Id;
+    },
+    set_spnRenameTableError2Id: function (value) {
+        this._spnRenameTableError2Id = value;
     },
 
     get_accessibleDatabasesOnly: function () {

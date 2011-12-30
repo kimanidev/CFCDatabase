@@ -4,6 +4,10 @@ using System.Linq;
 using System.Web;
 using CfCServiceTester.SVC.DataObjects;
 using System.Security.Cryptography;
+using Microsoft.SqlServer.Management.Smo;
+using System.Data.SqlClient;
+using System.Data;
+using CfCServiceTester.WEBservice.DataObjects;
 
 namespace CfCServiceTester.WEBservice
 {
@@ -17,10 +21,32 @@ namespace CfCServiceTester.WEBservice
         /// in <code>Session[CertificateKey]</code>
         /// </summary>
         public static readonly string CertificateKey = "{4908DA1F-CC08-4816-8971-1166CD3B03DB}";
+        /// <summary>
+        /// List with disconnected hosts is stored in the session
+        /// </summary>
+        public static readonly string HostsListKey = "{AEEA6FE4-1129-4108-B0CD-B0243FCADCAB}";
+
+        /// <summary>
+        /// The application generates public/private key individual for every session and stores it
+        /// in <code>Session[CertificateKey]</code>
+        /// </summary>
         public static string MyRSA
         {
             get { return (string)HttpContext.Current.Session[CertificateKey]; }
             set { HttpContext.Current.Session[CertificateKey] = value; }
+        }
+
+        /// <summary>
+        /// List with disconnected hosts is stored in the session
+        /// </summary>
+        public static List<string> DisconnectedHosts
+        {
+            get 
+            {
+                object tmp = HttpContext.Current.Session[HostsListKey];
+                return tmp == null ? new List<string>() : (List<string>)tmp;
+            }
+            set { HttpContext.Current.Session[HostsListKey] = value; }
         }
 
         /// <summary>
@@ -85,6 +111,74 @@ namespace CfCServiceTester.WEBservice
                 b[y] = (byte)((c1 << 4) + c2);
             }
             return b;
+        }
+
+        /// <summary>
+        /// Sends message to connected users and switches databas to single user mode.
+        /// <see cref="http://www.codeproject.com/KB/database/SqlServer_Backup_Restore.aspx?msg=3221753"/>
+        /// <param name="dbName">Database name</param>
+        /// </summary>
+        public static bool SetSingleMode(string dbName)
+        {
+            try
+            {
+                DisconnectedHosts = GetConnectedHosts();
+                SendNotification(String.Format("Access to the [{0}].[{1}] database is locked.", SqlServerName, dbName));    //DatabaseName
+
+                var srv = new Server(SqlServerName);
+                var db = srv.Databases[dbName];
+                if (db != null)     // db == null for new databases; there is no need for switching to single mode in this case
+                {
+                    db.DatabaseOptions.UserAccess = DatabaseUserAccess.Single;
+                    db.Alter(TerminationClause.RollbackTransactionsImmediately);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Sends message to connected users and switches databas to normal, multiuser mode.
+        /// <see cref="http://www.codeproject.com/KB/database/SqlServer_Backup_Restore.aspx?msg=3221753"/>
+        /// <param name="dbName">Database name</param>
+        /// </summary>
+        public static void SetMultiUserMode(string dbName)
+        {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[dbName];
+            db.DatabaseOptions.UserAccess = DatabaseUserAccess.Multiple;
+            db.Alter(TerminationClause.RollbackTransactionsImmediately);
+
+            SendNotification(String.Format("Access to the [{0}].[{1}] database is free now.", SqlServerName, dbName));
+        }
+
+        /// <summary>
+        /// Renames table.
+        /// <see cref="http://www.codeproject.com/KB/database/SqlServer_Backup_Restore.aspx?msg=3221753"/>
+        /// Foreign keys that are referenced to renamed table are correct but it is neccessary to replace views, triggers, stored procedures
+        /// and user defined functions. 
+        /// <see cref=" http://www.youdidwhatwithtsql.com/altering-database-objects-with-powershell/119"/>
+        /// <strong>This algorithm does not change CLR functions. You must to recompile them!</strong>
+        /// <param name="oldName">Old name</param>
+        /// <param name="newName">New name</param>
+        /// </summary>
+        public static List<AlteredDependencyDbo> RenameTheTable(string oldName, string newName)
+        {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[DatabaseName];
+            Table aTable = db.Tables[newName];
+            if (aTable != null)
+                throw new Exception(String.Format("Table {0} exists in the {1} database.", newName, DatabaseName));
+            aTable = db.Tables[oldName];
+            if (aTable == null)
+                throw new Exception(String.Format("There isn no table {0} in the {1} database.", newName, DatabaseName));
+
+            aTable.Rename(newName);
+            return CorrectStoredProcedure(db, oldName, newName);
         }
     }
 }

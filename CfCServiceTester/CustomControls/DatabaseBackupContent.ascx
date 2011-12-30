@@ -20,6 +20,13 @@
         </td>
     </tr>
     <tr>
+        <td>&nbsp;</td>
+        <td colspan="2">
+            <asp:CheckBox ID="chkSingleMode" runat="server" Checked="true" Text="Single user mode" 
+                          ToolTip="Check this control for switching to single user mode." />
+        </td>
+    </tr>
+    <tr>
         <td colspan="3" style="padding-bottom: 2ex;"><hr /></td>
     </tr>
     <tr>

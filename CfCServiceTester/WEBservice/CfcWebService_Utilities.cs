@@ -7,6 +7,8 @@ using System.Data;
 using System.IO;
 using Microsoft.SqlServer.Management.Smo;
 using CfCServiceTester.WEBservice.DataObjects;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace CfCServiceTester.WEBservice
 {
@@ -23,7 +25,13 @@ namespace CfCServiceTester.WEBservice
         /// List of roles for the connected user.
         /// </summary>
         public static readonly string RoleListKey = "{12FB9A22-7C13-4338-881E-62D24367B6E5}";
+        /// <summary>
+        /// SQL server's name
+        /// </summary>
         public static readonly string SqlServerNameKey = "{0B568310-9686-4CF9-B38C-99ED7FE48D87}";
+        /// <summary>
+        /// Database name
+        /// </summary>
         public static readonly string DatabaseNameKey = "{93CA56A2-3CE6-456D-86E6-0C9849CF363E}";
 
         internal static string ConnectionString
@@ -273,6 +281,12 @@ namespace CfCServiceTester.WEBservice
             }
         }
 
+        /// <summary>
+        /// Returns list with names of backup files.
+        /// </summary>
+        /// <param name="backupDirectory">Directory where backup files are stored</param>
+        /// <param name="template">Phrase in the name of backup file</param>
+        /// <returns>List with file names</returns>
         public static IList<string> GetBackupFilenames(string backupDirectory, string template)
         {
             string[] filePaths = Directory.GetFiles(backupDirectory, "*.bak");
@@ -290,6 +304,201 @@ namespace CfCServiceTester.WEBservice
                     select fileName
                     ).ToList();
                 return query;
+            }
+        }
+
+        /// <summary>
+        /// Returns list with name of hosts, connected to actual server
+        /// </summary>
+        /// <returns>List with host names.</returns>
+        private static List<string> GetConnectedHosts()
+        {
+            const string queryString =
+                "SELECT  DISTINCT hostname " +
+                "FROM [master].[dbo].sysprocesses (nolock) " +
+                "WHERE status <> 'background' AND hostname IS NOT NULL AND hostname <> ' ';";
+
+            // Get names of connected hosts. 
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                var da = new SqlDataAdapter(queryString, connection);
+                da.TableMappings.Add("Table", "HostNames");
+
+                var ds = new DataSet();
+                da.Fill(ds);
+                DataTable hosts = ds.Tables["HostNames"];
+                List<string> rzlt = (
+                    from host in hosts.AsEnumerable()
+                    select host.Field<string>("hostname")
+                    ).ToList();
+                return rzlt;
+            }
+        }
+
+        /// <summary>
+        /// <see cref="http://www.eggheadcafe.com/community/csharp/2/10085799/how-to-send-message-via-lan.aspx"/>
+        /// <seealso cref="http://www.dotnetspider.com/resources/35565-Send-Message-all-hosts-connected-LAN.aspx"/>
+        /// <seealso cref="http://bytes.com/topic/c-sharp/answers/262560-net-send-using-c"/>
+        /// </summary>
+        /// <param name="message"></param>
+        private static void SendNotification(string message)
+        {
+            foreach (string host in DisconnectedHosts)
+            {
+                var objProcess = new Process();
+                objProcess.StartInfo.FileName = "cmd.exe";
+                objProcess.StartInfo.Arguments = String.Format("/C NET SEND {0} {1}", host, message); 
+                objProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                objProcess.StartInfo.CreateNoWindow = true;
+                objProcess.Start();
+                objProcess.WaitForExit();
+            }
+        }
+
+        /// <summary>
+        /// Renames all references to old table in body of stored procedure
+        /// <see cref="http://www.youdidwhatwithtsql.com/altering-database-objects-with-powershell/119"/>
+        /// </summary>
+        /// <param name="oldName">Old table name</param>
+        /// <param name="newName">New table name</param>
+        /// <param name="db">Active database</param>
+        private static List<AlteredDependencyDbo> CorrectStoredProcedure(Database db, string oldName, string newName)
+        {
+            string regexTemplate = String.Format(@"\b{0}\b", oldName);        // @"^.*\b{0}\b.*$"
+            var rg = new Regex(regexTemplate, RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
+            string body;
+            var rzlt = new List<AlteredDependencyDbo>();
+
+            CorrectStoredProcedures(db, rg, newName, rzlt);
+            CorrectViews(db, rg, newName, rzlt);
+            CorrectUserDefinedFunctions(db, rg, newName, rzlt);
+
+            foreach (Trigger trg in db.Triggers)
+            {
+                bool isForbidden = trg.ImplementationType == ImplementationType.SqlClr || trg.IsEncrypted || trg.IsSystemObject;
+                if (!isForbidden)
+                {
+                    body = trg.TextBody;
+                    if (rg.IsMatch(body))
+                    {
+                        trg.TextBody = rg.Replace(body, newName);
+                        trg.Alter();
+                        rzlt.Add(new AlteredDependencyDbo() { ObjectType = DbObjectType.Trigger, Name = trg.Name });
+                    }
+                }
+            }
+
+            return rzlt;
+        }
+
+        /// <summary>
+        /// Procedure processes normal procedures only excluding encrypted, system and CLR procedures
+        /// </summary>
+        /// <param name="db">database</param>
+        /// <param name="rg">Regular expression for replacing text</param>
+        /// <param name="newName">New name of renamed table (old one is stored in regular expression</param>
+        /// <param name="rzlt">List with names modified objects.</param>
+        private static void CorrectStoredProcedures(Database db, Regex rg, string newName, List<AlteredDependencyDbo> rzlt)
+        {
+            DataTable dt = db.EnumObjects(DatabaseObjectTypes.StoredProcedure);
+            var procList = 
+                from sp in dt.AsEnumerable()
+                where String.Compare(sp.Field<string>("Schema"), "sys", true) != 0
+                select sp.Field<string>("Name");
+
+            foreach (string name in procList)
+            {
+                StoredProcedure sp = db.StoredProcedures[name];
+                if (sp == null)
+                    continue;
+
+                if (!(sp.ImplementationType == ImplementationType.SqlClr || sp.IsEncrypted || sp.IsSystemObject))
+                {
+                    string body = sp.TextBody;
+                    if (String.IsNullOrEmpty(body))
+                        continue;
+                    if (rg.IsMatch(body))
+                    {
+                        sp.TextBody = rg.Replace(body, newName);
+                        sp.Alter();
+                        rzlt.Add(new AlteredDependencyDbo() { ObjectType = DbObjectType.StoredProcedure, Name = sp.Name });
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Procedure processes normal views only excluding encrypted, system views.
+        /// </summary>
+        /// <param name="db">database</param>
+        /// <param name="rg">Regular expression for replacing text</param>
+        /// <param name="newName">New name of renamed table (old one is stored in regular expression</param>
+        /// <param name="rzlt">List with names modified objects.</param>
+        private static void CorrectViews(Database db, Regex rg, string newName, List<AlteredDependencyDbo> rzlt)
+        {
+            DataTable dt = db.EnumObjects(DatabaseObjectTypes.View);
+            var viewList =
+                from sp in dt.AsEnumerable()
+                where String.Compare(sp.Field<string>("Schema"), "sys", true) != 0 &&
+                        String.Compare(sp.Field<string>("Schema"), "INFORMATION_SCHEMA", true) != 0
+                select sp.Field<string>("Name");
+
+            foreach (string name in viewList)
+            {
+                View vw = db.Views[name];
+                if (vw == null)
+                    continue;
+
+                if (!(vw.IsEncrypted || vw.IsSystemObject))
+                {
+                    string body = vw.TextBody;
+                    if (String.IsNullOrEmpty(body))
+                        continue;
+
+                    if (rg.IsMatch(body))
+                    {
+                        vw.TextBody = rg.Replace(body, newName);
+                        vw.Alter();
+                        rzlt.Add(new AlteredDependencyDbo() { ObjectType = DbObjectType.StoredProcedure, Name = vw.Name });
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Procedure processes normal UDF only excluding encrypted, system and CLR UDF
+        /// </summary>
+        /// <param name="db">database</param>
+        /// <param name="rg">Regular expression for replacing text</param>
+        /// <param name="newName">New name of renamed table (old one is stored in regular expression</param>
+        /// <param name="rzlt">List with names modified objects.</param>
+        private static void CorrectUserDefinedFunctions(Database db, Regex rg, string newName, List<AlteredDependencyDbo> rzlt)
+        {
+            DataTable dt = db.EnumObjects(DatabaseObjectTypes.UserDefinedFunction);
+            var funcList =
+                from udf in dt.AsEnumerable()
+                where String.Compare(udf.Field<string>("Schema"), "sys", true) != 0
+                select udf.Field<string>("Name");
+
+            foreach (string name in funcList)
+            {
+                UserDefinedFunction udf = db.UserDefinedFunctions[name];
+                if (udf == null)
+                    continue;
+
+                if (!(udf.ImplementationType == ImplementationType.SqlClr || udf.IsEncrypted || udf.IsSystemObject))
+                {
+                    string body = udf.TextBody;
+                    if (String.IsNullOrEmpty(body))
+                        continue;
+
+                    if (rg.IsMatch(body))
+                    {
+                        udf.TextBody = rg.Replace(body, newName);
+                        udf.Alter();
+                        rzlt.Add(new AlteredDependencyDbo() { ObjectType = DbObjectType.StoredProcedure, Name = udf.Name });
+                    }
+                }
             }
         }
     }

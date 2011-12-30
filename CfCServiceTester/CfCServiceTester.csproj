@@ -36,18 +36,27 @@
     <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Program Files\Microsoft SQL Server\100\SDK\Assemblies\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.SqlServer.Management.Sdk.Sfc, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Program Files\Microsoft SQL Server\100\SDK\Assemblies\Microsoft.SqlServer.Management.Sdk.Sfc.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.SqlServer.Smo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Program Files\Microsoft SQL Server\100\SDK\Assemblies\Microsoft.SqlServer.Smo.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.SqlServer.SmoExtended, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Program Files\Microsoft SQL Server\100\SDK\Assemblies\Microsoft.SqlServer.SmoExtended.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SqlEnum, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Program Files\Microsoft SQL Server\100\SDK\Assemblies\Microsoft.SqlServer.SqlEnum.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -68,6 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CustomControls\DatabaseBackupContent.ascx" />
+    <Content Include="CustomControls\ModifyTableContent.ascx" />
     <Content Include="CustomControls\StartPageContent.ascx" />
     <Content Include="Images\ajax-loader.gif" />
     <Content Include="Images\boxy-ne.png" />
@@ -81,6 +91,7 @@
     <Content Include="Scripts\jquery-1.7.1.min.js" />
     <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="Scripts\jquery.boxy.js" />
+    <Content Include="Scripts\ModifyTableStepEventHandlers.js" />
     <Content Include="Scripts\RSA.js" />
     <Content Include="Scripts\RSA.min.js" />
     <Content Include="Styles\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
@@ -137,6 +148,13 @@
     <Compile Include="CustomControls\DatabaseBackupContent.ascx.designer.cs">
       <DependentUpon>DatabaseBackupContent.ascx</DependentUpon>
     </Compile>
+    <Compile Include="CustomControls\ModifyTableContent.ascx.cs">
+      <DependentUpon>ModifyTableContent.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CustomControls\ModifyTableContent.ascx.designer.cs">
+      <DependentUpon>ModifyTableContent.ascx</DependentUpon>
+    </Compile>
     <Compile Include="CustomControls\StartPageContent.ascx.cs">
       <DependentUpon>StartPageContent.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -167,9 +185,11 @@
     <Compile Include="WEBservice\CfcWebService_Utilities.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WEBservice\DataObjects\AlteredDependencyDbo.cs" />
     <Compile Include="WEBservice\DataObjects\BackupRestoreStatus.cs" />
     <Compile Include="WEBservice\DataObjects\CreateDbConnectionResponse.cs" />
     <Compile Include="WEBservice\DataObjects\DatabaseDbo.cs" />
+    <Compile Include="WEBservice\DataObjects\DataTablesDbo.cs" />
     <Compile Include="WEBservice\DataObjects\DbLogicalFileNames.cs" />
     <Compile Include="WEBservice\DataObjects\EnumerateBackupFilesResponse.cs" />
     <Compile Include="WEBservice\DataObjects\RsaParametersDbo.cs" />

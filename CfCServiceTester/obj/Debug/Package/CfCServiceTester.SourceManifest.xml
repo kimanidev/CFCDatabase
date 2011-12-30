@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<sitemanifest>
-  <IisApp path="C:\Gedimino\Norman\CfCServiceTester\CfCServiceTester\obj\Debug\Package\PackageTmp" />
-  <setAcl path="C:\Gedimino\Norman\CfCServiceTester\CfCServiceTester\obj\Debug\Package\PackageTmp" setAclResourceType="Directory" />
-  <setAcl path="C:\Gedimino\Norman\CfCServiceTester\CfCServiceTester\obj\Debug\Package\PackageTmp" setAclUser="anonymousAuthenticationUser" setAclResourceType="Directory" />
-</sitemanifest>

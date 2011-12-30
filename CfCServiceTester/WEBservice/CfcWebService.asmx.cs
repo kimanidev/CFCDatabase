@@ -115,6 +115,36 @@ namespace CfCServiceTester.WEBservice
         }
 
         /// <summary>
+        /// List of tables in selected database
+        /// </summary>
+        /// <param name="serverName">Server's name</param>
+        /// <param name="databaseName">Name of selected database</param>
+        /// <returns><see cref="DataTableListDbo"/></returns>
+        [WebMethod]
+        public DataTableListDbo EnumerateTables(string serverName, string databaseName)
+        {
+            try
+            {
+                Server server = new Server(serverName);
+                if (server == null)
+                    return new DataTableListDbo() { IsSuccess = false, ErrorMessage = "Invalid server's name." };
+                Database db = server.Databases[databaseName];
+                if (db == null)
+                    return new DataTableListDbo() { IsSuccess = false, ErrorMessage = "Invalid name of database." };
+
+                var rzlt = new List<string>();
+                foreach (Table currentTable in db.Tables)
+                    rzlt.Add(currentTable.Name);
+
+                return new DataTableListDbo() { IsSuccess = true, TableNames = rzlt };
+            }
+            catch (Exception ex)
+            {
+                return new DataTableListDbo() { IsSuccess = false, ErrorMessage = ex.Message };
+            }
+        }
+
+        /// <summary>
         /// Makes DB connection
         /// </summary>
         /// <param name="dataSource">SQL server's name</param>
@@ -156,9 +186,10 @@ namespace CfCServiceTester.WEBservice
         /// <param name="directory">Directory where backup file would be stored</param>
         /// <param name="file">File name of the backuo file</param>
         /// <param name="overWriteMode"><code>true</code> - delete existing file</param>
-        /// <returns></returns>
+        /// <param name="singleUserMode"><code>true</code> - put database to single user mode</param>
+        /// <returns><see cref="BackupStatus"/></returns>
         [WebMethod(EnableSession = true)]
-        public BackupStatus BackupDatabase(string directory, string file, bool overWriteMode)
+        public BackupStatus BackupDatabase(string directory, string file, bool overWriteMode, bool singleUserMode)
         {
             try
             {
@@ -173,7 +204,18 @@ namespace CfCServiceTester.WEBservice
                 }
                 else
                     RenameFile(fileName);
-                long fileSize = MakeBackup(fileName);
+                
+                long fileSize;
+                if (singleUserMode)
+                {
+                    bool isSingleMode = SetSingleMode(DatabaseName);
+                    fileSize = MakeBackup(fileName);
+                    if (isSingleMode)
+                        SetMultiUserMode(DatabaseName);
+                }
+                else
+                    fileSize = MakeBackup(fileName);
+
                 return new BackupStatus() { IsSuccess = true, FileSize = fileSize };
             }
             catch (Exception ex)
@@ -217,9 +259,10 @@ namespace CfCServiceTester.WEBservice
         /// <param name="directory">Directory with with backup files</param>
         /// <param name="file">Restore database from this file</param>
         /// <param name="withReplace"><code>true</code> - replace existing database</param>
+        /// <param name="singleUserMode"><code>true</code> - put database to single user mode</param>
         /// <returns><see cref="RestoreStatus"/></returns>
         [WebMethod(EnableSession = true)]
-        public RestoreStatus RestoreDatabase(string dbName, string directory, string file, bool withReplace)
+        public RestoreStatus RestoreDatabase(string dbName, string directory, string file, bool withReplace, bool singleUserMode)
         {
             try
             {
@@ -227,7 +270,12 @@ namespace CfCServiceTester.WEBservice
                     directory += @"\";
                 string fileName = Path.Combine(directory, file);
 
+                if (singleUserMode)
+                    SetSingleMode(dbName);
+
                 Restore(fileName, dbName, withReplace);
+                SetMultiUserMode(dbName);
+
                 return new RestoreStatus() { IsSuccess = true };
             }
             catch (Exception ex)
@@ -235,5 +283,32 @@ namespace CfCServiceTester.WEBservice
                 return new RestoreStatus() { IsSuccess = false, ErrorMessage = ex.Message };
             }
         }
+
+        /// <summary>
+        /// <see cref="http://msdn.microsoft.com/en-us/library/microsoft.sqlserver.management.smo.table.rename.aspx"/>
+        /// <seealso cref="http://www.youdidwhatwithtsql.com/altering-database-objects-with-powershell/119"/>
+        /// </summary>
+        /// <param name="oldName">Old table name</param>
+        /// <param name="newName">New table name</param>
+        /// <param name="singleUserMode"><code>true</code> - set single user mode</param>
+        /// <returns><see cref="RenameTableStatus"/></returns>
+        [WebMethod(EnableSession = true)]
+        public RenameTableStatus RenameTable(string oldName, string newName, bool singleUserMode)
+        {
+            try
+            {
+                if (singleUserMode)
+                    SetSingleMode(DatabaseName);
+                List<AlteredDependencyDbo> dependecies = RenameTheTable(oldName, newName);
+                if (singleUserMode)
+                    SetMultiUserMode(DatabaseName);
+                return new RenameTableStatus() { IsSuccess = true, AlteredDependencies = dependecies };
+            }
+            catch (Exception ex)
+            {
+                return new RenameTableStatus() { IsSuccess = false, ErrorMessage = ex.Message };
+            }
+        }
+
     }
 }

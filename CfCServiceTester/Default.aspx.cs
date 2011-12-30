@@ -42,6 +42,11 @@ namespace CfCServiceTester
             var ctrl = this.BackupPageContent.FindControl(controlName);
             return ctrl == null ? String.Empty : ctrl.ClientID;
         }
+        protected string GetThirdPageControlId(string controlName)
+        {
+            var ctrl = this.ModifyTablePageContent.FindControl(controlName);
+            return ctrl == null ? String.Empty : ctrl.ClientID;
+        }
 
         public _Default() : base()
         {
@@ -96,13 +101,17 @@ namespace CfCServiceTester
             }
             else
             {
-                if (wizard.ActiveStepIndex == 0)
+                switch (wizard.ActiveStepIndex)// == 0)
                 {
-                    this.StartPageContent.setConnectedLoginText(roles);
-                }
-                else if (wizard.ActiveStepIndex == 1)
-                {
-                    this.BackupPageContent.SetDefaultFileName();
+                    case 0:
+                        this.StartPageContent.setConnectedLoginText(roles);
+                        break;
+                    case 1:
+                        this.BackupPageContent.SetDefaultFileName();
+                        break;
+                    case 2:
+                        this.ModifyTablePageContent.SetupPage();
+                        break;
                 }
             }
         }

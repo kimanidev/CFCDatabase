@@ -2,6 +2,7 @@
 
 <%@ Register TagPrefix="con" TagName="StartPageContent" Src="~/CustomControls/StartPageContent.ascx" %>
 <%@ Register TagPrefix="con" TagName="BackupPageContent" Src="~/CustomControls/DatabaseBackupContent.ascx" %>
+<%@ Register TagPrefix="con" TagName="ModifyTablePageContent" Src="~/CustomControls/ModifyTableContent.ascx" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -22,6 +23,7 @@
                 <asp:ScriptReference Path="~/Scripts/jquery-1.7.1.min.js" />
                 <asp:ScriptReference Path="~/Scripts/ConnectionStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/BackupStepEventHandlers.js" />
+                <asp:ScriptReference Path="~/Scripts/ModifyTableStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/jquery.boxy.js" />
                 <asp:ScriptReference Path="~/Scripts/RSA.min.js" />
 
@@ -37,7 +39,9 @@
                 <asp:WizardStep runat="server" title="Backup and Restore">
                     <con:BackupPageContent ID="BackupPageContent" runat="server" />
                 </asp:WizardStep>
-
+                <asp:WizardStep runat="server" title="Modify table">
+                    <con:ModifyTablePageContent ID="ModifyTablePageContent" runat="server" />
+                </asp:WizardStep>
             </WizardSteps>
             <navigationbuttonstyle borderwidth="1" width="80" borderstyle="Solid" backcolor="lightgray" /> 
             <headerstyle horizontalalign="Right" font-bold="true" font-size="120%" /> 
@@ -70,6 +74,15 @@
                         'txtFileName1Id': '#<%= (GetSecondPageControlId("txtFileName1")) %>',
                         'spnRestoreOK1Id': '#<%= (GetSecondPageControlId("spnRestoreOK1")) %>',
                         'spnRestoreError1Id': '#<%= (GetSecondPageControlId("spnRestoreError1")) %>',
+                        'chkSingleModeId': '#<%= (GetSecondPageControlId("chkSingleMode")) %>',
+
+                        'txtServerName2Id': '#<%= (GetThirdPageControlId("txtServerName2")) %>',
+                        'txtDatabaseName2Id': '#<%= (GetThirdPageControlId("txtDatabaseName2")) %>',
+                        'txtTable2Id': '#<%= (GetThirdPageControlId("txtTable2")) %>',
+                        'txtNewTable2Id': '#<%= (GetThirdPageControlId("txtNewTable2")) %>',
+                        'spnRenameTableError2Id': '#<%= (GetThirdPageControlId("spnRenameTableError2")) %>',
+                        'spnRenameTableOK2Id': '#<%= (GetThirdPageControlId("spnRenameTableOK2")) %>',
+                        '_chkSingleMode2Id': '#<%= (GetThirdPageControlId("chkSingleMode2")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",
@@ -78,12 +91,7 @@
                         'rsaModulus': "<%= RsaModulus %>"
                     });
         }
-/*
-        function pageLoad() {
-            var man = $find('CfcTestManager');
-            man.greet();
-        }
-*/
+
     // ]]>
     </script>
 
