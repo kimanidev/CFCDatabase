@@ -76,6 +76,7 @@
     <Reference Include="System.Web.Mobile" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CustomControls\ColumnEditBox.ascx" />
     <Content Include="CustomControls\DatabaseBackupContent.ascx" />
     <Content Include="CustomControls\ModifyTableContent.ascx" />
     <Content Include="CustomControls\StartPageContent.ascx" />
@@ -88,6 +89,7 @@
     <Content Include="Scripts\BackupStepEventHandlers.js" />
     <Content Include="Scripts\CfcServiceTestManager.js" />
     <Content Include="Scripts\ConnectionStepEventHandlers.js" />
+    <Content Include="Scripts\ColumnEditBoxEventHandler.js" />
     <Content Include="Scripts\jquery-1.7.1.min.js" />
     <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="Scripts\jquery.boxy.js" />
@@ -113,6 +115,7 @@
     <Content Include="Styles\base\jquery.ui.theme.css" />
     <Content Include="Styles\boxy.css" />
     <Content Include="Styles\Styles.css" />
+    <Content Include="Styles\FormattedTable.css" />
     <Content Include="Styles\ui-lightness\images\ui-anim_basic_16x16.gif" />
     <Content Include="Styles\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
     <Content Include="Styles\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
@@ -141,6 +144,13 @@
     <Content Include="WEBservice\CfcWebService.asmx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomControls\ColumnEditBox.ascx.cs">
+      <DependentUpon>ColumnEditBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CustomControls\ColumnEditBox.ascx.designer.cs">
+      <DependentUpon>ColumnEditBox.ascx</DependentUpon>
+    </Compile>
     <Compile Include="CustomControls\DatabaseBackupContent.ascx.cs">
       <DependentUpon>DatabaseBackupContent.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -189,9 +199,12 @@
     <Compile Include="WEBservice\DataObjects\BackupRestoreStatus.cs" />
     <Compile Include="WEBservice\DataObjects\CreateDbConnectionResponse.cs" />
     <Compile Include="WEBservice\DataObjects\DatabaseDbo.cs" />
+    <Compile Include="WEBservice\DataObjects\DataColumnDbo.cs" />
     <Compile Include="WEBservice\DataObjects\DataTablesDbo.cs" />
     <Compile Include="WEBservice\DataObjects\DbLogicalFileNames.cs" />
     <Compile Include="WEBservice\DataObjects\EnumerateBackupFilesResponse.cs" />
+    <Compile Include="WEBservice\DataObjects\EnumerateColumnsResponse.cs" />
+    <Compile Include="WEBservice\DataObjects\UpdateColumnRequest.cs" />
     <Compile Include="WEBservice\DataObjects\RsaParametersDbo.cs" />
     <Compile Include="WEBservice\DataObjects\SqlServerDbo.cs" />
     <Compile Include="WEBservice\InternalTypes\UsrNamePassword.cs" />

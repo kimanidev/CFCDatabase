@@ -1,4 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ModifyTableContent.ascx.cs" Inherits="CfCServiceTester.CustomControls.ModifyTableContent" %>
+<%@ Register TagPrefix="con" TagName="ColumnEditor" Src="~/CustomControls/ColumnEditBox.ascx" %>
 
 <table style="width:45em;">
     <colgroup>
@@ -64,4 +65,58 @@
             </div>
         </td>
     </tr>
+    <tr>
+        <td colspan="3"><hr /></td>
+    </tr>
+    <tr>
+        <td>
+            <a href="#" title="Get information about columns in the table." onclick="return GetColumnInfo(this);">Get columns</a>
+        </td>
+        <td colspan="2">
+            <span id="spnGetColumnsError2" class="ErrorMessage" style="display: none;" />
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <div id="DynamicTable2" style="display:none; width: 100%;" >
+                <table style="width: 100%;" class="FormattedTable" >
+                    <colgroup>
+                        <col style="width:8%" />
+                        <col style="width:8%" />
+                        <col style="width:30%" />
+                        <col style="width:20%" />
+                        <col style="width:10%" />
+                        <col style="width:8%" />
+                        <col style="width:8%" />
+                        <col style="width:8%" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Iden-<br />tity</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Length</th>
+                            <th>Preci-<br />sion</th>
+                            <th>Scale</th>
+                            <th>Null</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="8">
+                                <a href="#" onclick="return InsertNewColumn();" title="Append new column">Add column</a>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </td>
+    </tr>
 </table>
+
+<div id="ColumnEditor2" style="display: none; width: 26em; height:auto;" class='boxy' >
+    <con:ColumnEditor ID="ColumnEditorBox2" runat="server" />
+</div>

@@ -11,6 +11,7 @@
     <title>CfC Service Tester</title>
     <link href="Styles/Styles.css" rel="stylesheet" type="text/css"/>
     <link href="Styles/boxy.css" rel="stylesheet" type="text/css"/>
+    <link href="Styles/FormattedTable.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -24,6 +25,7 @@
                 <asp:ScriptReference Path="~/Scripts/ConnectionStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/BackupStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/ModifyTableStepEventHandlers.js" />
+                <asp:ScriptReference Path="~/Scripts/ColumnEditBoxEventHandler.js" />
                 <asp:ScriptReference Path="~/Scripts/jquery.boxy.js" />
                 <asp:ScriptReference Path="~/Scripts/RSA.min.js" />
 
@@ -82,7 +84,15 @@
                         'txtNewTable2Id': '#<%= (GetThirdPageControlId("txtNewTable2")) %>',
                         'spnRenameTableError2Id': '#<%= (GetThirdPageControlId("spnRenameTableError2")) %>',
                         'spnRenameTableOK2Id': '#<%= (GetThirdPageControlId("spnRenameTableOK2")) %>',
-                        '_chkSingleMode2Id': '#<%= (GetThirdPageControlId("chkSingleMode2")) %>',
+                        'chkSingleMode2Id': '#<%= (GetThirdPageControlId("chkSingleMode2")) %>',
+
+                        'txtColumnName3Id': '#<%= (GetEditColumnBoxControlId("txtColumnName3")) %>',
+                        'ddlDatatype3Id': '#<%= (GetEditColumnBoxControlId("ddlDatatype3")) %>',
+                        'txtMaximumLength3Id': '#<%= (GetEditColumnBoxControlId("txtMaximumLength3")) %>',
+                        'txtNumericPrecision3Id': '#<%= (GetEditColumnBoxControlId("txtNumericPrecision3")) %>',
+                        'txtNumericScale3Id': '#<%= (GetEditColumnBoxControlId("txtNumericScale3")) %>',
+                        'chlColumnProperties3Id': '#<%= (GetEditColumnBoxControlId("chlColumnProperties3")) %>',
+                        'txtDefaultValue3Id': '#<%= (GetEditColumnBoxControlId("txtDefaultValue3")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",

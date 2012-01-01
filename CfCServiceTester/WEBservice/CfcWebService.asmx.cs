@@ -310,5 +310,53 @@ namespace CfCServiceTester.WEBservice
             }
         }
 
+        /// <summary>
+        /// Returns description of all columns in the table
+        /// </summary>
+        /// <param name="serverName">Server name</param>
+        /// <param name="dbName">database name</param>
+        /// <param name="tableName">table name</param>
+        /// <returns><see cref="EnumerateColumnsResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public EnumerateColumnsResponse EnumerateColumns(string serverName, string dbName, string tableName)
+        {
+            try
+            {
+                var rzlt = new EnumerateColumnsResponse();
+                rzlt.Columns.AddRange(GetTableColumns(tableName));
+                rzlt.IsSuccess = true;
+                return rzlt;
+            }
+            catch (Exception ex)
+            {
+                return new EnumerateColumnsResponse() { IsSuccess = false, ErrorMessage = ex.Message };
+            }
+        }
+
+        /// <summary>
+        /// Inserts new column into the table defined in the parameter
+        /// <see cref="http://www.mssqltips.com/sqlservertip/1826/getting-started-with-sql-server-management-objects-smo/"/>
+        /// </summary>
+        /// <param name="columnRequest"><see cref="UpdateColumnRequest"/></param>
+        /// <returns>Definition of the new column</returns>
+        [WebMethod(EnableSession = true)]
+        public InsertColumnResponse InsertColumn(UpdateColumnRequest columnRequest)
+        {
+            try
+            {
+                DataColumnDbo column = InsertColumn(columnRequest.Table, columnRequest.Column);
+                return new InsertColumnResponse() { IsSuccess = true, Column = column };
+            }
+            catch (Exception ex)
+            {
+                var msg = new StringBuilder(ex.Message);
+                for (Exception inner = ex.InnerException; inner != null; inner = inner.InnerException)
+                {
+                    msg.Append("\n");
+                    msg.Append(inner.Message);
+                }
+                return new InsertColumnResponse() { IsSuccess = false, ErrorMessage = msg.ToString() };
+            }
+        }
     }
 }

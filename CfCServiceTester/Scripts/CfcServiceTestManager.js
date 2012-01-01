@@ -32,12 +32,21 @@ CfcServiceTestManager.CfcComponent = function () {
     this._spnRenameTableOK2Id = '';         // Span with OK message (Modify table part)
     this._chkSingleMode2Id = '';            // Checkbox for switching to single user mode (Modify table part)
 
+    this._txtColumnName3Id = '';            // Column name (Column Edit window)
+    this._ddlDatatype3Id = '';              // SQL data type dropdown (Column Edit window)
+    this._txtMaximumLength3Id = '';         // Maximum Length (Column Edit window)
+    this._txtNumericPrecision3Id = '';      // Numeric Precision (Column Edit window)
+    this._txtNumericScale3Id = '';          // Numeric Scale (Column Edit window)
+    this._chlColumnProperties3Id = '';      // Column properties (primary kei, is null, identity)
+    this._txtDefaultValue3Id = '';          // Default value (Column Edit window)
+
     this._localServersOnly = true;          // true - look for local servers only, false - all available SQL servers
     this._accessibleDatabasesOnly = true;   // true - enumerate accessable databases only, false - all databases on the server
 
     this._rsaExponent = '';         // RSA parameters: exponent
     this._rsaModulus = '';          //                 Modulus
 
+    this._columnEditor = null;      // Column editor (boxy dialog, object)
     this._userRoles = [];
 }
 CfcServiceTestManager.CfcComponent.prototype = {
@@ -94,6 +103,13 @@ CfcServiceTestManager.CfcComponent.prototype = {
     },
     set_divLoginTooltip: function (value) {
         this._divLoginTooltip = value;
+    },
+
+    get_columnEditor: function () {
+        return this._columnEditor;
+    },
+    set_columnEditor: function (value) {
+        this._columnEditor = value;
     },
 
     get_userRoles: function () {
@@ -215,11 +231,60 @@ CfcServiceTestManager.CfcComponent.prototype = {
         this._chkSingleMode2Id = value;
     },
 
+    get_txtColumnName3Id: function () {
+        return this._txtColumnName3Id;
+    },
+    set_txtColumnName3Id: function (value) {
+        this._txtColumnName3Id = value;
+    },
+
+    get_ddlDatatype3Id: function () {
+        return this._ddlDatatype3Id;
+    },
+    set_ddlDatatype3Id: function (value) {
+        this._ddlDatatype3Id = value;
+    },
+
+    get_txtMaximumLength3Id: function () {
+        return this._txtMaximumLength3Id;
+    },
+    set_txtMaximumLength3Id: function (value) {
+        this._txtMaximumLength3Id = value;
+    },
+
+    get_txtNumericPrecision3Id: function () {
+        return this._txtNumericPrecision3Id;
+    },
+    set_txtNumericPrecision3Id: function (value) {
+        this._txtNumericPrecision3Id = value;
+    },
+
+    get_txtNumericScale3Id: function () {
+        return this._txtNumericScale3Id;
+    },
+    set_txtNumericScale3Id: function (value) {
+        this._txtNumericScale3Id = value;
+    },
+
+    get_chlColumnProperties3Id: function () {
+        return this._chlColumnProperties3Id;
+    },
+    set_chlColumnProperties3Id: function (value) {
+        this._chlColumnProperties3Id = value;
+    },
+
     get_localServersOnly: function () {
         return this._localServersOnly;
     },
     set_localServersOnly: function (value) {
         this._localServersOnly = value;
+    },
+
+    get_txtDefaultValue3Id: function () {
+        return this._txtDefaultValue3Id;
+    },
+    set_txtDefaultValue3Id: function (value) {
+        this._txtDefaultValue3Id = value;
     },
 
     get_spnRenameTableError2Id: function () {

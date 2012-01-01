@@ -501,5 +501,173 @@ namespace CfCServiceTester.WEBservice
                 }
             }
         }
+
+        /// <summary>
+        /// Returns list with columns that represents primary key
+        /// </summary>
+        /// <param name="aTable">Current table, <see cref="Table"/></param>
+        /// <returns>List with names of columns in the primary key.</returns>
+        private static List<string> GetPrimaryKeyColumns(Table aTable)
+        {
+            var keyQuery = (
+                from Index ind in aTable.Indexes
+                where ind.IndexKeyType == IndexKeyType.DriPrimaryKey
+                select ind
+                ).FirstOrDefault();
+            if (keyQuery == null)
+                return new List<string>();
+            else
+            {
+                var rzlt = new List<string>();
+                foreach (IndexedColumn clmn in keyQuery.IndexedColumns)
+                    rzlt.Add(clmn.Name);
+                return rzlt;
+            }
+        }
+
+        /// <summary>
+        /// Creates column in the table
+        /// </summary>
+        /// <param name="aTable">Table, <see cref="Table"/></param>
+        /// <param name="column">Column description <see cref="DataColumnDbo"/></param>
+        /// <returns>SMO column, <see cref="Column"/></returns>
+        private static Column CreateColumn(Table aTable, DataColumnDbo column)
+        {
+           SqlDataType sqlType = (SqlDataType)Enum.Parse(typeof(SqlDataType), column.SqlDataType, true);
+            int length;
+            if (column.MaximumLength.HasValue && column.MaximumLength.Value > 0)
+                length = column.MaximumLength.Value;
+            else
+                length = column.NumericPrecision ?? 0;
+
+            var newColumn = new Column(aTable, column.Name, 
+                                       GetSmoType(sqlType, length, column.NumericPrecision ?? 0, column.NumericScale ?? 0))
+            {
+                Identity = column.IsIdentity,
+                Nullable = column.IsNullable,
+            };
+            if (!String.IsNullOrEmpty(column.Default))
+            {
+                newColumn.AddDefaultConstraint();
+                newColumn.DefaultConstraint.Text = column.Default;
+            }
+            if (newColumn.Identity)
+            {
+                newColumn.IdentityIncrement = 1;
+                newColumn.IdentitySeed = 1;
+            }
+
+            aTable.Columns.Add(newColumn);
+            return newColumn;
+        }
+
+        private static Microsoft.SqlServer.Management.Smo.DataType GetSmoType(SqlDataType sqlType, int length, int precision, int scale)
+        {
+            switch (sqlType)
+            {
+                case SqlDataType.BigInt:
+                    return DataType.BigInt;
+                case SqlDataType.Binary:
+                    return new DataType(SqlDataType.Binary, length);
+                case SqlDataType.Bit:
+                    return DataType.Bit;
+                case SqlDataType.Char:
+                    return new DataType(SqlDataType.Char, length);
+                case SqlDataType.Date:
+                    return DataType.Date;
+                case SqlDataType.DateTime:
+                    return DataType.DateTime;
+                case SqlDataType.Decimal:
+                    return new DataType(SqlDataType.Decimal, scale, precision);
+                case SqlDataType.Float:
+                    return DataType.Float;
+                case SqlDataType.Geography:
+                    return DataType.Geography;
+                case SqlDataType.Geometry:
+                    return DataType.Geometry;
+                case SqlDataType.Image:
+                    return DataType.Image;
+                case SqlDataType.Int:
+                    return DataType.Int;
+                case SqlDataType.Money:
+                    return DataType.Money;
+                case SqlDataType.NChar:
+                    return new DataType(SqlDataType.NChar, length);
+                case SqlDataType.NText:
+                    return DataType.NText;
+                case SqlDataType.NVarChar:
+                    return new DataType(SqlDataType.NVarChar, length);
+                case SqlDataType.NVarCharMax:
+                    return DataType.NVarCharMax;
+                case SqlDataType.Real:
+                    return DataType.Real;
+                case SqlDataType.SmallDateTime:
+                    return DataType.SmallDateTime;
+                case SqlDataType.SmallInt:
+                    return DataType.SmallInt;
+                case SqlDataType.SmallMoney:
+                    return DataType.SmallMoney;
+                case SqlDataType.SysName:
+                    return DataType.SysName;
+                case SqlDataType.Text:
+                    return DataType.Text;
+                case SqlDataType.Timestamp:
+                    return DataType.Timestamp;
+                case SqlDataType.TinyInt:
+                    return DataType.TinyInt;
+                case SqlDataType.UniqueIdentifier:
+                    return DataType.UniqueIdentifier;
+                case SqlDataType.VarBinary:
+                    return new DataType(SqlDataType.VarBinary, length);
+                case SqlDataType.VarBinaryMax:
+                    return DataType.VarBinaryMax;
+                case SqlDataType.VarChar:
+                    return new DataType(SqlDataType.VarChar, length);
+                case SqlDataType.VarCharMax:
+                    return DataType.VarCharMax;
+                case SqlDataType.Variant:
+                    return DataType.Variant;
+                case SqlDataType.Xml:
+                    return new DataType(SqlDataType.Xml);
+                case SqlDataType.DateTimeOffset:
+                    return new DataType(SqlDataType.DateTimeOffset, scale);
+                case SqlDataType.DateTime2:
+                    return new DataType(SqlDataType.DateTime2, scale);
+                default:
+                    return DataType.Int;
+            }
+        }
+
+        private static void InsertColumnIntoPrimarykey(Table table, Column column)
+        {
+            var query = (
+                from Index ind in table.Indexes
+                where ind.IndexKeyType == IndexKeyType.DriPrimaryKey
+                select ind).FirstOrDefault();
+            if (query == null)
+            {
+                var primaryKeyIndex = new Index(table, String.Concat("PK_", table.Name)) { IndexKeyType = IndexKeyType.DriPrimaryKey };
+                primaryKeyIndex.IndexedColumns.Add(new IndexedColumn(primaryKeyIndex, column.Name));
+                table.Indexes.Add(primaryKeyIndex);
+            }
+            else
+                query.IndexedColumns.Add(new IndexedColumn(query, column.Name));
+        }
+
+        public static DataColumnDbo CreateDataColumnDbo(Column clmn, List<string> primaryKeyColumns)
+        {
+            return new DataColumnDbo()
+            {
+                Name = clmn.Name,
+                SqlDataType = clmn.DataType.Name,
+                MaximumLength = clmn.DataType.MaximumLength,
+                NumericPrecision = clmn.DataType.NumericPrecision,
+                NumericScale = clmn.DataType.NumericScale,
+                IsNullable = clmn.Nullable,
+                IsIdentity = clmn.Identity,
+                IsPrimaryKey = primaryKeyColumns.Contains(clmn.Name),
+                Default = clmn.Default,
+            };
+        }
     }
 }

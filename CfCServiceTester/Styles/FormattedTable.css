@@ -1,0 +1,43 @@
+﻿table.FormattedTable
+{
+	border-style:solid;
+	border-width:3px;
+	border-top-color: #3923D6; 
+	border-left-color: #3923D6;
+}
+table.FormattedTableNoBorder
+{
+	border-style:none;
+}
+
+table.FormattedTable th
+{
+	background-color: #3923D6; 
+	color: White;
+}
+
+table.FormattedTable tr.eventRow 
+{
+	background-color: #FAFDFE;
+}
+
+table.FormattedTable tr.oddRow 
+{
+	background-color: #D8F0F8;
+}
+
+table.FormattedTable tr.primaryKeyRow 
+{
+	background-color: #E4C0B1;
+}
+
+table.FormattedTable tfoot tr
+{
+	background-color: #A8A8FF;
+}
+
+table.FormattedTable tfoot tr a:hover
+{
+	color: #FF5353; 
+	font-weight:bolder;
+}

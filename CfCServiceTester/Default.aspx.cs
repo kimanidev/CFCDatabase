@@ -11,6 +11,7 @@ using System.Security.Cryptography;
 using CfCServiceTester.SVC.DataObjects;
 using CfCServiceTester.WEBservice;
 using System.Text;
+using CfCServiceTester.CustomControls;
 
 namespace CfCServiceTester
 {
@@ -45,6 +46,15 @@ namespace CfCServiceTester
         protected string GetThirdPageControlId(string controlName)
         {
             var ctrl = this.ModifyTablePageContent.FindControl(controlName);
+            return ctrl == null ? String.Empty : ctrl.ClientID;
+        }
+        protected string GetEditColumnBoxControlId(string controlName)
+        {
+            var ctrlRoot = this.ModifyTablePageContent.FindControl("ColumnEditorBox2");
+            if (ctrlRoot == null)
+                return String.Empty;
+
+            var ctrl = ((ColumnEditBox)ctrlRoot).FindControl(controlName);
             return ctrl == null ? String.Empty : ctrl.ClientID;
         }
 

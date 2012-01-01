@@ -21,6 +21,7 @@ function PickUpTables() {
     return false;
 }
 
+// Rename table
 function RenameTable(oldNameId, newNameId) {
     var manager = $find('CfcTestManager');
 
@@ -44,6 +45,40 @@ function RenameTable(oldNameId, newNameId) {
     CfCServiceTester.WEBservice.CfcWebService.RenameTable(oldName, newName, singleUserMode, 
                                                           onSuccess_RenameTable, onFailure_EnumerateTables);
     return false;
+}
+
+// Show column info
+function GetColumnInfo(hrefElement) {
+    var manager = $find('CfcTestManager');
+
+    var serverName = $(manager.get_txtServerName2Id()).val();
+    if (!serverName) {
+        alert('Server is not selected.')
+        return false;
+    }
+    var databaseName = $(manager.get_txtDatabaseName2Id()).val();
+    if (!databaseName) {
+        alert('Database is not selected.')
+        return false;
+    }
+    var tableName = $(manager.get_txtTable2Id()).val();
+    if (!tableName) {
+        alert('Table is not selected.')
+        return false;
+    }
+
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateColumns(serverName, databaseName, tableName,
+                                                          onSuccess_EnumerateColumns, onFailure_EnumerateTables);
+    return false;
+}
+
+function InsertNewColumn() {
+    var manager = $find('CfcTestManager');
+
+    var dialog = new Boxy('#ColumnEditor2', 
+            { center: true, modal: true, title: "Create new column", draggable: true, fixed: false}); 
+    manager.set_columnEditor(dialog);
+    dialog.show();
 }
 
 // result is instance of DataTableListDbo class.
@@ -84,8 +119,59 @@ function onSuccess_RenameTable(result)
         $(manager.get_spnRenameTableOK2Id()).hide();
     }
 }
-function AfterRenaming() {
 
+// rsult is instance of EnumerateColumnsResponse
+function onSuccess_EnumerateColumns(result) {
+    var errMessage = $('span#spnGetColumnsError2');
+    if (!result.IsSuccess) {
+        errMessage.text(result.ErrorMessage);
+        errMessage.show();
+    }
+    else {
+        errMessage.hide();
+
+        var aDiv = $('div#DynamicTable2');
+        var body = aDiv.find('table tbody');
+        body.empty();
+        
+        var sb = new Sys.StringBuilder();
+        Array.forEach(result.Columns, AppendRowToTable, sb);
+        var tableBody = sb.toString();
+        body.html(tableBody);
+        aDiv.show();
+    }
+}
+
+// Parameters:
+//  The element argument is the array element that the function will take action on. Instance of the DataColumnDbo class.
+//  The index argument is the index of element, and 
+//  The array argument is the array that contains element.
+//  Context (this) represents string builder (innerHtl for the body element).
+// See http://msdn.microsoft.com/en-us/library/bb397509.aspx
+function AppendRowToTable(element, index, array) {
+    var className = '';
+    if (element.IsPrimaryKey)
+        className = 'primaryKeyRow';
+    else
+        className = index % 2 > 0 ? 'oddRow' : 'eventRow';
+
+    this.append('<tr class="' + className + '"><td>');
+    this.append(element.IsPrimaryKey ? '+' : '&nbsp;');
+    this.append('</td><td>');
+    this.append(element.IsIdentity ? '+' : '&nbsp;');
+    this.append('</td><td class="ColumnName">');
+    this.append(element.Name);
+    this.append('</td><td>');
+    this.append(element.SqlDataType);
+    this.append('</td><td>');
+    this.append(element.MaximumLength > 0 ? element.MaximumLength : '&nbsp;');
+    this.append('</td><td>');
+    this.append(element.NumericPrecision > 0 ? element.NumericPrecision : '&nbsp;');
+    this.append('</td><td>');
+    this.append(element.NumericScale > 0 ? element.NumericScale : '&nbsp;');
+    this.append('</td><td>');
+    this.append(element.IsNullable ? '+' : '&nbsp;');
+    this.append('</td></tr>');
 }
 
 function FillTableDropDown2(result) {

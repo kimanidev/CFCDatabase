@@ -10,96 +10,96 @@
 namespace CfCServiceTester.CustomControls {
     
     
-    public partial class ModifyTableContent {
+    public partial class ColumnEditBox {
         
         /// <summary>
-        /// txtServerName2 control.
+        /// txtColumnName3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtServerName2;
+        protected global::System.Web.UI.WebControls.TextBox txtColumnName3;
         
         /// <summary>
-        /// txtDatabaseName2 control.
+        /// chlColumnProperties3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtDatabaseName2;
+        protected global::System.Web.UI.WebControls.CheckBoxList chlColumnProperties3;
         
         /// <summary>
-        /// chkSingleMode2 control.
+        /// ddlDatatype3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkSingleMode2;
+        protected global::System.Web.UI.WebControls.DropDownList ddlDatatype3;
         
         /// <summary>
-        /// txtTable2 control.
+        /// txtMaximumLength3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtTable2;
+        protected global::System.Web.UI.WebControls.TextBox txtMaximumLength3;
         
         /// <summary>
-        /// btnPickImage control.
+        /// txtNumericPrecision3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ImageButton btnPickImage;
+        protected global::System.Web.UI.WebControls.TextBox txtNumericPrecision3;
         
         /// <summary>
-        /// WaitImage control.
+        /// txtNumericScale3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Image WaitImage;
+        protected global::System.Web.UI.WebControls.TextBox txtNumericScale3;
         
         /// <summary>
-        /// txtNewTable2 control.
+        /// txtDefaultValue3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtNewTable2;
+        protected global::System.Web.UI.WebControls.TextBox txtDefaultValue3;
         
         /// <summary>
-        /// spnRenameTableError2 control.
+        /// btnInsertColumn3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl spnRenameTableError2;
+        protected global::System.Web.UI.WebControls.Button btnInsertColumn3;
         
         /// <summary>
-        /// spnRenameTableOK2 control.
+        /// btnDeleteColumn3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl spnRenameTableOK2;
+        protected global::System.Web.UI.WebControls.Button btnDeleteColumn3;
         
         /// <summary>
-        /// ColumnEditorBox2 control.
+        /// btnEditColumn3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::CfCServiceTester.CustomControls.ColumnEditBox ColumnEditorBox2;
+        protected global::System.Web.UI.WebControls.Button btnEditColumn3;
     }
 }

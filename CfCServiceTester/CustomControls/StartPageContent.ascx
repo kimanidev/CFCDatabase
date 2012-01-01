@@ -20,7 +20,8 @@
                 <span class="Magnifier" style="display:inline-block">
                     <asp:ImageButton ID="btnPickImage" ImageUrl="~/Images/Magnifier-24.png"
                         OnClientClick='return PickServers();'
-                        runat="server" ToolTip="Choose SQL Server from the list" />
+                        runat="server" ToolTip="Choose SQL Server from the list" 
+                TabIndex="10" />
                 </span>
                 <span class="Pauser" style="display:none;">
                     <asp:Image ID="WaitImage" runat="server" ImageUrl="~/Images/ajax-loader.gif" />
@@ -41,7 +42,8 @@
                 <span class="Magnifier" style="display:inline-block">
                     <asp:ImageButton ID="btnSelectDatabase" ImageUrl="~/Images/Magnifier-24.png"
                         OnClientClick='return PickDatabases();'
-                        runat="server" ToolTip="Choose Database name from the list" />
+                        runat="server" ToolTip="Choose Database name from the list" 
+                TabIndex="11" />
                 </span>
                 <span class="Pauser" style="display:none;">
                     <asp:Image ID="WaitImage1" runat="server" ImageUrl="~/Images/ajax-loader.gif" />
@@ -57,15 +59,18 @@
     <tr>
         <td>Login name/password</td>
         <td>
-            <asp:TextBox runat="server" ID="txtLoginName" Width="85%" ToolTip="Login name" />
+            <asp:TextBox runat="server" ID="txtLoginName" Width="85%" 
+                ToolTip="Login name" />
         </td>
         <td>
-            <asp:TextBox runat="server" ID="txtLoginPasswd" Width="85%" ToolTip="Password" TextMode="Password" />
+            <asp:TextBox runat="server" ID="txtLoginPasswd" Width="85%" ToolTip="Password" 
+                TextMode="Password" />
         </td>
     </tr>
     <tr>
         <td style="vertical-align:top;">
-            <a href="#" onclick="return ConnectDatabase();" title="Connect client to database">Connect to database</a>
+            <a href="#" onclick="return ConnectDatabase();" 
+                title="Connect client to database" tabindex="0">Connect to database</a>
         </td>
         <td colspan="2" style="vertical-align:top;" >
             <span runat="server" id="spnConnectionError" class="ErrorMessage" style="display: none;" />
