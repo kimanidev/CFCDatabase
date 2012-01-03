@@ -83,12 +83,13 @@
                     <colgroup>
                         <col style="width:8%" />
                         <col style="width:8%" />
-                        <col style="width:30%" />
-                        <col style="width:20%" />
+                        <col style="width:23%" />
+                        <col style="width:13%" />
                         <col style="width:10%" />
                         <col style="width:8%" />
                         <col style="width:8%" />
                         <col style="width:8%" />
+                        <col style="width:14%" />
                     </colgroup>
                     <thead>
                         <tr>
@@ -100,13 +101,14 @@
                             <th>Preci-<br />sion</th>
                             <th>Scale</th>
                             <th>Null</th>
+                            <th>Default<br />Value</th>
                         </tr>
                     </thead>
                     <tbody>
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="8">
+                            <td colspan="9">
                                 <a href="#" onclick="return InsertNewColumn();" title="Append new column">Add column</a>
                             </td>
                         </tr>

@@ -1,4 +1,5 @@
-﻿function InsertColumn3(insertButton) {
+﻿// Insert new Column
+function InsertColumn3(insertButton) {
     var manager = $find('CfcTestManager');
 
     if (!ValidateColumnName(true))
@@ -109,7 +110,13 @@ function onSuccess_InsertColumn(result) {
     if (result.IsSuccess) {
         var boxy = manager.get_columnEditor()
         boxy.hide();
-        GetColumnInfo(null);
+        //GetColumnInfo(null);
+
+        var sb = new Sys.StringBuilder();
+        var AppendRowToTableDelegate = Function.createDelegate(sb, AppendRowToTable);
+        var rowNumber = $('div#DynamicTable2 table tbody tr').length;
+        AppendRowToTableDelegate(result.Column, rowNumber, []);
+        $('div#DynamicTable2 table tbody:last').append(sb.toString());
     }
     else {
         alert(result.ErrorMessage);

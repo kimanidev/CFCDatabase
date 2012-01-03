@@ -36,7 +36,7 @@ table.FormattedTable tfoot tr
 	background-color: #A8A8FF;
 }
 
-table.FormattedTable tfoot tr a:hover
+table.FormattedTable tr a:hover
 {
 	color: #FF5353; 
 	font-weight:bolder;

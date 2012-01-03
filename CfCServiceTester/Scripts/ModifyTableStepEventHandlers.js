@@ -81,6 +81,31 @@ function InsertNewColumn() {
     dialog.show();
 }
 
+// Edit column. Parameter is link that activated Click event.
+function EditCurrentColumn(aLink) {
+    var manager = $find('CfcTestManager');
+
+    PrepareDialogFields($(aLink));
+    return false;
+}
+
+// Edit column. Parameter is wrapped link that activated Click event.
+function PrepareDialogFields(aLink) {
+    var manager = $find('CfcTestManager');
+
+    var columnName = aLink.text();
+    $(manager.get_hdnOldFieldName3Id()).val(columnName);    // siblings() shows all elements in the row exept the link
+    $(manager.get_txtColumnName3Id()).val(columnName);
+
+    var rowData = [];
+    aLink.parent().siblings().each(function (index) {
+        rowData[index] = $(this).text(); 
+    });
+    
+    
+    alert('As jau cia');
+}
+
 // result is instance of DataTableListDbo class.
 function onSuccess_EnumerateTables(result) {
     var manager = $find('CfcTestManager');
@@ -148,6 +173,7 @@ function onSuccess_EnumerateColumns(result) {
 //  The array argument is the array that contains element.
 //  Context (this) represents string builder (innerHtl for the body element).
 // See http://msdn.microsoft.com/en-us/library/bb397509.aspx
+// Modify function PrepareDialogFields after changing order of elements in the row.
 function AppendRowToTable(element, index, array) {
     var className = '';
     if (element.IsPrimaryKey)
@@ -155,22 +181,25 @@ function AppendRowToTable(element, index, array) {
     else
         className = index % 2 > 0 ? 'oddRow' : 'eventRow';
 
-    this.append('<tr class="' + className + '"><td>');
+    this.append('<tr class="' + className + '"><td>');      // 1 - Primary key flag
     this.append(element.IsPrimaryKey ? '+' : '&nbsp;');
-    this.append('</td><td>');
+    this.append('</td><td>');                               // 2 - Identity flag
     this.append(element.IsIdentity ? '+' : '&nbsp;');
-    this.append('</td><td class="ColumnName">');
+    this.append('</td><td class="ColumnName">');            // 3 - Column name
+    this.append('<a href="#" onclick="return EditCurrentColumn(this);" title="Click the link for editing column">');
     this.append(element.Name);
-    this.append('</td><td>');
+    this.append('</a></td><td>');                           // 4 - Sql datatype
     this.append(element.SqlDataType);
-    this.append('</td><td>');
+    this.append('</td><td>');                               // 5 - Max length
     this.append(element.MaximumLength > 0 ? element.MaximumLength : '&nbsp;');
-    this.append('</td><td>');
+    this.append('</td><td>');                               // 6 - Numeric precision
     this.append(element.NumericPrecision > 0 ? element.NumericPrecision : '&nbsp;');
-    this.append('</td><td>');
+    this.append('</td><td>');                               // 7 - Numeric scale
     this.append(element.NumericScale > 0 ? element.NumericScale : '&nbsp;');
-    this.append('</td><td>');
+    this.append('</td><td>');                               // 8 - I nullable flag
     this.append(element.IsNullable ? '+' : '&nbsp;');
+    this.append('</td><td>');                               // 9 - Default value
+    this.append(element.Default);
     this.append('</td></tr>');
 }
 

@@ -93,6 +93,7 @@
                         'txtNumericScale3Id': '#<%= (GetEditColumnBoxControlId("txtNumericScale3")) %>',
                         'chlColumnProperties3Id': '#<%= (GetEditColumnBoxControlId("chlColumnProperties3")) %>',
                         'txtDefaultValue3Id': '#<%= (GetEditColumnBoxControlId("txtDefaultValue3")) %>',
+                        'hdnOldFieldName3Id': '#<%= (GetEditColumnBoxControlId("hdnOldFieldName3")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",

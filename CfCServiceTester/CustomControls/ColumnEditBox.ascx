@@ -1,18 +1,13 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ColumnEditBox.ascx.cs" Inherits="CfCServiceTester.CustomControls.ColumnEditBox" %>
 
+<asp:HiddenField ID="hdnOldFieldName3" runat='server' Value="" />
+
 <table class="FormattedTableNoBorder">
     <colgroup>
         <col style="width:30%" />
         <col style="width:40%" />
         <col style="width:30%" />
     </colgroup>
-<%--
-    <thead>
-        <tr>
-            <th colspan="3">Create new column</th>
-        </tr>
-    </thead>
---%>    
     <tbody>
         <tr>
             <td>Name</td>
