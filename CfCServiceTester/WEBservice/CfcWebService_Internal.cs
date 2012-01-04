@@ -198,20 +198,6 @@ namespace CfCServiceTester.WEBservice
             foreach (Column clmn in aTable.Columns)
             {
                 yield return CreateDataColumnDbo(clmn, primaryKeyColumns);
-/*
-                yield return new DataColumnDbo()
-                {
-                    Name = clmn.Name,
-                    SqlDataType = clmn.DataType.Name,
-                    MaximumLength = clmn.DataType.MaximumLength,
-                    NumericPrecision = clmn.DataType.NumericPrecision,
-                    NumericScale = clmn.DataType.NumericScale,
-                    IsNullable = clmn.Nullable,
-                    IsIdentity = clmn.Identity,
-                    IsPrimaryKey = primaryKeyColumns.Contains(clmn.Name),
-                    Default = clmn.Default,
-                };
-*/
             }
         }
 

@@ -656,7 +656,7 @@ namespace CfCServiceTester.WEBservice
 
         public static DataColumnDbo CreateDataColumnDbo(Column clmn, List<string> primaryKeyColumns)
         {
-            return new DataColumnDbo()
+            var rzlt = new DataColumnDbo()
             {
                 Name = clmn.Name,
                 SqlDataType = clmn.DataType.Name,
@@ -666,8 +666,16 @@ namespace CfCServiceTester.WEBservice
                 IsNullable = clmn.Nullable,
                 IsIdentity = clmn.Identity,
                 IsPrimaryKey = primaryKeyColumns.Contains(clmn.Name),
-                Default = clmn.Default,
             };
+            if (clmn.DefaultConstraint != null)
+            {
+                string dfText = clmn.DefaultConstraint.Text;
+                while (dfText.StartsWith("(") && dfText.EndsWith(")"))
+                    dfText = dfText.Substring(1, dfText.Length - 2);
+                rzlt.Default = dfText;
+            }
+            
+            return rzlt;
         }
     }
 }

@@ -79,6 +79,8 @@ function InsertNewColumn() {
             { center: true, modal: true, title: "Create new column", draggable: true, fixed: false}); 
     manager.set_columnEditor(dialog);
     dialog.show();
+
+    return false;
 }
 
 // Edit column. Parameter is link that activated Click event.
@@ -86,6 +88,11 @@ function EditCurrentColumn(aLink) {
     var manager = $find('CfcTestManager');
 
     PrepareDialogFields($(aLink));
+    var dialog = new Boxy('#ColumnEditor2',
+            { center: true, modal: true, title: "Create new column", draggable: true, fixed: false });
+    manager.set_columnEditor(dialog);
+    dialog.show();
+
     return false;
 }
 
@@ -99,11 +106,29 @@ function PrepareDialogFields(aLink) {
 
     var rowData = [];
     aLink.parent().siblings().each(function (index) {
-        rowData[index] = $(this).text(); 
+        rowData[index] = $(this).text().trim(); 
     });
-    
-    
-    alert('As jau cia');
+
+    // CheckboxList
+    var query = manager.get_chlColumnProperties3Id() + ' input[type=checkbox]:';
+    $(query + 'checked').removeAttr('checked');
+    $(query + 'eq(0)').attr('checked', rowData[0] == '+');
+    $(query + 'eq(1)').attr('checked', rowData[1] == '+');
+    $(query + 'eq(2)').attr('checked', rowData[6] == '+');
+
+    // DropDown List
+    query = manager.get_ddlDatatype3Id() + ' option';
+    $(query + '[selected]').removeAttr('selected');
+    var regex = new RegExp('^' + rowData[2] + '$', "i");
+    $(query).filter(function () {
+        var value = $(this).attr('value');
+        return regex.test(value);
+    }).attr('selected', true);
+
+    $(manager.get_txtMaximumLength3Id()).val(rowData[3]);       // Maximum length
+    $(manager.get_txtNumericPrecision3Id()).val(rowData[4]);    // Precision
+    $(manager.get_txtNumericScale3Id()).val(rowData[5]);        // Scale
+    $(manager.get_txtDefaultValue3Id()).val(rowData[7]);        // Default value
 }
 
 // result is instance of DataTableListDbo class.

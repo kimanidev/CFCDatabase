@@ -191,6 +191,7 @@ namespace CfCServiceTester.WEBservice
         [WebMethod(EnableSession = true)]
         public BackupStatus BackupDatabase(string directory, string file, bool overWriteMode, bool singleUserMode)
         {
+            bool isSingleMode = false;
             try
             {
                 if (!directory.EndsWith(@"\"))
@@ -204,14 +205,12 @@ namespace CfCServiceTester.WEBservice
                 }
                 else
                     RenameFile(fileName);
-                
+
                 long fileSize;
                 if (singleUserMode)
                 {
-                    bool isSingleMode = SetSingleMode(DatabaseName);
+                    isSingleMode = SetSingleMode(DatabaseName);
                     fileSize = MakeBackup(fileName);
-                    if (isSingleMode)
-                        SetMultiUserMode(DatabaseName);
                 }
                 else
                     fileSize = MakeBackup(fileName);
@@ -221,6 +220,11 @@ namespace CfCServiceTester.WEBservice
             catch (Exception ex)
             {
                 return new BackupStatus() { IsSuccess = false, FileSize = 0L, ErrorMessage = ex.Message };
+            }
+            finally
+            {
+                if (isSingleMode)
+                    SetMultiUserMode(DatabaseName);
             }
         }
 

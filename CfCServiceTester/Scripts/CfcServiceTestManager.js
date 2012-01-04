@@ -40,6 +40,7 @@ CfcServiceTestManager.CfcComponent = function () {
     this._chlColumnProperties3Id = '';      // Column properties (primary key, is null, identity)
     this._txtDefaultValue3Id = '';          // Default value (Column Edit window)
     this._hdnOldFieldName3Id = '';          // Old field name (Column Edit window in Edit mode).
+    this._txtDefaultValue3Id = '';          // Default value (Column Edit window);
 
     this._localServersOnly = true;          // true - look for local servers only, false - all available SQL servers
     this._accessibleDatabasesOnly = true;   // true - enumerate accessable databases only, false - all databases on the server
@@ -279,6 +280,13 @@ CfcServiceTestManager.CfcComponent.prototype = {
     },
     set_hdnOldFieldName3Id: function (value) {
         this._hdnOldFieldName3Id = value;
+    },
+
+    get_txtDefaultValue3Id: function () {
+        return this._txtDefaultValue3Id;
+    },
+    set_txtDefaultValue3Id: function (value) {
+        this._txtDefaultValue3Id = value;
     },
 
     get_localServersOnly: function () {
