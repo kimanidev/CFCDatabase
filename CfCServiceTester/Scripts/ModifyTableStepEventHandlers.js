@@ -76,7 +76,12 @@ function InsertNewColumn() {
     var manager = $find('CfcTestManager');
 
     var dialog = new Boxy('#ColumnEditor2', 
-            { center: true, modal: true, title: "Create new column", draggable: true, fixed: false}); 
+            { center: true, modal: true, title: "Create new column", draggable: true, fixed: false});
+
+    $('#ColumnEditor2 span.InsertColumn3').show();
+    $('#ColumnEditor2 span.EditColumn3').hide();
+    $(manager.get_chlColumnProperties3Id() + ' input[type=checkbox]:eq(2)').attr('checked', true);
+
     manager.set_columnEditor(dialog);
     dialog.show();
 
@@ -89,7 +94,10 @@ function EditCurrentColumn(aLink) {
 
     PrepareDialogFields($(aLink));
     var dialog = new Boxy('#ColumnEditor2',
-            { center: true, modal: true, title: "Create new column", draggable: true, fixed: false });
+            { center: true, modal: true, title: "Edit column", draggable: true, fixed: false });
+
+    $('#ColumnEditor2 span.InsertColumn3').hide();
+    $('#ColumnEditor2 span.EditColumn3').show();
     manager.set_columnEditor(dialog);
     dialog.show();
 

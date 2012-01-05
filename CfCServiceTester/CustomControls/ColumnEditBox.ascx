@@ -101,6 +101,8 @@
                                 ToolTip="Insert new column" CausesValidation="true" />
                 </span>
                 <span class="EditColumn3" style="display:none; white-space:nowrap;" >
+                    <asp:Button ID="btnRenameColumn3" runat="server" OnClientClick="return RenameColumn3(this);" Text="Rename" 
+                                ToolTip="Rename column" />
                     <asp:Button ID="btnDeleteColumn3" runat="server" OnClientClick="return DeleteColumn(this);" Text="Delete" 
                                 ToolTip="Delete the column" />
                     <asp:Button ID="btnEditColumn3" runat="server" OnClientClick="return EditColumn(this);" Text="Update" 

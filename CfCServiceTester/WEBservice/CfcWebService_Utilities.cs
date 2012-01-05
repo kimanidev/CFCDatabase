@@ -9,6 +9,7 @@ using Microsoft.SqlServer.Management.Smo;
 using CfCServiceTester.WEBservice.DataObjects;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace CfCServiceTester.WEBservice
 {
@@ -676,6 +677,44 @@ namespace CfCServiceTester.WEBservice
             }
             
             return rzlt;
+        }
+
+        /// <summary>
+        /// Packs all exception messages into single string.
+        /// </summary>
+        /// <param name="ex"><see cref="Exception"/></param>
+        /// <returns>String with messages from the exception and inner ones.</returns>
+        public static string ParseErrorMessage(Exception ex)
+        {
+            var msg = new StringBuilder(ex.Message);
+            for (Exception inner = ex.InnerException; inner != null; inner = inner.InnerException)
+            {
+                msg.Append("\n");
+                msg.Append(inner.Message);
+            }
+            return msg.ToString();
+        }
+
+        /// <summary>
+        /// Returns table object
+        /// </summary>
+        /// <param name="tableName">String with table name</param>
+        /// <returns><see cref="Table"/></returns>
+        public static Table GetTable(string tableName)
+        {
+            var srv = new Server(SqlServerName);
+            if (srv == null)
+                throw new Exception(String.Format("Server '{0}' was not found.", SqlServerName));
+
+            var db = srv.Databases[DatabaseName];
+            if (srv == null)
+                throw new Exception(String.Format("Database '{0}' was not found.", DatabaseName));
+
+            Table aTable = db.Tables[tableName];
+            if (aTable == null)
+                throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName));
+
+            return aTable;
         }
     }
 }

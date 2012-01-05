@@ -196,8 +196,13 @@ namespace CfCServiceTester.WEBservice
             {
                 if (!directory.EndsWith(@"\"))
                     directory += @"\";
-                string fileName = Path.Combine(directory, file);
+                if (!Directory.Exists(directory))
+                {
+                    string error = String.Format("Backup directory '{0}' was not found.", directory);
+                    return new BackupStatus() { IsSuccess = false, FileSize = 0L, ErrorMessage = error };
+                }
 
+                string fileName = Path.Combine(directory, file);
                 if (overWriteMode)
                 {
                     if (File.Exists(fileName))
@@ -241,6 +246,11 @@ namespace CfCServiceTester.WEBservice
                 return new EnumerateBackupFilesResponse() { IsSuccess = false, ErrorMessage = "Backup directory is not defined." };
             if (!backupDirectory.EndsWith(@"\"))
                 backupDirectory += @"\";
+            if (!Directory.Exists(backupDirectory))
+            {
+                string error = String.Format("Backup directory '{0}' was not found.", backupDirectory);
+                return new EnumerateBackupFilesResponse() { IsSuccess = false, ErrorMessage = error };
+            }
             try
             {
                 IList<string> fileList = GetBackupFilenames(backupDirectory, template);
@@ -268,23 +278,32 @@ namespace CfCServiceTester.WEBservice
         [WebMethod(EnableSession = true)]
         public RestoreStatus RestoreDatabase(string dbName, string directory, string file, bool withReplace, bool singleUserMode)
         {
+            bool isSingleMode = false;
             try
             {
                 if (!directory.EndsWith(@"\"))
                     directory += @"\";
+                if (!Directory.Exists(directory))
+                {
+                    string error = String.Format("Backup directory '{0}' was not found.", directory);
+                    return new EnumerateBackupFilesResponse() { IsSuccess = false, ErrorMessage = error };
+                }
                 string fileName = Path.Combine(directory, file);
 
                 if (singleUserMode)
-                    SetSingleMode(dbName);
+                    isSingleMode = SetSingleMode(dbName);
 
                 Restore(fileName, dbName, withReplace);
-                SetMultiUserMode(dbName);
-
                 return new RestoreStatus() { IsSuccess = true };
             }
             catch (Exception ex)
             {
                 return new RestoreStatus() { IsSuccess = false, ErrorMessage = ex.Message };
+            }
+            finally
+            {
+                if (isSingleMode)
+                    SetMultiUserMode(DatabaseName);
             }
         }
 
@@ -304,13 +323,16 @@ namespace CfCServiceTester.WEBservice
                 if (singleUserMode)
                     SetSingleMode(DatabaseName);
                 List<AlteredDependencyDbo> dependecies = RenameTheTable(oldName, newName);
-                if (singleUserMode)
-                    SetMultiUserMode(DatabaseName);
                 return new RenameTableStatus() { IsSuccess = true, AlteredDependencies = dependecies };
             }
             catch (Exception ex)
             {
                 return new RenameTableStatus() { IsSuccess = false, ErrorMessage = ex.Message };
+            }
+            finally
+            {
+                if (singleUserMode)
+                    SetMultiUserMode(DatabaseName);
             }
         }
 
@@ -353,14 +375,28 @@ namespace CfCServiceTester.WEBservice
             }
             catch (Exception ex)
             {
-                var msg = new StringBuilder(ex.Message);
-                for (Exception inner = ex.InnerException; inner != null; inner = inner.InnerException)
-                {
-                    msg.Append("\n");
-                    msg.Append(inner.Message);
-                }
-                return new InsertColumnResponse() { IsSuccess = false, ErrorMessage = msg.ToString() };
+                return new InsertColumnResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
             }
+        }
+
+        /// <summary>
+        /// Renames column in the table
+        /// </summary>
+        /// <param name="columnRequest"><see cref="UpdateColumnRequest"/></param>
+        /// <returns><see cref="InsertColumnResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public InsertColumnResponse RenameColumn(UpdateColumnRequest columnRequest)
+        {
+            try
+            {
+                DataColumnDbo column = RenameColumn(columnRequest.Table, columnRequest.OldColumnName, columnRequest.Column.Name);
+                return new InsertColumnResponse() { IsSuccess = true, Column = column };
+            }
+            catch (Exception ex)
+            {
+                return new InsertColumnResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+            }
+
         }
     }
 }

@@ -7,19 +7,48 @@ function InsertColumn3(insertButton) {
     if (!ValidateNumericValues($(insertButton).parents('table.FormattedTableNoBorder').find('tbody')))
         return false;
 
-    var insertRequest = CreateUpdateRequest('Insert');
-    CfCServiceTester.WEBservice.CfcWebService.InsertColumn(insertRequest, onSuccess_InsertColumn, onFailure_InsertColumn);
+    if (ValidateNames("", newName)) {
+        var insertRequest = CreateUpdateRequest('Insert');
+        CfCServiceTester.WEBservice.CfcWebService.InsertColumn(insertRequest, onSuccess_InsertColumn, onFailure_InsertColumn);
+    }
     return false;
+}
+
+// Rename the column
+function RenameColumn3(renameButton) {
+    var manager = $find('CfcTestManager');
+
+    var oldName = $(manager.get_hdnOldFieldName3Id()).val;
+    var newName = $(manager.get_txtColumnName3Id()).val;
+    if (ValidateColumnName(true)) {
+        var renameRequest = CreateUpdateRequest('Rename');
+        CfCServiceTester.WEBservice.CfcWebService.RenameColumn(renameRequest, onSuccess_RenameColumn, onFailure_InsertColumn);
+    }
+     return false;
 }
 
 // Column name is mandatory field and must be unique for new column. 
 function ValidateColumnName(insertMode) {
     var manager = $find('CfcTestManager');
 
+    var oldName = $(manager.get_hdnOldFieldName3Id()).val();
     var columnNameControl = $(manager.get_txtColumnName3Id());
     var columnName = columnNameControl.val();
     if (!columnName) {
         alert('Column name is not defined.');
+        columnNameControl.focus();
+        return false;
+    }
+    if (oldName != '' && columnName == oldName) {
+        alert('Column was not renamed.');
+        columnNameControl.focus();
+        return false;
+    }
+
+    // Regex validator for column name: http://stackoverflow.com/questions/4977898/check-for-valid-sql-column-name
+    var rg = /^[a-z][a-z\d_]*$/i;
+    if (!rg.test(columnName)) {
+        alert('Column name contains invalid characters.');
         columnNameControl.focus();
         return false;
     }
@@ -97,10 +126,14 @@ function CreateUpdateRequest(updateMode) {
     var rzlt = {};
     rzlt.Operation = updateMode;
     rzlt.Table = $(manager.get_txtTable2Id()).val();
-    rzlt.OldColumnName = '';    // TODO: write column name here for edit operations
+    rzlt.OldColumnName = $(manager.get_hdnOldFieldName3Id()).val();
     rzlt.Column = column;
     
     return rzlt;
+}
+
+function onSuccess_RenameColumn(result) {
+    alert('As jau cia');
 }
 
 // result is instance of the InsertColumnResponse class

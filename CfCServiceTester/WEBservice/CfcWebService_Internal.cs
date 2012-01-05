@@ -209,21 +209,35 @@ namespace CfCServiceTester.WEBservice
         /// <returns>Column description, <see cref="DataColumnDbo"/></returns>
         public static DataColumnDbo InsertColumn(string tableName, DataColumnDbo column)
         {
-            var srv = new Server(SqlServerName);
-            if (srv == null)
-                throw new Exception(String.Format("Server '{0}' was not found.", SqlServerName));
-            var db = srv.Databases[DatabaseName];
-            if (srv == null)
-                throw new Exception(String.Format("Database '{0}' was not found.", DatabaseName));
-
-            Table aTable = db.Tables[tableName];
-            if (aTable == null)
-                throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName));
+            Table aTable = GetTable(tableName);
 
             Column newColumn = CreateColumn(aTable, column);
             if (column.IsPrimaryKey)
                 InsertColumnIntoPrimarykey(aTable, newColumn);
             aTable.Alter();
+
+            List<string> primaryKeyColumns = GetPrimaryKeyColumns(aTable);
+            return CreateDataColumnDbo(newColumn, primaryKeyColumns);
+        }
+
+        /// <summary>
+        /// Inserts new column into the table
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="oldColumnName">Old column name</param>
+        /// <param name="newColumnName">New column name</param>
+        /// <returns>Column description, <see cref="DataColumnDbo"/></returns>
+        public static DataColumnDbo RenameColumn(string tableName, string oldColumnName, string newColumnName)
+        {
+            Table aTable = GetTable(tableName);
+
+            Column aColumn = aTable.Columns[oldColumnName];
+            if (aColumn == null)
+                throw new Exception(String.Format("Table '{0}' has no column '{1}'.", tableName, oldColumnName));
+
+            aColumn.Rename(newColumnName);
+            aTable.Alter();
+            Column newColumn = aTable.Columns[newColumnName];
 
             List<string> primaryKeyColumns = GetPrimaryKeyColumns(aTable);
             return CreateDataColumnDbo(newColumn, primaryKeyColumns);
