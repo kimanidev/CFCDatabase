@@ -108,7 +108,7 @@
         <td>
             <a href="#" onclick='return RestoreDatabase("<%= chkOverwriteDb1.ClientID %>");' title="Restore database">Restore database</a>
         </td>
-        <td colspan="2">
+        <td>
             <span class="Nowrap" id="RestoreDatabase1">
                 <asp:CheckBox ID="chkOverwriteDb1" runat="server" Checked="true" Text="Overwrite existing file." 
                               ToolTip="The SQL server will overwrite database with the same name." />
@@ -116,6 +116,11 @@
                     <asp:Image ID="Image2" runat="server" ImageUrl="~/Images/ajax-loader.gif" />
                 </span>
             </span>
+        </td>
+        <td>
+            <input type="checkbox" id="chkSwitchDatabase" checked="checked" 
+                    title="Uncheck the control if you don't want changing to restored database." /> 
+            <label for="chkSwitchDatabase" >Switch database</label>
         </td>
     </tr>
     <tr>

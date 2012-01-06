@@ -8,6 +8,7 @@ using Microsoft.SqlServer.Management.Smo;
 using System.Data.SqlClient;
 using System.Data;
 using CfCServiceTester.WEBservice.DataObjects;
+using System.Text.RegularExpressions;
 
 namespace CfCServiceTester.WEBservice
 {
@@ -209,7 +210,8 @@ namespace CfCServiceTester.WEBservice
         /// <returns>Column description, <see cref="DataColumnDbo"/></returns>
         public static DataColumnDbo InsertColumn(string tableName, DataColumnDbo column)
         {
-            Table aTable = GetTable(tableName);
+            Database db;
+            Table aTable = GetTable(tableName, out db);
 
             Column newColumn = CreateColumn(aTable, column);
             if (column.IsPrimaryKey)
@@ -226,10 +228,13 @@ namespace CfCServiceTester.WEBservice
         /// <param name="tableName">Table name</param>
         /// <param name="oldColumnName">Old column name</param>
         /// <param name="newColumnName">New column name</param>
+        /// <param name="alteredDependencies">List with altered procedures, functions, triggers and views.</param>
         /// <returns>Column description, <see cref="DataColumnDbo"/></returns>
-        public static DataColumnDbo RenameColumn(string tableName, string oldColumnName, string newColumnName)
+        public static DataColumnDbo RenameColumn(string tableName, string oldColumnName, string newColumnName, 
+                                                 out List<AlteredDependencyDbo> alteredDependencies)
         {
-            Table aTable = GetTable(tableName);
+            Database db;
+            Table aTable = GetTable(tableName, out db);
 
             Column aColumn = aTable.Columns[oldColumnName];
             if (aColumn == null)
@@ -239,8 +244,21 @@ namespace CfCServiceTester.WEBservice
             aTable.Alter();
             Column newColumn = aTable.Columns[newColumnName];
 
+            alteredDependencies = CorrectFieldNames(db, tableName, oldColumnName, newColumnName);
             List<string> primaryKeyColumns = GetPrimaryKeyColumns(aTable);
             return CreateDataColumnDbo(newColumn, primaryKeyColumns);
+        }
+
+        private static void RenameDatabase(string newName)
+        {
+            string oldName = DatabaseName;
+            DatabaseName = newName;
+            string connString = ConnectionString;
+
+            string regexTemplate = String.Format(@"\b{0}\b", oldName);        
+            var rg = new Regex(regexTemplate, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+            ConnectionString = rg.Replace(connString, newName);
         }
     }
 }

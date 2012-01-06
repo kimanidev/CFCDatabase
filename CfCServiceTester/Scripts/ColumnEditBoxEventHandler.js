@@ -132,8 +132,23 @@ function CreateUpdateRequest(updateMode) {
     return rzlt;
 }
 
+// result is instance of RenameColumnResponse class.
 function onSuccess_RenameColumn(result) {
-    alert('As jau cia');
+    var manager = $find('CfcTestManager');
+
+    if (result.IsSuccess) {
+        var oldColumnName = $(manager.get_hdnOldFieldName3Id()).val().trim().toUpperCase();
+        $('div#DynamicTable2 table tbody tr td.ColumnName').filter(function () {
+            var currentName = $(this).text().trim().toUpperCase();
+            return oldColumnName == currentName;
+        }).text(result.Column.Name);
+
+        var boxy = manager.get_columnEditor()
+        boxy.hide();
+    }
+    else {
+        alert(result.ErrorMessage);
+    }
 }
 
 // result is instance of the InsertColumnResponse class

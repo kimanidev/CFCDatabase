@@ -276,7 +276,8 @@ namespace CfCServiceTester.WEBservice
         /// <param name="singleUserMode"><code>true</code> - put database to single user mode</param>
         /// <returns><see cref="RestoreStatus"/></returns>
         [WebMethod(EnableSession = true)]
-        public RestoreStatus RestoreDatabase(string dbName, string directory, string file, bool withReplace, bool singleUserMode)
+        public RestoreStatus RestoreDatabase(string dbName, string directory, string file, bool withReplace, 
+                                             bool singleUserMode, bool switchDatabase)
         {
             bool isSingleMode = false;
             try
@@ -294,6 +295,8 @@ namespace CfCServiceTester.WEBservice
                     isSingleMode = SetSingleMode(dbName);
 
                 Restore(fileName, dbName, withReplace);
+                if (switchDatabase)
+                    RenameDatabase(dbName);
                 return new RestoreStatus() { IsSuccess = true };
             }
             catch (Exception ex)
@@ -302,8 +305,7 @@ namespace CfCServiceTester.WEBservice
             }
             finally
             {
-                if (isSingleMode)
-                    SetMultiUserMode(DatabaseName);
+                SetMultiUserMode(dbName);
             }
         }
 
@@ -385,16 +387,20 @@ namespace CfCServiceTester.WEBservice
         /// <param name="columnRequest"><see cref="UpdateColumnRequest"/></param>
         /// <returns><see cref="InsertColumnResponse"/></returns>
         [WebMethod(EnableSession = true)]
-        public InsertColumnResponse RenameColumn(UpdateColumnRequest columnRequest)
+        public RenameColumnResponse RenameColumn(UpdateColumnRequest columnRequest)
         {
+            List<AlteredDependencyDbo> alteredDependencies;
             try
             {
-                DataColumnDbo column = RenameColumn(columnRequest.Table, columnRequest.OldColumnName, columnRequest.Column.Name);
-                return new InsertColumnResponse() { IsSuccess = true, Column = column };
+                DataColumnDbo column = RenameColumn(columnRequest.Table, columnRequest.OldColumnName, columnRequest.Column.Name,
+                                                    out alteredDependencies);
+                var rzlt = new RenameColumnResponse() { IsSuccess = true, Column = column };
+                rzlt.AlteredDependencies.AddRange(alteredDependencies);
+                return rzlt;
             }
             catch (Exception ex)
             {
-                return new InsertColumnResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+                return new RenameColumnResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
             }
 
         }

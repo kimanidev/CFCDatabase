@@ -38,6 +38,7 @@ namespace CfCServiceTester.WEBservice
         internal static string ConnectionString
         {
             get { return (string)HttpContext.Current.Session[ConnectionStringKey]; }
+            set { HttpContext.Current.Session[ConnectionStringKey] = value; }
         }
         internal static List<string> RoleList
         {
@@ -46,10 +47,12 @@ namespace CfCServiceTester.WEBservice
         public static string SqlServerName
         {
             get { return (string)HttpContext.Current.Session[SqlServerNameKey]; }
+            set { HttpContext.Current.Session[SqlServerNameKey] = value; }
         }
         public static string DatabaseName
         {
             get { return (string)HttpContext.Current.Session[DatabaseNameKey]; }
+            set { HttpContext.Current.Session[DatabaseNameKey] = value; }
         }
 
         /// <summary>
@@ -78,9 +81,9 @@ namespace CfCServiceTester.WEBservice
                 var sqlConnection = new SqlConnection(csb.ConnectionString);
                 sqlConnection.Open();   // Verify connection
                 sqlConnection.Close();
-                HttpContext.Current.Session[ConnectionStringKey] = csb.ConnectionString;
-                HttpContext.Current.Session[SqlServerNameKey] = dataSource;
-                HttpContext.Current.Session[DatabaseNameKey] = initialCatalog;
+                ConnectionString = csb.ConnectionString;
+                SqlServerName = dataSource;
+                DatabaseName = initialCatalog;
 
                 isValid = true;
                 return csb.ConnectionString;
@@ -365,15 +368,37 @@ namespace CfCServiceTester.WEBservice
         /// <param name="db">Active database</param>
         private static List<AlteredDependencyDbo> CorrectStoredProcedure(Database db, string oldName, string newName)
         {
-            string regexTemplate = String.Format(@"\b{0}\b", oldName);        // @"^.*\b{0}\b.*$"
+            string regexTemplate = String.Format(@"\b{0}\b", oldName);        
             var rg = new Regex(regexTemplate, RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
-            string body;
+//            string body;
             var rzlt = new List<AlteredDependencyDbo>();
 
             CorrectStoredProcedures(db, rg, newName, rzlt);
             CorrectViews(db, rg, newName, rzlt);
             CorrectUserDefinedFunctions(db, rg, newName, rzlt);
+            CorrectTriggers(db, rg, newName, rzlt);
 
+            //foreach (Trigger trg in db.Triggers)
+            //{
+            //    bool isForbidden = trg.ImplementationType == ImplementationType.SqlClr || trg.IsEncrypted || trg.IsSystemObject;
+            //    if (!isForbidden)
+            //    {
+            //        body = trg.TextBody;
+            //        if (rg.IsMatch(body))
+            //        {
+            //            trg.TextBody = rg.Replace(body, newName);
+            //            trg.Alter();
+            //            rzlt.Add(new AlteredDependencyDbo() { ObjectType = DbObjectType.Trigger, Name = trg.Name });
+            //        }
+            //    }
+            //}
+
+            return rzlt;
+        }
+
+        private static void CorrectTriggers(Database db, Regex rg, string newName, List<AlteredDependencyDbo> rzlt)
+        {
+            string body;
             foreach (Trigger trg in db.Triggers)
             {
                 bool isForbidden = trg.ImplementationType == ImplementationType.SqlClr || trg.IsEncrypted || trg.IsSystemObject;
@@ -388,6 +413,19 @@ namespace CfCServiceTester.WEBservice
                     }
                 }
             }
+        }
+
+        private static List<AlteredDependencyDbo> CorrectFieldNames(Database db, string tblName, string oldName, string newName)
+        {
+            string regexTemplate = String.Format(@"\b({0}|\[{0}\])\.({1}|\[{1}\])\b", tblName, oldName);
+            var rg = new Regex(regexTemplate, RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
+            var rzlt = new List<AlteredDependencyDbo>();
+            string newFieldName = String.Format(@"[{0}].[{1}]", tblName, newName);
+
+            CorrectStoredProcedures(db, rg, newFieldName, rzlt);
+            CorrectViews(db, rg, newFieldName, rzlt);
+            CorrectUserDefinedFunctions(db, rg, newFieldName, rzlt);
+            CorrectTriggers(db, rg, newFieldName, rzlt);
 
             return rzlt;
         }
@@ -699,14 +737,15 @@ namespace CfCServiceTester.WEBservice
         /// Returns table object
         /// </summary>
         /// <param name="tableName">String with table name</param>
+        /// <param name="db">Curent database</param>
         /// <returns><see cref="Table"/></returns>
-        public static Table GetTable(string tableName)
+        public static Table GetTable(string tableName, out Database db)
         {
             var srv = new Server(SqlServerName);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' was not found.", SqlServerName));
 
-            var db = srv.Databases[DatabaseName];
+            db = srv.Databases[DatabaseName];
             if (srv == null)
                 throw new Exception(String.Format("Database '{0}' was not found.", DatabaseName));
 

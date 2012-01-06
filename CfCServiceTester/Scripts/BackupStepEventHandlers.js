@@ -55,6 +55,7 @@ function RestoreDatabase(chkOverwriteId) {
     var fileName = $(manager.get_txtFileName1Id()).val();
     var overWriteMode = $('#' + chkOverwriteId).attr('checked') == 'checked';
     var singleUserMode = $(manager.get_chkSingleModeId()).attr('checked') == 'checked';
+    var switchDatabase = $('#chkSwitchDatabase').attr('checked') == 'checked';
 
     if (!dbName) {
         alert('Data base name is not defined.');
@@ -69,8 +70,8 @@ function RestoreDatabase(chkOverwriteId) {
         return false;
     }
 
-    CfCServiceTester.WEBservice.CfcWebService.RestoreDatabase(dbName, directory, fileName, 
-                overWriteMode, singleUserMode, onSuccess_RestoreDatabase, onFailure_PickDatabases);
+    CfCServiceTester.WEBservice.CfcWebService.RestoreDatabase(dbName, directory, fileName,
+                overWriteMode, singleUserMode, switchDatabase, onSuccess_RestoreDatabase, onFailure_PickDatabases);
 
     $('span#RestoreDatabase1 span.Pauser').show();
     return false;
@@ -150,6 +151,10 @@ function onSuccess_RestoreDatabase(result) {
     if (result.IsSuccess) {
         $(manager.get_spnRestoreError1Id()).hide();
         $(manager.get_spnRestoreOK1Id()).show();
+        if ($('#chkSwitchDatabase').attr('checked') == 'checked') {
+            var newDbName = $(ma.get_txtDatabaseName1Id()).val();
+            $(manager.get_txtDatabaseNameId()).val(newDbName);
+        }
     }
     else {
         $(manager.get_spnRestoreError1Id()).text(result.ErrorMessage);

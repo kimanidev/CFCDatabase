@@ -24,4 +24,16 @@ namespace CfCServiceTester.WEBservice.DataObjects
         [DataMember]
         public DataColumnDbo Column { get; set; }
     }
+
+    [DataContract(Namespace = "CfCServiceNS")]
+    public class RenameColumnResponse : InsertColumnResponse
+    {
+        [DataMember]
+        public List<AlteredDependencyDbo> AlteredDependencies { get; set; }
+
+        public RenameColumnResponse() : base()
+        {
+            this.AlteredDependencies = new List<AlteredDependencyDbo>();
+        }
+    }
 }
