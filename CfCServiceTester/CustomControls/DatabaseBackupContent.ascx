@@ -120,7 +120,7 @@
         <td>
             <input type="checkbox" id="chkSwitchDatabase" checked="checked" 
                     title="Uncheck the control if you don't want changing to restored database." /> 
-            <label for="chkSwitchDatabase" >Switch database</label>
+            <label for="chkSwitchDatabase" >Switch active database</label>
         </td>
     </tr>
     <tr>

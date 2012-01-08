@@ -37,5 +37,17 @@ namespace CfCServiceTester.WEBservice.DataObjects
         /// </summary>
         [DataMember]
         public DataColumnDbo Column { get; set; }
+
+        /// <summary>
+        /// <code>true</code> - switch database into single user mode
+        /// </summary>
+        [DataMember]
+        public bool SingleUserMode { get; set; }
+
+        /// <summary>
+        /// <code>true</code> - disable dependencies before deleting the column
+        /// </summary>
+        [DataMember]
+        public bool DisableDependencies { get; set; }
     }
 }

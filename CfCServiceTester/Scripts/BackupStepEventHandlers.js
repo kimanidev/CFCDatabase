@@ -191,6 +191,6 @@ function FillBackupFilesDropDown1(result) {
 }
 
 function onFailure_BackupDatabase(result) {
-    alert(result);
+    alert(result.get_message());
 }
 

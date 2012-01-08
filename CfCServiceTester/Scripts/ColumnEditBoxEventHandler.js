@@ -7,10 +7,9 @@ function InsertColumn3(insertButton) {
     if (!ValidateNumericValues($(insertButton).parents('table.FormattedTableNoBorder').find('tbody')))
         return false;
 
-    if (ValidateNames("", newName)) {
-        var insertRequest = CreateUpdateRequest('Insert');
-        CfCServiceTester.WEBservice.CfcWebService.InsertColumn(insertRequest, onSuccess_InsertColumn, onFailure_InsertColumn);
-    }
+    var insertRequest = CreateUpdateRequest('Insert');
+    CfCServiceTester.WEBservice.CfcWebService.InsertColumn(insertRequest, onSuccess_InsertColumn, onFailure_InsertColumn);
+
     return false;
 }
 
@@ -18,17 +17,43 @@ function InsertColumn3(insertButton) {
 function RenameColumn3(renameButton) {
     var manager = $find('CfcTestManager');
 
-    var oldName = $(manager.get_hdnOldFieldName3Id()).val;
-    var newName = $(manager.get_txtColumnName3Id()).val;
+    var oldName = $(manager.get_hdnOldFieldName3Id()).val();
+    var newName = $(manager.get_txtColumnName3Id()).val();
     if (ValidateColumnName(true)) {
         var renameRequest = CreateUpdateRequest('Rename');
         CfCServiceTester.WEBservice.CfcWebService.RenameColumn(renameRequest, onSuccess_RenameColumn, onFailure_InsertColumn);
     }
-     return false;
+    return false;
+}
+
+// Delete the column
+function DeleteColumn3(deleteButton) {
+    var manager = $find('CfcTestManager');
+
+    var confirmMessage = String.format("Are you sure to delete the '{0}' column?", $(manager.get_txtColumnName3Id()).val());
+    if (!confirm(confirmMessage))
+        return false;
+
+    if (ValidateColumnName(false, "Delete column")) {
+        var deleteRequest = CreateUpdateRequest('Delete');
+        CfCServiceTester.WEBservice.CfcWebService.DeleteColumn(deleteRequest, onSuccess_DeleteColumn, onFailure_InsertColumn);
+    }
+    return false;
+}
+
+// Change type of the column
+function EditColumn(editButton) {
+    var manager = $find('CfcTestManager');
+
+    if (ValidateColumnName(false, "Update column")) {
+        var updateRequest = CreateUpdateRequest('Modify');
+        CfCServiceTester.WEBservice.CfcWebService.UpdateColumn(updateRequest, onSuccess_UpdateColumn, onFailure_InsertColumn);
+    }
+    return false;
 }
 
 // Column name is mandatory field and must be unique for new column. 
-function ValidateColumnName(insertMode) {
+function ValidateColumnName(insertMode, operation) {
     var manager = $find('CfcTestManager');
 
     var oldName = $(manager.get_hdnOldFieldName3Id()).val();
@@ -39,11 +64,21 @@ function ValidateColumnName(insertMode) {
         columnNameControl.focus();
         return false;
     }
-    if (oldName != '' && columnName == oldName) {
-        alert('Column was not renamed.');
-        columnNameControl.focus();
-        return false;
+    if (insertMode) {
+        if (oldName != '' && columnName == oldName) {
+            alert('Column was not renamed.');
+            columnNameControl.focus();
+            return false;
+        }
+    } else {
+        if (oldName != columnName) {
+            var errorMessage = String.format("Column name cannot be changed for the '{0}' operation.", operation);
+            alert(errorMessage);
+            columnNameControl.focus();
+            return false;
+        }
     }
+
 
     // Regex validator for column name: http://stackoverflow.com/questions/4977898/check-for-valid-sql-column-name
     var rg = /^[a-z][a-z\d_]*$/i;
@@ -58,12 +93,13 @@ function ValidateColumnName(insertMode) {
     if (jQuery.inArray(columnName.toUpperCase(), ColumnNames) > -1) {
         if (insertMode) {
             alert('Table contains column "' + columnName + '"');
+            columnNameControl.focus();
             return false;
         }
     } else {
-        // TODO: renaming column requires unique name too.
         if (!insertMode) {
             alert('Table has no column "' + columnName + '"');
+            columnNameControl.focus();
             return false;
         }
     }
@@ -128,17 +164,61 @@ function CreateUpdateRequest(updateMode) {
     rzlt.Table = $(manager.get_txtTable2Id()).val();
     rzlt.OldColumnName = $(manager.get_hdnOldFieldName3Id()).val();
     rzlt.Column = column;
+    rzlt.SingleUserMode = $(manager.get_chkSingleMode2Id()).attr('checked') == 'checked';
+    rzlt.DisableDependencies = $('#ColumnEditor2 input#chkDisableDependencies').attr('checked') == 'checked';
     
+    $('#ColumnEditor2 span.Pauser').show();
     return rzlt;
+}
+
+function onSuccess_UpdateColumn(result) {
+    var manager = $find('CfcTestManager');
+    $('#ColumnEditor2 span.Pauser').hide();
+    if (result.IsSuccess) {
+        alert('I am here.');
+
+        var boxy = manager.get_columnEditor()
+        boxy.hide();
+    } else {
+        alert(result.ErrorMessage);
+        $(manager.get_txtColumnName3Id()).focus();
+    }
+}
+
+function onSuccess_DeleteColumn(result) {
+    var manager = $find('CfcTestManager');
+    $('#ColumnEditor2 span.Pauser').hide();
+
+    if (result.IsSuccess) {
+        var oldColumnName = $(manager.get_hdnOldFieldName3Id()).val().trim();
+        var queryString = String.format("div#DynamicTable2 table tbody tr td.ColumnName:contains({0})", oldColumnName);
+        $(queryString).parent().remove();
+        
+        // Recreate 'Zebra';
+        $('div#DynamicTable2 table tbody tr').each(function (index) {
+            var className = index % 2 > 0 ? 'oddRow' : 'eventRow';
+            var jqThis = $(this);
+            if (jqThis.attr('class') != 'primaryKeyRow')
+                jqThis.attr('class', className);
+        });
+
+        var boxy = manager.get_columnEditor()
+        boxy.hide();
+    }
+    else {
+        alert(result.ErrorMessage);
+        $(manager.get_txtColumnName3Id()).focus();
+    }
 }
 
 // result is instance of RenameColumnResponse class.
 function onSuccess_RenameColumn(result) {
     var manager = $find('CfcTestManager');
+    $('#ColumnEditor2 span.Pauser').hide();
 
     if (result.IsSuccess) {
         var oldColumnName = $(manager.get_hdnOldFieldName3Id()).val().trim().toUpperCase();
-        $('div#DynamicTable2 table tbody tr td.ColumnName').filter(function () {
+        $('div#DynamicTable2 table tbody tr td.ColumnName a').filter(function () {
             var currentName = $(this).text().trim().toUpperCase();
             return oldColumnName == currentName;
         }).text(result.Column.Name);
@@ -148,12 +228,14 @@ function onSuccess_RenameColumn(result) {
     }
     else {
         alert(result.ErrorMessage);
+        $(manager.get_txtColumnName3Id()).focus();
     }
 }
 
 // result is instance of the InsertColumnResponse class
 function onSuccess_InsertColumn(result) {
     var manager = $find('CfcTestManager');
+    $('#ColumnEditor2 span.Pauser').hide();
 
     if (result.IsSuccess) {
         var boxy = manager.get_columnEditor()
@@ -168,10 +250,15 @@ function onSuccess_InsertColumn(result) {
     }
     else {
         alert(result.ErrorMessage);
+        $(manager.get_txtColumnName3Id()).focus();
     }
 }
 
 function onFailure_InsertColumn(result) {
-    alert(result);
+    var manager = $find('CfcTestManager');
+    $('#ColumnEditor2 span.Pauser').hide();
+
+    alert(result.get_message());
+    $(manager.get_txtColumnName3Id()).focus();
 }
 

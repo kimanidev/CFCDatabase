@@ -372,7 +372,7 @@ namespace CfCServiceTester.WEBservice
         {
             try
             {
-                DataColumnDbo column = InsertColumn(columnRequest.Table, columnRequest.Column);
+                DataColumnDbo column = InsertColumn(columnRequest.Table, columnRequest.Column, columnRequest.SingleUserMode);
                 return new InsertColumnResponse() { IsSuccess = true, Column = column };
             }
             catch (Exception ex)
@@ -385,7 +385,7 @@ namespace CfCServiceTester.WEBservice
         /// Renames column in the table
         /// </summary>
         /// <param name="columnRequest"><see cref="UpdateColumnRequest"/></param>
-        /// <returns><see cref="InsertColumnResponse"/></returns>
+        /// <returns><see cref="RenameColumnResponse"/></returns>
         [WebMethod(EnableSession = true)]
         public RenameColumnResponse RenameColumn(UpdateColumnRequest columnRequest)
         {
@@ -393,10 +393,51 @@ namespace CfCServiceTester.WEBservice
             try
             {
                 DataColumnDbo column = RenameColumn(columnRequest.Table, columnRequest.OldColumnName, columnRequest.Column.Name,
-                                                    out alteredDependencies);
+                                                    columnRequest.SingleUserMode, out alteredDependencies);
                 var rzlt = new RenameColumnResponse() { IsSuccess = true, Column = column };
                 rzlt.AlteredDependencies.AddRange(alteredDependencies);
                 return rzlt;
+            }
+            catch (Exception ex)
+            {
+                return new RenameColumnResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+            }
+
+        }
+
+        /// <summary>
+        /// Removes column from the table
+        /// </summary>
+        /// <param name="columnRequest">Request for deleting the column</param>
+        /// <returns><see cref="DeleteColumnResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public DeleteColumnResponse DeleteColumn(UpdateColumnRequest columnRequest)
+        {
+            List<DroppedDependencyDbo> droppedDependencies;
+            try
+            {
+                DeleteColumn(columnRequest.Table, columnRequest.Column.Name, columnRequest.DisableDependencies,
+                                                    columnRequest.SingleUserMode, out droppedDependencies);
+                var rzlt = new DeleteColumnResponse() { IsSuccess = true, DroppedDependencies = droppedDependencies };
+                return rzlt;
+            }
+            catch (Exception ex)
+            {
+                return new DeleteColumnResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+            }
+        }
+
+        /// <summary>
+        /// Removes column from the table
+        /// </summary>
+        /// <param name="columnRequest">Request for deleting the column</param>
+        /// <returns><see cref="RenameColumnResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public RenameColumnResponse UpdateColumn(UpdateColumnRequest columnRequest)
+        {
+            try
+            {
+                return new RenameColumnResponse() { IsSuccess = false, ErrorMessage = "'UpdateColumn' is not implemented." };
             }
             catch (Exception ex)
             {

@@ -36,4 +36,17 @@ namespace CfCServiceTester.WEBservice.DataObjects
             this.AlteredDependencies = new List<AlteredDependencyDbo>();
         }
     }
+
+    [DataContract(Namespace = "CfCServiceNS")]
+    public class DeleteColumnResponse : InsertColumnResponse
+    {
+        [DataMember]
+        public List<DroppedDependencyDbo> DroppedDependencies { get; set; }
+
+        public DeleteColumnResponse()
+            : base()
+        {
+            this.DroppedDependencies = new List<DroppedDependencyDbo>();
+        }
+    }
 }

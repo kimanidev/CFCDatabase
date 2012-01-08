@@ -150,7 +150,7 @@ function FillDatabaseDropDown(result) {
 }
 
 function onFailure_PickServers(result) {
-    alert(result);
+    alert(result.get_message());
 }
 function onFailure_PickDatabases(result) {
     var msg = result.get_message();

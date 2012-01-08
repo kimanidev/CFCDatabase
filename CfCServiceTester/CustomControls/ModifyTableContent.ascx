@@ -70,7 +70,7 @@
     </tr>
     <tr>
         <td>
-            <a href="#" title="Get information about columns in the table." onclick="return GetColumnInfo(this);">Get columns</a>
+            <a href="#" title="Display structure of the table and modify it." onclick="return GetColumnInfo(this);">Edit table</a>
         </td>
         <td colspan="2">
             <span id="spnGetColumnsError2" class="ErrorMessage" style="display: none;" />

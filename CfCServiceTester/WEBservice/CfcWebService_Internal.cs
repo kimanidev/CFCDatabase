@@ -121,18 +121,20 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         public static bool SetSingleMode(string dbName)
         {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[dbName];
+            // db == null for new databases; there is no need for switching to single mode in this case
+            return db == null ? true : SetSingleMode(db);
+        }
+        private static bool SetSingleMode(Database db)
+        {
             try
             {
                 DisconnectedHosts = GetConnectedHosts();
-                SendNotification(String.Format("Access to the [{0}].[{1}] database is locked.", SqlServerName, dbName));    //DatabaseName
-
-                var srv = new Server(SqlServerName);
-                var db = srv.Databases[dbName];
-                if (db != null)     // db == null for new databases; there is no need for switching to single mode in this case
-                {
-                    db.DatabaseOptions.UserAccess = DatabaseUserAccess.Single;
-                    db.Alter(TerminationClause.RollbackTransactionsImmediately);
-                }
+                SendNotification(String.Format("Access to the [{0}].[{1}] database is locked.", SqlServerName, db.Name));
+                db.DatabaseOptions.UserAccess = DatabaseUserAccess.Single;
+                db.Alter(TerminationClause.RollbackTransactionsImmediately);
+                
                 return true;
             }
             catch (Exception ex)
@@ -151,10 +153,15 @@ namespace CfCServiceTester.WEBservice
         {
             var srv = new Server(SqlServerName);
             var db = srv.Databases[dbName];
+            if (db != null)
+                SetMultiUserMode(db);
+        }
+        private static void SetMultiUserMode(Database db)
+        {
             db.DatabaseOptions.UserAccess = DatabaseUserAccess.Multiple;
             db.Alter(TerminationClause.RollbackTransactionsImmediately);
 
-            SendNotification(String.Format("Access to the [{0}].[{1}] database is free now.", SqlServerName, dbName));
+            SendNotification(String.Format("Access to the [{0}].[{1}] database is free now.", SqlServerName, db.Name));
         }
 
         /// <summary>
@@ -207,19 +214,31 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         /// <param name="tableName">Table name</param>
         /// <param name="column">Column definition, <see cref="DataColumnDbo"/></param>
+        /// <param name="singleUserMode"><code>true</code> - switch to single user mode</param>
         /// <returns>Column description, <see cref="DataColumnDbo"/></returns>
-        public static DataColumnDbo InsertColumn(string tableName, DataColumnDbo column)
+        public static DataColumnDbo InsertColumn(string tableName, DataColumnDbo column, bool singleUserMode)
         {
-            Database db;
-            Table aTable = GetTable(tableName, out db);
+            Database db = null;
+            bool isSingleUserMode = false;
+            try
+            {
+                Table aTable = GetTable(tableName, out db);
+                if (singleUserMode)
+                    isSingleUserMode = SetSingleMode(db);
 
-            Column newColumn = CreateColumn(aTable, column);
-            if (column.IsPrimaryKey)
-                InsertColumnIntoPrimarykey(aTable, newColumn);
-            aTable.Alter();
+                Column newColumn = CreateColumn(aTable, column);
+                if (column.IsPrimaryKey)
+                    InsertColumnIntoPrimarykey(aTable, newColumn);
+                aTable.Alter();
 
-            List<string> primaryKeyColumns = GetPrimaryKeyColumns(aTable);
-            return CreateDataColumnDbo(newColumn, primaryKeyColumns);
+                List<string> primaryKeyColumns = GetPrimaryKeyColumns(aTable);
+                return CreateDataColumnDbo(newColumn, primaryKeyColumns);
+            }
+            finally
+            {
+                if (isSingleUserMode && db != null)
+                    SetMultiUserMode(db);
+            }
         }
 
         /// <summary>
@@ -228,25 +247,37 @@ namespace CfCServiceTester.WEBservice
         /// <param name="tableName">Table name</param>
         /// <param name="oldColumnName">Old column name</param>
         /// <param name="newColumnName">New column name</param>
+        /// <param name="singleUserMode"><code>true</code> - switch to single user mode</param>
         /// <param name="alteredDependencies">List with altered procedures, functions, triggers and views.</param>
         /// <returns>Column description, <see cref="DataColumnDbo"/></returns>
         public static DataColumnDbo RenameColumn(string tableName, string oldColumnName, string newColumnName, 
-                                                 out List<AlteredDependencyDbo> alteredDependencies)
+                                                 bool singleUserMode, out List<AlteredDependencyDbo> alteredDependencies)
         {
-            Database db;
-            Table aTable = GetTable(tableName, out db);
+            Database db = null;
+            bool isSingleUserMode = false;
+            try
+            {
+                Table aTable = GetTable(tableName, out db);
+                if (singleUserMode)
+                    isSingleUserMode = SetSingleMode(db);
 
-            Column aColumn = aTable.Columns[oldColumnName];
-            if (aColumn == null)
-                throw new Exception(String.Format("Table '{0}' has no column '{1}'.", tableName, oldColumnName));
+                Column aColumn = aTable.Columns[oldColumnName];
+                if (aColumn == null)
+                    throw new Exception(String.Format("Table '{0}' has no column '{1}'.", tableName, oldColumnName));
 
-            aColumn.Rename(newColumnName);
-            aTable.Alter();
-            Column newColumn = aTable.Columns[newColumnName];
+                aColumn.Rename(newColumnName);
+                aTable.Alter();
+                Column newColumn = aTable.Columns[newColumnName];
 
-            alteredDependencies = CorrectFieldNames(db, tableName, oldColumnName, newColumnName);
-            List<string> primaryKeyColumns = GetPrimaryKeyColumns(aTable);
-            return CreateDataColumnDbo(newColumn, primaryKeyColumns);
+                alteredDependencies = CorrectFieldNames(db, tableName, oldColumnName, newColumnName);
+                List<string> primaryKeyColumns = GetPrimaryKeyColumns(aTable);
+                return CreateDataColumnDbo(newColumn, primaryKeyColumns);
+            }
+            finally
+            {
+                if (isSingleUserMode && db != null)
+                    SetMultiUserMode(db);
+            }
         }
 
         private static void RenameDatabase(string newName)
@@ -259,6 +290,40 @@ namespace CfCServiceTester.WEBservice
             var rg = new Regex(regexTemplate, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
             ConnectionString = rg.Replace(connString, newName);
+        }
+
+        public static void DeleteColumn(string tableName, string columnName, bool DisableDependencies,
+                                                 bool singleUserMode, out List<DroppedDependencyDbo> alteredDependencies)
+        {
+            Database db = null;
+            var droppedDependencies = new List<DroppedDependencyDbo>();
+            bool isSingleUserMode = false;
+            try
+            {
+                Table aTable = GetTable(tableName, out db);
+                if (singleUserMode)
+                    isSingleUserMode = SetSingleMode(db);
+
+                Column aColumn = aTable.Columns[columnName];
+                if (aColumn == null)
+                    throw new Exception(String.Format("Table '{0}' has no column '{1}'.", tableName, columnName));
+
+                if (DisableDependencies)
+                {
+                    DeleteColumnFromForeignKeys(db, aTable, aColumn, droppedDependencies);
+                    DeleteColumnFromIndexes(aTable, aColumn, droppedDependencies);
+                }
+
+                aColumn.Drop();
+                aTable.Alter();
+            }
+            finally
+            {
+                if (isSingleUserMode && db != null)
+                    SetMultiUserMode(db);
+
+                alteredDependencies = droppedDependencies;
+            }
         }
     }
 }

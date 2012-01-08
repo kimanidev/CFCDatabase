@@ -498,7 +498,7 @@ namespace CfCServiceTester.WEBservice
                     {
                         vw.TextBody = rg.Replace(body, newName);
                         vw.Alter();
-                        rzlt.Add(new AlteredDependencyDbo() { ObjectType = DbObjectType.StoredProcedure, Name = vw.Name });
+                        rzlt.Add(new AlteredDependencyDbo() { ObjectType = DbObjectType.View, Name = vw.Name });
                     }
                 }
             }
@@ -535,7 +535,7 @@ namespace CfCServiceTester.WEBservice
                     {
                         udf.TextBody = rg.Replace(body, newName);
                         udf.Alter();
-                        rzlt.Add(new AlteredDependencyDbo() { ObjectType = DbObjectType.StoredProcedure, Name = udf.Name });
+                        rzlt.Add(new AlteredDependencyDbo() { ObjectType = DbObjectType.UserDefinedFunction, Name = udf.Name });
                     }
                 }
             }
@@ -754,6 +754,132 @@ namespace CfCServiceTester.WEBservice
                 throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName));
 
             return aTable;
+        }
+
+        // Delete index from the table if it contains column that needs to be deleted
+        private static void DeleteColumnFromIndexes(Table aTable, Column aColumn, List<DroppedDependencyDbo> alteredDependencies)
+        {
+            Func<Index, string, bool> indexContainsColumn = delegate(Index ind, string name)
+            {
+                foreach (IndexedColumn clm in ind.IndexedColumns)
+                {
+                    if (String.Compare(clm.Name, name, true) == 0)
+                        return true;
+                }
+                return false;
+            };
+            Func<Index, IList<string>> getColumnNames = delegate(Index ind)
+            {
+                var rzlt = new List<string>();
+                foreach(IndexedColumn clm in ind.IndexedColumns)
+                    rzlt.Add(clm.Name);
+                return rzlt;
+            };
+
+            for (int i = aTable.Indexes.Count - 1; i >= 0; i--)
+            {
+                Index ind = aTable.Indexes[i];
+                if (indexContainsColumn(ind, aColumn.Name))
+                {
+                    alteredDependencies.Add(new DroppedDependencyDbo()
+                    {
+                        Name = ind.Name,
+                        ObjectType = ind.IndexKeyType == IndexKeyType.DriPrimaryKey ? DbObjectType.primaryKey : DbObjectType.index,
+                        TableName = aTable.Name,
+                        Columns = getColumnNames(ind)
+                    });
+                    ind.Drop();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The function returns List of foreign keys that references a column in the table.
+        /// The function quries data with Linq to datable 
+        /// <see cref="http://msdn.microsoft.com/en-us/library/system.data.datatableextensions_methods.aspx"/>
+        /// </summary>
+        /// <param name="tableName">Name of target table </param>
+        /// <param name="columnName">Name of target column</param>
+        /// <returns>
+        ///     <para>List of pairs <see cref="KeyValuePair"/></para>
+        ///     <list type="bullet">
+        ///         <item>key - name of the foreign key</item>,
+        ///         <item>value - name of the table</item>
+        ///     </list>
+        /// </returns>
+        private static List<KeyValuePair<string, string>> GetForeignKeys(string tableName, string columnName)
+        {
+            const string queryString =
+                "SELECT own.name AS TableName, fk.name AS ForeignKeyName " +
+                "FROM sys.foreign_key_columns fkc " +
+                    "JOIN sys.objects trg ON trg.object_id = fkc.referenced_object_id " +
+                    "JOIN sys.objects fk ON fk.object_id = fkc.constraint_object_id " +
+                    "JOIN sys.objects own ON own.object_id = fkc.parent_object_id " +
+                "WHERE trg.name LIKE @TableName " +
+                    "AND EXISTS ( " +
+                        "SELECT * " +
+                        "FROM sys.columns clm " +
+                        "WHERE fkc.referenced_object_id = clm.object_id " +
+                            "AND fkc.referenced_column_id = clm.column_id " +
+                            "AND clm.name LIKE @ColumnName " +
+                ")";
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                var da = new SqlDataAdapter(queryString, connection);
+                da.SelectCommand.Parameters.AddWithValue("@TableName", tableName);
+                da.SelectCommand.Parameters.AddWithValue("@ColumnName", columnName);
+                da.TableMappings.Add("Table", "ForeignKeyList");
+
+                var ds = new DataSet();
+                da.Fill(ds);
+                DataTable foreignKeys = ds.Tables["ForeignKeyList"];
+                var rzlt = (
+                    from fKey in foreignKeys.AsEnumerable()
+                    select new KeyValuePair<string, string>(fKey.Field<string>("ForeignKeyName"), fKey.Field<string>("TableName"))
+                    ).ToList();
+                return rzlt;
+            }
+        }
+
+        /// <summary>
+        /// Delete foreign keys from the database if it contains column that needs to be deleted
+        /// </summary>
+        /// <param name="db">Current database <see cref="Database"/></param>
+        /// <param name="aTable">Current table, <see cref="Table"/></param>
+        /// <param name="aColumn">Current column, <see cref="Column"/></param>
+        /// <param name="alteredDependencies">List with dropped dependecies</param>
+        private static void DeleteColumnFromForeignKeys(Database db, Table aTable, Column aColumn, 
+                                                        List<DroppedDependencyDbo> alteredDependencies)
+        {
+            Func<ForeignKey, IList<string>> getColumnNames = delegate(ForeignKey foreignKey)
+            {
+                var rzlt = new List<string>();
+                foreach (ForeignKeyColumn clm in foreignKey.Columns)
+                    rzlt.Add(clm.Name);
+                return rzlt;
+            };
+
+            List<KeyValuePair<string, string>> foreignKeys = GetForeignKeys(aTable.Name, aColumn.Name);
+            foreach (KeyValuePair<string, string> pair in foreignKeys)
+            {
+                Table currentTable = db.Tables[pair.Value];
+                if (currentTable != null)
+                {
+                    ForeignKey fKey = currentTable.ForeignKeys[pair.Key];
+                    if (fKey != null)
+                    {
+                        alteredDependencies.Add(new DroppedDependencyDbo()
+                        {
+                            Name = fKey.Name,
+                            ObjectType = DbObjectType.foreignKey,
+                            TableName = currentTable.Name,
+                            Columns = getColumnNames(fKey)
+                        });
+                        fKey.Drop();
+                    }
+                }
+                currentTable.Alter();
+            }
         }
     }
 }

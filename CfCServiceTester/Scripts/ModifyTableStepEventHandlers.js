@@ -80,6 +80,7 @@ function InsertNewColumn() {
 
     $('#ColumnEditor2 span.InsertColumn3').show();
     $('#ColumnEditor2 span.EditColumn3').hide();
+    $('#ColumnEditor2 span.Pauser').hide();
     $(manager.get_chlColumnProperties3Id() + ' input[type=checkbox]:eq(2)').attr('checked', true);
 
     manager.set_columnEditor(dialog);
@@ -98,6 +99,7 @@ function EditCurrentColumn(aLink) {
 
     $('#ColumnEditor2 span.InsertColumn3').hide();
     $('#ColumnEditor2 span.EditColumn3').show();
+    $('#ColumnEditor2 span.Pauser').hide();
     manager.set_columnEditor(dialog);
     dialog.show();
 
@@ -123,6 +125,12 @@ function PrepareDialogFields(aLink) {
     $(query + 'eq(0)').attr('checked', rowData[0] == '+');
     $(query + 'eq(1)').attr('checked', rowData[1] == '+');
     $(query + 'eq(2)').attr('checked', rowData[6] == '+');
+
+    if (rowData[0] == '+' || rowData[1] == '+') {
+        $('#spnModifyColumnType3').hide();
+    } else {
+        $('#spnModifyColumnType3').show();
+    }
 
     // DropDown List
     query = manager.get_ddlDatatype3Id() + ' option';
@@ -262,5 +270,5 @@ function tblSelectionChanged2(selectElement) {
 }
 
 function onFailure_EnumerateTables(result) {
-    alert(result);
+    alert(result.get_message());
 }

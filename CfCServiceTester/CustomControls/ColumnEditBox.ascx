@@ -103,11 +103,25 @@
                 <span class="EditColumn3" style="display:none; white-space:nowrap;" >
                     <asp:Button ID="btnRenameColumn3" runat="server" OnClientClick="return RenameColumn3(this);" Text="Rename" 
                                 ToolTip="Rename column" />
-                    <asp:Button ID="btnDeleteColumn3" runat="server" OnClientClick="return DeleteColumn(this);" Text="Delete" 
+                    <asp:Button ID="btnDeleteColumn3" runat="server" OnClientClick="return DeleteColumn3(this);" Text="Delete" 
                                 ToolTip="Delete the column" />
-                    <asp:Button ID="btnEditColumn3" runat="server" OnClientClick="return EditColumn(this);" Text="Update" 
-                                ToolTip="Update the column" />
+                    <span id="spnModifyColumnType3" style="display:inline-block; white-space:nowrap;" >
+                        <asp:Button ID="btnEditColumn3" runat="server" OnClientClick="return EditColumn(this);" Text="Update" 
+                                ToolTip="Change type of the column" />
+                    </span>
                 </span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="Pauser" style="display:none;">
+                    <asp:Image ID="WaitImage" runat="server" ImageUrl="~/Images/ajax-loader.gif" />
+                </span>
+            </td>
+            <td colspan="2">
+                <input type="checkbox" id="chkDisableDependencies"
+                        title="Check the control if you want to remove dependencies (foreign and primary keys, unique constraints, ...)." /> 
+                <label for="chkDisableDependencies" >Delete dependencies before deleting</label>
             </td>
         </tr>
     </tfoot>
