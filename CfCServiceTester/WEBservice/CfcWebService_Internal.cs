@@ -215,21 +215,31 @@ namespace CfCServiceTester.WEBservice
         /// <param name="tableName">Table name</param>
         /// <param name="column">Column definition, <see cref="DataColumnDbo"/></param>
         /// <param name="singleUserMode"><code>true</code> - switch to single user mode</param>
+        /// <param name="disableDependencies">
+        ///     <code>true</code> - drop foreign keys that references primary key if column is new member of priamry key
+        /// </param>
+        /// <param name="droppedKeys">Foreign keys, that were removed for recreating primary key.</param>
         /// <returns>Column description, <see cref="DataColumnDbo"/></returns>
-        public static DataColumnDbo InsertColumn(string tableName, DataColumnDbo column, bool singleUserMode)
+        public static DataColumnDbo InsertColumn(string tableName, DataColumnDbo column, bool singleUserMode, bool disableDependencies,
+                                    out List<DroppedDependencyDbo> droppedKeys)
         {
             Database db = null;
             bool isSingleUserMode = false;
             try
             {
                 Table aTable = GetTable(tableName, out db);
-                if (singleUserMode)
+                if (singleUserMode && !column.IsPrimaryKey)
                     isSingleUserMode = SetSingleMode(db);
 
                 Column newColumn = CreateColumn(aTable, column);
-                if (column.IsPrimaryKey)
-                    InsertColumnIntoPrimarykey(aTable, newColumn);
                 aTable.Alter();
+                if (column.IsPrimaryKey)
+                {
+                    droppedKeys = InsertColumnIntoPrimarykey(aTable, newColumn, disableDependencies, db);
+                    aTable.Alter();
+                }
+                else
+                    droppedKeys = new List<DroppedDependencyDbo>();
 
                 List<string> primaryKeyColumns = GetPrimaryKeyColumns(aTable);
                 return CreateDataColumnDbo(newColumn, primaryKeyColumns);
@@ -241,6 +251,53 @@ namespace CfCServiceTester.WEBservice
             }
         }
 
+        private static DataColumnDbo GetDataColumnDbo(Table aTable, string columnName, out Column currentColumn)
+        {
+            Column column = aTable.Columns[columnName];
+            if (column == null)
+                throw new Exception(String.Format("Column '{0}' was not found in the '{1}' table.", columnName, aTable.Name));
+            List<string> primaryKeyColumns = GetPrimaryKeyColumns(aTable);
+            currentColumn = column;
+            return CreateDataColumnDbo(column, primaryKeyColumns);
+        }
+
+        /// <summary>
+        /// The procedure manages processing of the column updating.
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="column">Column description </param>
+        /// <param name="disableDependencies"><code>true</code> - remove dependencies</param>
+        /// <param name="singleUserMode"><code>true</code> - single user mode</param>
+        /// <param name="droppedKeys">List of dropped foreign keys</param>
+        /// <returns>Description of the updated column</returns>
+        public static DataColumnDbo UpdateColumn(string tableName, DataColumnDbo column, bool disableDependencies, bool singleUserMode,
+                                        out List<DroppedDependencyDbo> droppedKeys)
+        {
+            Database db = null;
+            bool isSingleUserMode = false;
+            var droppedForeignKeys = new List<DroppedDependencyDbo>();
+            try
+            {
+                Table aTable = GetTable(tableName, out db);
+                if (singleUserMode && !column.IsPrimaryKey)
+                    isSingleUserMode = SetSingleMode(db);
+                Column currentColumn;
+                DataColumnDbo oldValues = GetDataColumnDbo(aTable, column.Name, out currentColumn);
+                if (!oldValues.IsPrimaryKey && column.IsPrimaryKey)
+                {
+                    droppedForeignKeys.AddRange(InsertColumnIntoPrimarykey(aTable, currentColumn, disableDependencies, db));
+                    aTable.Alter();
+                }
+
+                droppedKeys = droppedForeignKeys;
+                return GetDataColumnDbo(aTable, column.Name, out currentColumn);
+            }
+            finally
+            {
+                if (isSingleUserMode && db != null)
+                    SetMultiUserMode(db);
+            }
+        }
         /// <summary>
         /// Inserts new column into the table
         /// </summary>

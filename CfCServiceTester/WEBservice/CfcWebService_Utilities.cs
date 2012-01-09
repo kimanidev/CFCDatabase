@@ -204,6 +204,7 @@ namespace CfCServiceTester.WEBservice
             restore.RelocateFiles.Add(new RelocateFile(logicalFileNames.LogicalNameLog, logFile));
             
             restore.SqlRestore(server);
+            System.Data.SqlClient.SqlConnection.ClearAllPools();
         }
 
         /// <summary>
@@ -677,8 +678,10 @@ namespace CfCServiceTester.WEBservice
             }
         }
 
-        private static void InsertColumnIntoPrimarykey(Table table, Column column)
+        private static List<DroppedDependencyDbo> InsertColumnIntoPrimarykey(
+                                Table table, Column column, bool disableDependencies, Database db)
         {
+            var droppedForeignKeys = new List<DroppedDependencyDbo>();
             var query = (
                 from Index ind in table.Indexes
                 where ind.IndexKeyType == IndexKeyType.DriPrimaryKey
@@ -690,7 +693,118 @@ namespace CfCServiceTester.WEBservice
                 table.Indexes.Add(primaryKeyIndex);
             }
             else
-                query.IndexedColumns.Add(new IndexedColumn(query, column.Name));
+            {
+                if (disableDependencies)
+                {
+                    DropDependentForeignKeys(query.Name, db, droppedForeignKeys);
+                }
+                AddColumnToIndex(table, column, query);
+            }
+            return droppedForeignKeys;
+        }
+
+        private static void DropDependentForeignKeys(string primaryKeyName, Database db, List<DroppedDependencyDbo> droppedForeignKeys)
+        {
+            const string queryString =
+                "SELECT own.name AS TableName, fk.name AS ForeignKeyName " +
+                "FROM sys.foreign_keys fk " +
+	                "JOIN sys.key_constraints kc ON fk.referenced_object_id = kc.parent_object_id " +
+		                "AND kc.unique_index_id = fk.key_index_id " +
+	                "JOIN sys.objects own ON own.object_id = fk.parent_object_id " +
+                "WHERE kc.name = @PrimaryKeyName";
+
+            List<KeyValuePair<string, string>> lstForeignKeys;
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                var da = new SqlDataAdapter(queryString, connection);
+                da.SelectCommand.Parameters.AddWithValue("@PrimaryKeyName", primaryKeyName);
+                da.TableMappings.Add("Table", "ForeignKeyList");
+
+                var ds = new DataSet();
+                da.Fill(ds);
+                DataTable foreignKeys = ds.Tables["ForeignKeyList"];
+                lstForeignKeys = (
+                    from fKey in foreignKeys.AsEnumerable()
+                    select new KeyValuePair<string, string>(fKey.Field<string>("ForeignKeyName"), fKey.Field<string>("TableName"))
+                    ).ToList();
+            }
+
+            foreach (KeyValuePair<string, string> pair in lstForeignKeys)
+            {
+                Table currentTable = db.Tables[pair.Value];
+                if (currentTable != null)
+                {
+                    ForeignKey fKey = currentTable.ForeignKeys[pair.Key];
+                    if (fKey != null)
+                    {
+                        droppedForeignKeys.Add(new DroppedDependencyDbo()
+                        {
+                            Name = fKey.Name,
+                            ObjectType = DbObjectType.foreignKey,
+                            TableName = currentTable.Name,
+                            Columns = GetColumnNames(fKey)
+                        });
+                        fKey.Drop();
+                    }
+                    currentTable.Alter();
+                }
+            }
+
+        }
+
+        public static void AddColumnToIndex(Table table, Column column, Index ind)
+        {
+            string oldName = ind.Name;
+            var idx = new Index(table, oldName)
+            {
+                BoundingBoxYMax = ind.BoundingBoxYMax,
+                BoundingBoxYMin = ind.BoundingBoxYMin,
+                BoundingBoxXMax = ind.BoundingBoxXMax,
+                BoundingBoxXMin = ind.BoundingBoxXMin,
+                CompactLargeObjects = ind.CompactLargeObjects,
+                DisallowRowLocks = ind.DisallowRowLocks,
+                FileGroup = ind.FileGroup,
+                FileStreamFileGroup = ind.FileStreamFileGroup,
+                FileStreamPartitionScheme = ind.FileStreamPartitionScheme,
+                FillFactor = ind.FillFactor,
+                FilterDefinition = ind.FilterDefinition,
+                IgnoreDuplicateKeys = ind.IgnoreDuplicateKeys,
+                IndexKeyType = ind.IndexKeyType,
+                IsClustered = ind.IsClustered,
+                IsFullTextKey = ind.IsFullTextKey,
+                IsUnique = ind.IsUnique,
+                Level1Grid = ind.Level1Grid,
+                Level2Grid = ind.Level2Grid,
+                Level3Grid = ind.Level3Grid,
+                Level4Grid = ind.Level4Grid,
+                MaximumDegreeOfParallelism = ind.MaximumDegreeOfParallelism,
+                NoAutomaticRecomputation = ind.NoAutomaticRecomputation,
+                OnlineIndexOperation = ind.OnlineIndexOperation,
+                PadIndex = ind.PadIndex,
+                ParentXmlIndex = ind.ParentXmlIndex,
+                PartitionScheme = ind.PartitionScheme,
+                SecondaryXmlIndexType = ind.SecondaryXmlIndexType,
+                SortInTempdb = ind.SortInTempdb,
+                SpatialIndexType = ind.SpatialIndexType,
+            };
+
+            foreach (IndexedColumn iColumn in ind.IndexedColumns)
+            {
+                var newIdxColumn = new IndexedColumn(idx, iColumn.Name)
+                {
+                    Descending = iColumn.Descending,
+                    IsIncluded = iColumn.IsIncluded,
+                };
+                idx.IndexedColumns.Add(newIdxColumn);
+            }
+            idx.IndexedColumns.Add(new IndexedColumn(idx, column.Name));
+            
+            bool oldDisallowPageLocks = ind.DisallowPageLocks;
+            ind.Drop();
+            idx.Create();
+            idx.DisallowPageLocks = oldDisallowPageLocks;
+            idx.Alter();
         }
 
         public static DataColumnDbo CreateDataColumnDbo(Column clmn, List<string> primaryKeyColumns)
@@ -755,6 +869,21 @@ namespace CfCServiceTester.WEBservice
 
             return aTable;
         }
+        
+        private static IList<string> GetColumnNames(Index ind)
+        {
+            var rzlt = new List<string>();
+            foreach (IndexedColumn clm in ind.IndexedColumns)
+                rzlt.Add(clm.Name);
+            return rzlt;
+        }
+        private static IList<string> GetColumnNames(ForeignKey fKey)
+        {
+            var rzlt = new List<string>();
+            foreach (ForeignKeyColumn clm in fKey.Columns)
+                rzlt.Add(clm.Name);
+            return rzlt;
+        }
 
         // Delete index from the table if it contains column that needs to be deleted
         private static void DeleteColumnFromIndexes(Table aTable, Column aColumn, List<DroppedDependencyDbo> alteredDependencies)
@@ -768,13 +897,6 @@ namespace CfCServiceTester.WEBservice
                 }
                 return false;
             };
-            Func<Index, IList<string>> getColumnNames = delegate(Index ind)
-            {
-                var rzlt = new List<string>();
-                foreach(IndexedColumn clm in ind.IndexedColumns)
-                    rzlt.Add(clm.Name);
-                return rzlt;
-            };
 
             for (int i = aTable.Indexes.Count - 1; i >= 0; i--)
             {
@@ -786,7 +908,7 @@ namespace CfCServiceTester.WEBservice
                         Name = ind.Name,
                         ObjectType = ind.IndexKeyType == IndexKeyType.DriPrimaryKey ? DbObjectType.primaryKey : DbObjectType.index,
                         TableName = aTable.Name,
-                        Columns = getColumnNames(ind)
+                        Columns = GetColumnNames(ind)
                     });
                     ind.Drop();
                 }
@@ -877,8 +999,8 @@ namespace CfCServiceTester.WEBservice
                         });
                         fKey.Drop();
                     }
+                    currentTable.Alter();
                 }
-                currentTable.Alter();
             }
         }
     }

@@ -370,10 +370,12 @@ namespace CfCServiceTester.WEBservice
         [WebMethod(EnableSession = true)]
         public InsertColumnResponse InsertColumn(UpdateColumnRequest columnRequest)
         {
+            List<DroppedDependencyDbo> droppedForeignKeys;
             try
             {
-                DataColumnDbo column = InsertColumn(columnRequest.Table, columnRequest.Column, columnRequest.SingleUserMode);
-                return new InsertColumnResponse() { IsSuccess = true, Column = column };
+                DataColumnDbo column = InsertColumn(columnRequest.Table, columnRequest.Column, columnRequest.SingleUserMode,
+                                                    columnRequest.DisableDependencies, out droppedForeignKeys);
+                return new InsertColumnResponse() { IsSuccess = true, Column = column, DroppedForeignKeys = droppedForeignKeys };
             }
             catch (Exception ex)
             {
@@ -431,17 +433,26 @@ namespace CfCServiceTester.WEBservice
         /// Removes column from the table
         /// </summary>
         /// <param name="columnRequest">Request for deleting the column</param>
-        /// <returns><see cref="RenameColumnResponse"/></returns>
+        /// <returns><see cref="InsertColumnResponse"/></returns>
         [WebMethod(EnableSession = true)]
-        public RenameColumnResponse UpdateColumn(UpdateColumnRequest columnRequest)
+        public InsertColumnResponse UpdateColumn(UpdateColumnRequest columnRequest)
         {
             try
             {
-                return new RenameColumnResponse() { IsSuccess = false, ErrorMessage = "'UpdateColumn' is not implemented." };
+                List<DroppedDependencyDbo> droppedDependencies;
+                DataColumnDbo dbo = UpdateColumn(columnRequest.Table, columnRequest.Column, columnRequest.DisableDependencies,
+                                                    columnRequest.SingleUserMode, out droppedDependencies);
+                var rzlt = new InsertColumnResponse() 
+                { 
+                    IsSuccess = true,
+                    Column = dbo,
+                    DroppedForeignKeys = droppedDependencies
+                };
+                return rzlt;
             }
             catch (Exception ex)
             {
-                return new RenameColumnResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+                return new InsertColumnResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
             }
 
         }

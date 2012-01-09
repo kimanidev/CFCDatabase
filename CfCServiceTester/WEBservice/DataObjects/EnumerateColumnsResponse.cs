@@ -19,14 +19,26 @@ namespace CfCServiceTester.WEBservice.DataObjects
     }
 
     [DataContract(Namespace = "CfCServiceNS")]
-    public class InsertColumnResponse : RestoreStatus
+    public class InsertColumnResponseBase : RestoreStatus
     {
         [DataMember]
         public DataColumnDbo Column { get; set; }
     }
 
     [DataContract(Namespace = "CfCServiceNS")]
-    public class RenameColumnResponse : InsertColumnResponse
+    public class InsertColumnResponse : InsertColumnResponseBase
+    {
+        [DataMember]
+        public List<DroppedDependencyDbo> DroppedForeignKeys { get; set; }
+
+        public InsertColumnResponse() : base()
+        {
+            this.DroppedForeignKeys = new List<DroppedDependencyDbo>();
+        }
+    }
+
+    [DataContract(Namespace = "CfCServiceNS")]
+    public class RenameColumnResponse : InsertColumnResponseBase
     {
         [DataMember]
         public List<AlteredDependencyDbo> AlteredDependencies { get; set; }
@@ -38,7 +50,7 @@ namespace CfCServiceTester.WEBservice.DataObjects
     }
 
     [DataContract(Namespace = "CfCServiceNS")]
-    public class DeleteColumnResponse : InsertColumnResponse
+    public class DeleteColumnResponse : InsertColumnResponseBase
     {
         [DataMember]
         public List<DroppedDependencyDbo> DroppedDependencies { get; set; }
