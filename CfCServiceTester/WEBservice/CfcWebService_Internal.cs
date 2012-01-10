@@ -283,10 +283,19 @@ namespace CfCServiceTester.WEBservice
                     isSingleUserMode = SetSingleMode(db);
                 Column currentColumn;
                 DataColumnDbo oldValues = GetDataColumnDbo(aTable, column.Name, out currentColumn);
+
+                if (oldValues.IsNullable && !column.IsNullable)
+                    RemoveNullCondition(aTable, currentColumn);
                 if (!oldValues.IsPrimaryKey && column.IsPrimaryKey)
                 {
+                    // Include into primary key
                     droppedForeignKeys.AddRange(InsertColumnIntoPrimarykey(aTable, currentColumn, disableDependencies, db));
                     aTable.Alter();
+                }
+                else if (oldValues.IsPrimaryKey && !column.IsPrimaryKey)
+                {
+                    // Remove from primary key
+                    // TODO: write removing primary key and recreating it again
                 }
 
                 droppedKeys = droppedForeignKeys;

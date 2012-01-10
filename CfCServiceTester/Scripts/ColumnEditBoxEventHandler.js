@@ -8,7 +8,10 @@ function InsertColumn3(insertButton) {
         return false;
 
     var insertRequest = CreateUpdateRequest('Insert');
-    CfCServiceTester.WEBservice.CfcWebService.InsertColumn(insertRequest, onSuccess_InsertColumn, onFailure_InsertColumn);
+    if (insertRequest.Column.IsNullable && insertRequest.Column.IsPrimaryKey)
+        alert('Nullable columns cannot be included into primary key.');
+    else
+        CfCServiceTester.WEBservice.CfcWebService.InsertColumn(insertRequest, onSuccess_InsertColumn, onFailure_InsertColumn);
 
     return false;
 }
@@ -47,7 +50,10 @@ function EditColumn(editButton) {
 
     if (ValidateColumnName(false, "Update column")) {
         var updateRequest = CreateUpdateRequest('Modify');
-        CfCServiceTester.WEBservice.CfcWebService.UpdateColumn(updateRequest, onSuccess_UpdateColumn, onFailure_InsertColumn);
+        if (updateRequest.Column.IsNullable && updateRequest.Column.IsPrimaryKey)
+            alert('Nullable columns cannot be included into primary key.');
+        else
+            CfCServiceTester.WEBservice.CfcWebService.UpdateColumn(updateRequest, onSuccess_UpdateColumn, onFailure_InsertColumn);
     }
     return false;
 }
@@ -171,11 +177,52 @@ function CreateUpdateRequest(updateMode) {
     return rzlt;
 }
 
+// result is instance of InsertColumnResponse class
 function onSuccess_UpdateColumn(result) {
     var manager = $find('CfcTestManager');
+    var whiteSpace = ' ';
     $('#ColumnEditor2 span.Pauser').hide();
     if (result.IsSuccess) {
-        alert('I am here.');
+        var queryString = String.format("div#DynamicTable2 table tbody tr td.ColumnName:contains({0})", result.Column.Name);
+        //var currentRow = $(queryString).parent();
+        $(queryString).siblings().each(function (index) {
+            var curentElement = $(this);
+            switch (index) {
+                case 0:     // Is primary Key
+                    curentElement.text(result.Column.IsPrimaryKey ? '+' : whiteSpace);
+                    if (result.Column.IsPrimaryKey)
+                        curentElement.parent().attr("class", "primaryKeyRow");
+                    break;
+                case 1:     // Is identity
+                    curentElement.text(result.Column.IsIdentity ? '+' : whiteSpace);
+                    break;
+                case 2:     // Data type
+                    curentElement.text(result.Column.SqlDataType);
+                    break;
+                case 3:     // Maximum length
+                    curentElement.text(result.Column.MaximumLength);
+                    break;
+                case 4:     // Numeric precision
+                    curentElement.text(result.Column.NumericPrecision);
+                    break;
+                case 5:     // Numeric scale
+                    curentElement.text(result.Column.NumericScale);
+                    break;
+                case 6:     // Is NULL
+                    curentElement.text(result.Column.IsNullable ? '+' : whiteSpace);
+                    break;
+                case 7:     // Default value
+                    curentElement.text(result.Column.Default);
+                    break;
+            }
+        });
+        // Recreate 'Zebra';
+        $('div#DynamicTable2 table tbody tr').each(function (index) {
+            var className = index % 2 > 0 ? 'oddRow' : 'eventRow';
+            var jqThis = $(this);
+            if (jqThis.attr('class') != 'primaryKeyRow')
+                jqThis.attr('class', className);
+        });
 
         var boxy = manager.get_columnEditor()
         boxy.hide();

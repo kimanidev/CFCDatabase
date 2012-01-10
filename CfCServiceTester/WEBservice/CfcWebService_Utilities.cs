@@ -687,11 +687,7 @@ namespace CfCServiceTester.WEBservice
                 where ind.IndexKeyType == IndexKeyType.DriPrimaryKey
                 select ind).FirstOrDefault();
             if (query == null)
-            {
-                var primaryKeyIndex = new Index(table, String.Concat("PK_", table.Name)) { IndexKeyType = IndexKeyType.DriPrimaryKey };
-                primaryKeyIndex.IndexedColumns.Add(new IndexedColumn(primaryKeyIndex, column.Name));
-                table.Indexes.Add(primaryKeyIndex);
-            }
+                CreateNewPrimaryKey(table, column.Name);
             else
             {
                 if (disableDependencies)
@@ -701,6 +697,20 @@ namespace CfCServiceTester.WEBservice
                 AddColumnToIndex(table, column, query);
             }
             return droppedForeignKeys;
+        }
+
+        private static void CreateNewPrimaryKey(Table table, string columnName)
+        {
+            var primaryKeyIndex = new Index(table, String.Concat("PK_", table.Name))
+            {
+                IndexKeyType = IndexKeyType.DriPrimaryKey,
+                IsClustered = false,
+                FillFactor = 50
+            };
+            primaryKeyIndex.IndexedColumns.Add(new IndexedColumn(primaryKeyIndex, columnName));
+            primaryKeyIndex.Create();
+            primaryKeyIndex.DisallowPageLocks = true;
+            primaryKeyIndex.Alter();
         }
 
         private static void DropDependentForeignKeys(string primaryKeyName, Database db, List<DroppedDependencyDbo> droppedForeignKeys)
