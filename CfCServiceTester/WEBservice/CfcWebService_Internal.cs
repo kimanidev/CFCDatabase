@@ -286,6 +286,9 @@ namespace CfCServiceTester.WEBservice
 
                 if (oldValues.IsNullable && !column.IsNullable)
                     RemoveNullCondition(aTable, currentColumn);
+
+                
+                #region Primary Key block
                 if (!oldValues.IsPrimaryKey && column.IsPrimaryKey)
                 {
                     // Include into primary key
@@ -295,8 +298,18 @@ namespace CfCServiceTester.WEBservice
                 else if (oldValues.IsPrimaryKey && !column.IsPrimaryKey)
                 {
                     // Remove from primary key
-                    // TODO: write removing primary key and recreating it again
+                    droppedForeignKeys.AddRange(RemoveColumnFromPrimarykey(aTable, currentColumn, disableDependencies, db));
+                    aTable.Alter();
                 }
+                #endregion
+
+                if (!oldValues.IsNullable && column.IsNullable)
+                {
+                    droppedForeignKeys.AddRange(RestoreNullCondition(aTable, currentColumn, disableDependencies, db));
+                    aTable.Alter();
+                }
+                if (DataColumnDbo.RequiresRecreating(oldValues, column))
+                    droppedForeignKeys.AddRange(RemoveOrRestoreIdentity(aTable, column, disableDependencies, db));
 
                 droppedKeys = droppedForeignKeys;
                 return GetDataColumnDbo(aTable, column.Name, out currentColumn);

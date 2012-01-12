@@ -687,7 +687,7 @@ namespace CfCServiceTester.WEBservice
                 where ind.IndexKeyType == IndexKeyType.DriPrimaryKey
                 select ind).FirstOrDefault();
             if (query == null)
-                CreateNewPrimaryKey(table, column.Name);
+                CreateNewPrimaryKey(table, String.Concat("PK_", table.Name), IndexKeyType.DriPrimaryKey, column.Name);
             else
             {
                 if (disableDependencies)
@@ -699,20 +699,35 @@ namespace CfCServiceTester.WEBservice
             return droppedForeignKeys;
         }
 
-        private static void CreateNewPrimaryKey(Table table, string columnName)
+        /// <summary>
+        /// Recreates primary key or index.
+        /// </summary>
+        /// <param name="table">Current table <see cref="Table"/></param>
+        /// <param name="indexName">Name of the index/primary key</param>
+        /// <param name="indexKeyType">Type of index</param>
+        /// <param name="columnNames">Columns in the index</param>
+        private static void CreateNewPrimaryKey(Table table, string indexName, IndexKeyType indexKeyType,
+            params string[] columnNames)
         {
-            var primaryKeyIndex = new Index(table, String.Concat("PK_", table.Name))
+            var primaryKeyIndex = new Index(table, indexName)
             {
-                IndexKeyType = IndexKeyType.DriPrimaryKey,
+                IndexKeyType = indexKeyType,
                 IsClustered = false,
                 FillFactor = 50
             };
-            primaryKeyIndex.IndexedColumns.Add(new IndexedColumn(primaryKeyIndex, columnName));
+            foreach (string columnName in columnNames)
+                primaryKeyIndex.IndexedColumns.Add(new IndexedColumn(primaryKeyIndex, columnName));
             primaryKeyIndex.Create();
             primaryKeyIndex.DisallowPageLocks = true;
             primaryKeyIndex.Alter();
         }
 
+        /// <summary>
+        /// Drops foreign keys that points to selected primary key
+        /// </summary>
+        /// <param name="primaryKeyName">Name of the priamry key</param>
+        /// <param name="db">Current database</param>
+        /// <param name="droppedForeignKeys">List with dropped foreign keys</param>
         private static void DropDependentForeignKeys(string primaryKeyName, Database db, List<DroppedDependencyDbo> droppedForeignKeys)
         {
             const string queryString =
@@ -817,7 +832,7 @@ namespace CfCServiceTester.WEBservice
             idx.Alter();
         }
 
-        public static DataColumnDbo CreateDataColumnDbo(Column clmn, List<string> primaryKeyColumns)
+        public static DataColumnDbo CreateDataColumnDbo(Column clmn, IList<string> primaryKeyColumns)
         {
             var rzlt = new DataColumnDbo()
             {

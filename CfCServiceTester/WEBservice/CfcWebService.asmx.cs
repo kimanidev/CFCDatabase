@@ -11,6 +11,8 @@ using System.Text;
 using CfCServiceTester.WEBservice.InternalTypes;
 using CfCServiceTester.WEBservice.DataObjects;
 using System.IO;
+using System.Transactions;
+using System.Web.Configuration;
 
 namespace CfCServiceTester.WEBservice
 {
@@ -24,6 +26,12 @@ namespace CfCServiceTester.WEBservice
     [System.Web.Script.Services.ScriptService]
     public partial class CfcWebService : System.Web.Services.WebService
     {
+        /// <summary>
+        /// Transaction timeout in minutes. 
+        /// </summary>
+        private static readonly int TransactionTimeout = 10;
+
+
         /// <summary>
         /// Ping method for testing service
         /// </summary>
@@ -49,26 +57,35 @@ namespace CfCServiceTester.WEBservice
         [WebMethod]
         public IEnumerable<SqlServerDbo> EnumerateSqlServers(bool localOnly, string namePattern)
         {
-            DataTable dtSmo = SmoApplication.EnumAvailableSqlServers(localOnly);
-            var rzlt = new List<SqlServerDbo>();
-            SqlServerDbo dbo;
-
-            foreach (DataRow dr in dtSmo.Rows)
+            var options = new TransactionOptions()
             {
-                dbo = new SqlServerDbo()
-                {
-                    Name = dr.Field<string>("Name"),
-                    Server = dr.Field<string>("Server"),
-                    Instance = dr.Field<string>("Instance"),
-                    IsClustered = dr.Field<bool>("IsClustered"),
-                    Version = dr.Field<string>("Version"),
-                    IsLocal = dr.Field<bool>("IsLocal")
-                };
-                if (String.IsNullOrEmpty(namePattern) || dbo.Name.ToUpper().Contains(namePattern.ToUpper()))
-                    rzlt.Add(dbo);
-            }
+                IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                Timeout = new TimeSpan(0, TransactionTimeout, 0)
+            };
+            using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+            {
+                DataTable dtSmo = SmoApplication.EnumAvailableSqlServers(localOnly);
+                var rzlt = new List<SqlServerDbo>();
+                SqlServerDbo dbo;
 
-            return rzlt;
+                foreach (DataRow dr in dtSmo.Rows)
+                {
+                    dbo = new SqlServerDbo()
+                    {
+                        Name = dr.Field<string>("Name"),
+                        Server = dr.Field<string>("Server"),
+                        Instance = dr.Field<string>("Instance"),
+                        IsClustered = dr.Field<bool>("IsClustered"),
+                        Version = dr.Field<string>("Version"),
+                        IsLocal = dr.Field<bool>("IsLocal")
+                    };
+                    if (String.IsNullOrEmpty(namePattern) || dbo.Name.ToUpper().Contains(namePattern.ToUpper()))
+                        rzlt.Add(dbo);
+                }
+
+                trScope.Complete();
+                return rzlt;
+            }
         }
         /// <summary>
         /// Returns all available databases in selected server
@@ -82,30 +99,40 @@ namespace CfCServiceTester.WEBservice
         {
             try
             {
-                Server server = new Server(serverName);
-                var rzlt = new List<DatabaseDbo>();
-                if (server.Databases == null || server.Databases.Count < 1)
-                    return rzlt;
-                DatabaseDbo dbo;
-                string dbsName;
-
-                foreach (Database dbs in server.Databases)
+                var options = new TransactionOptions()
                 {
-                    dbsName = dbs.Name;
-                    if ((!String.IsNullOrEmpty(dbsName) || String.IsNullOrEmpty(namePattern) || dbsName.ToUpper().Contains(namePattern.ToUpper())) &&
-                        (!accessibleOnly || dbs.IsAccessible))
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    Server server = new Server(serverName);
+                    var rzlt = new List<DatabaseDbo>();
+                    if (server.Databases == null || server.Databases.Count < 1)
+                        return rzlt;
+                    DatabaseDbo dbo;
+                    string dbsName;
+
+                    foreach (Database dbs in server.Databases)
                     {
-                        dbo = new DatabaseDbo()
+                        dbsName = dbs.Name;
+                        if ((!String.IsNullOrEmpty(dbsName) || String.IsNullOrEmpty(namePattern) || dbsName.ToUpper().Contains(namePattern.ToUpper())) &&
+                            (!accessibleOnly || dbs.IsAccessible))
                         {
-                            Name = dbsName,
-                            ID = dbs.ID,
-                            IsAccessible = dbs.IsAccessible,
-                            Size = dbs.Size
-                        };
-                        rzlt.Add(dbo);
+                            dbo = new DatabaseDbo()
+                            {
+                                Name = dbsName,
+                                ID = dbs.ID,
+                                IsAccessible = dbs.IsAccessible,
+                                Size = dbs.Size
+                            };
+                            rzlt.Add(dbo);
+                        }
                     }
+
+                    trScope.Complete();
+                    return rzlt;
                 }
-                return rzlt;
             }
             catch (Exception ex)
             {
@@ -125,18 +152,27 @@ namespace CfCServiceTester.WEBservice
         {
             try
             {
-                Server server = new Server(serverName);
-                if (server == null)
-                    return new DataTableListDbo() { IsSuccess = false, ErrorMessage = "Invalid server's name." };
-                Database db = server.Databases[databaseName];
-                if (db == null)
-                    return new DataTableListDbo() { IsSuccess = false, ErrorMessage = "Invalid name of database." };
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    Server server = new Server(serverName);
+                    if (server == null)
+                        return new DataTableListDbo() { IsSuccess = false, ErrorMessage = "Invalid server's name." };
+                    Database db = server.Databases[databaseName];
+                    if (db == null)
+                        return new DataTableListDbo() { IsSuccess = false, ErrorMessage = "Invalid name of database." };
 
-                var rzlt = new List<string>();
-                foreach (Table currentTable in db.Tables)
-                    rzlt.Add(currentTable.Name);
+                    var rzlt = new List<string>();
+                    foreach (Table currentTable in db.Tables)
+                        rzlt.Add(currentTable.Name);
 
-                return new DataTableListDbo() { IsSuccess = true, TableNames = rzlt };
+                    trScope.Complete();
+                    return new DataTableListDbo() { IsSuccess = true, TableNames = rzlt };
+                }
             }
             catch (Exception ex)
             {
@@ -166,8 +202,18 @@ namespace CfCServiceTester.WEBservice
                 var rzlt = new CreateDbConnectionResponse() { Connected = true };
                 try
                 {
-                    rzlt.Roles = GetUsersRoles(credentials.UserName);
-                    return rzlt;
+                    var options = new TransactionOptions()
+                    {
+                        IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                        Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                    };
+                    using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                    {
+                        rzlt.Roles = GetUsersRoles(credentials.UserName);
+
+                        trScope.Complete();
+                        return rzlt;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -194,33 +240,42 @@ namespace CfCServiceTester.WEBservice
             bool isSingleMode = false;
             try
             {
-                if (!directory.EndsWith(@"\"))
-                    directory += @"\";
-                if (!Directory.Exists(directory))
+                var options = new TransactionOptions() 
+                { 
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
                 {
-                    string error = String.Format("Backup directory '{0}' was not found.", directory);
-                    return new BackupStatus() { IsSuccess = false, FileSize = 0L, ErrorMessage = error };
-                }
+                    if (!directory.EndsWith(@"\"))
+                        directory += @"\";
+                    if (!Directory.Exists(directory))
+                    {
+                        string error = String.Format("Backup directory '{0}' was not found.", directory);
+                        return new BackupStatus() { IsSuccess = false, FileSize = 0L, ErrorMessage = error };
+                    }
 
-                string fileName = Path.Combine(directory, file);
-                if (overWriteMode)
-                {
-                    if (File.Exists(fileName))
-                        File.Delete(fileName);
-                }
-                else
-                    RenameFile(fileName);
+                    string fileName = Path.Combine(directory, file);
+                    if (overWriteMode)
+                    {
+                        if (File.Exists(fileName))
+                            File.Delete(fileName);
+                    }
+                    else
+                        RenameFile(fileName);
 
-                long fileSize;
-                if (singleUserMode)
-                {
-                    isSingleMode = SetSingleMode(DatabaseName);
-                    fileSize = MakeBackup(fileName);
-                }
-                else
-                    fileSize = MakeBackup(fileName);
+                    long fileSize;
+                    if (singleUserMode)
+                    {
+                        isSingleMode = SetSingleMode(DatabaseName);
+                        fileSize = MakeBackup(fileName);
+                    }
+                    else
+                        fileSize = MakeBackup(fileName);
 
-                return new BackupStatus() { IsSuccess = true, FileSize = fileSize };
+                    trScope.Complete();
+                    return new BackupStatus() { IsSuccess = true, FileSize = fileSize };
+                }
             }
             catch (Exception ex)
             {
@@ -253,10 +308,20 @@ namespace CfCServiceTester.WEBservice
             }
             try
             {
-                IList<string> fileList = GetBackupFilenames(backupDirectory, template);
-                var rzlt = new EnumerateBackupFilesResponse() { IsSuccess = true };
-                rzlt.NameList = fileList;
-                return rzlt;
+                var options = new TransactionOptions() 
+                { 
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    IList<string> fileList = GetBackupFilenames(backupDirectory, template);
+                    var rzlt = new EnumerateBackupFilesResponse() { IsSuccess = true };
+                    rzlt.NameList = fileList;
+
+                    trScope.Complete();
+                    return rzlt;
+                }
             }
             catch (Exception ex)
             {
@@ -282,22 +347,32 @@ namespace CfCServiceTester.WEBservice
             bool isSingleMode = false;
             try
             {
-                if (!directory.EndsWith(@"\"))
-                    directory += @"\";
-                if (!Directory.Exists(directory))
+                var options = new TransactionOptions() 
+                { 
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
                 {
-                    string error = String.Format("Backup directory '{0}' was not found.", directory);
-                    return new EnumerateBackupFilesResponse() { IsSuccess = false, ErrorMessage = error };
+                    if (!directory.EndsWith(@"\"))
+                        directory += @"\";
+                    if (!Directory.Exists(directory))
+                    {
+                        string error = String.Format("Backup directory '{0}' was not found.", directory);
+                        return new EnumerateBackupFilesResponse() { IsSuccess = false, ErrorMessage = error };
+                    }
+                    string fileName = Path.Combine(directory, file);
+
+                    if (singleUserMode)
+                        isSingleMode = SetSingleMode(dbName);
+
+                    Restore(fileName, dbName, withReplace);
+                    if (switchDatabase)
+                        RenameDatabase(dbName);
+
+                    trScope.Complete();
+                    return new RestoreStatus() { IsSuccess = true };
                 }
-                string fileName = Path.Combine(directory, file);
-
-                if (singleUserMode)
-                    isSingleMode = SetSingleMode(dbName);
-
-                Restore(fileName, dbName, withReplace);
-                if (switchDatabase)
-                    RenameDatabase(dbName);
-                return new RestoreStatus() { IsSuccess = true };
             }
             catch (Exception ex)
             {
@@ -322,10 +397,20 @@ namespace CfCServiceTester.WEBservice
         {
             try
             {
-                if (singleUserMode)
-                    SetSingleMode(DatabaseName);
-                List<AlteredDependencyDbo> dependecies = RenameTheTable(oldName, newName);
-                return new RenameTableStatus() { IsSuccess = true, AlteredDependencies = dependecies };
+                var options = new TransactionOptions() 
+                { 
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    if (singleUserMode)
+                        SetSingleMode(DatabaseName);
+                    List<AlteredDependencyDbo> dependecies = RenameTheTable(oldName, newName);
+
+                    trScope.Complete();
+                    return new RenameTableStatus() { IsSuccess = true, AlteredDependencies = dependecies };
+                }
             }
             catch (Exception ex)
             {
@@ -350,10 +435,20 @@ namespace CfCServiceTester.WEBservice
         {
             try
             {
-                var rzlt = new EnumerateColumnsResponse();
-                rzlt.Columns.AddRange(GetTableColumns(tableName));
-                rzlt.IsSuccess = true;
-                return rzlt;
+                var options = new TransactionOptions() 
+                { 
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    var rzlt = new EnumerateColumnsResponse();
+                    rzlt.Columns.AddRange(GetTableColumns(tableName));
+                    rzlt.IsSuccess = true;
+
+                    trScope.Complete();
+                    return rzlt;
+                }
             }
             catch (Exception ex)
             {
@@ -373,9 +468,19 @@ namespace CfCServiceTester.WEBservice
             List<DroppedDependencyDbo> droppedForeignKeys;
             try
             {
-                DataColumnDbo column = InsertColumn(columnRequest.Table, columnRequest.Column, columnRequest.SingleUserMode,
-                                                    columnRequest.DisableDependencies, out droppedForeignKeys);
-                return new InsertColumnResponse() { IsSuccess = true, Column = column, DroppedForeignKeys = droppedForeignKeys };
+                var options = new TransactionOptions() 
+                { 
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    DataColumnDbo column = InsertColumn(columnRequest.Table, columnRequest.Column, columnRequest.SingleUserMode,
+                                                        columnRequest.DisableDependencies, out droppedForeignKeys);
+
+                    trScope.Complete();
+                    return new InsertColumnResponse() { IsSuccess = true, Column = column, DroppedForeignKeys = droppedForeignKeys };
+                }
             }
             catch (Exception ex)
             {
@@ -394,11 +499,21 @@ namespace CfCServiceTester.WEBservice
             List<AlteredDependencyDbo> alteredDependencies;
             try
             {
-                DataColumnDbo column = RenameColumn(columnRequest.Table, columnRequest.OldColumnName, columnRequest.Column.Name,
-                                                    columnRequest.SingleUserMode, out alteredDependencies);
-                var rzlt = new RenameColumnResponse() { IsSuccess = true, Column = column };
-                rzlt.AlteredDependencies.AddRange(alteredDependencies);
-                return rzlt;
+                var options = new TransactionOptions() 
+                { 
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    DataColumnDbo column = RenameColumn(columnRequest.Table, columnRequest.OldColumnName, columnRequest.Column.Name,
+                                                        columnRequest.SingleUserMode, out alteredDependencies);
+                    var rzlt = new RenameColumnResponse() { IsSuccess = true, Column = column };
+                    rzlt.AlteredDependencies.AddRange(alteredDependencies);
+
+                    trScope.Complete();
+                    return rzlt;
+                }
             }
             catch (Exception ex)
             {
@@ -418,10 +533,20 @@ namespace CfCServiceTester.WEBservice
             List<DroppedDependencyDbo> droppedDependencies;
             try
             {
-                DeleteColumn(columnRequest.Table, columnRequest.Column.Name, columnRequest.DisableDependencies,
-                                                    columnRequest.SingleUserMode, out droppedDependencies);
-                var rzlt = new DeleteColumnResponse() { IsSuccess = true, DroppedDependencies = droppedDependencies };
-                return rzlt;
+                var options = new TransactionOptions() 
+                { 
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    DeleteColumn(columnRequest.Table, columnRequest.Column.Name, columnRequest.DisableDependencies,
+                                                        columnRequest.SingleUserMode, out droppedDependencies);
+                    var rzlt = new DeleteColumnResponse() { IsSuccess = true, DroppedDependencies = droppedDependencies };
+
+                    trScope.Complete();
+                    return rzlt;
+                }
             }
             catch (Exception ex)
             {
@@ -439,16 +564,26 @@ namespace CfCServiceTester.WEBservice
         {
             try
             {
-                List<DroppedDependencyDbo> droppedDependencies;
-                DataColumnDbo dbo = UpdateColumn(columnRequest.Table, columnRequest.Column, columnRequest.DisableDependencies,
-                                                    columnRequest.SingleUserMode, out droppedDependencies);
-                var rzlt = new InsertColumnResponse() 
+                var options = new TransactionOptions() 
                 { 
-                    IsSuccess = true,
-                    Column = dbo,
-                    DroppedForeignKeys = droppedDependencies
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
                 };
-                return rzlt;
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    List<DroppedDependencyDbo> droppedDependencies;
+                    DataColumnDbo dbo = UpdateColumn(columnRequest.Table, columnRequest.Column, columnRequest.DisableDependencies,
+                                                        columnRequest.SingleUserMode, out droppedDependencies);
+                    var rzlt = new InsertColumnResponse()
+                    {
+                        IsSuccess = true,
+                        Column = dbo,
+                        DroppedForeignKeys = droppedDependencies
+                    };
+                    
+                    trScope.Complete();
+                    return rzlt;
+                }
             }
             catch (Exception ex)
             {

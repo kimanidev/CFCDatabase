@@ -125,13 +125,13 @@ function PrepareDialogFields(aLink) {
     $(query + 'eq(0)').attr('checked', rowData[0] == '+');
     $(query + 'eq(1)').attr('checked', rowData[1] == '+');
     $(query + 'eq(2)').attr('checked', rowData[6] == '+');
-
+/*
     if (rowData[0] == '+' || rowData[1] == '+') {
         $('#spnModifyColumnType3').hide();
     } else {
         $('#spnModifyColumnType3').show();
     }
-
+*/
     // DropDown List
     query = manager.get_ddlDatatype3Id() + ' option';
     $(query + '[selected]').removeAttr('selected');

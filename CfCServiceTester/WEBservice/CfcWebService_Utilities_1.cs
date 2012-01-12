@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using Microsoft.SqlServer.Management.Smo;
 using System.Data;
 using System.Text;
+using CfCServiceTester.WEBservice.DataObjects;
 
 namespace CfCServiceTester.WEBservice
 {
@@ -14,6 +15,8 @@ namespace CfCServiceTester.WEBservice
     /// </summary>
     public partial class CfcWebService
     {
+        private delegate void ProcessColumnDelegate(Table aTable, DataColumnDbo currentColumn);
+
         /// <summary>
         /// Removes is null condition from the column
         /// </summary>
@@ -39,11 +42,16 @@ namespace CfCServiceTester.WEBservice
         }
 
         /// <summary>
-        /// Returns <code>true</code> if table contains no repeating values in defined set of columns
+        /// Returns <code>true</code> if table contains no repeating values in defined set of columns. 
         /// </summary>
         /// <param name="aTable">Table to be tested, <see cref="Table"/></param>
         /// <param name="columnNames">Set of columns that needs to be verified</param>
-        /// <returns><code>true</code> - all rows contains different value of the set.</returns>
+        /// <returns>
+        ///     <list type="bullet">
+        ///         <item><code>true</code> - all rows contains different values of the set,</item>
+        ///         <item><code>false</code> - no colums or set contains repeating values in the table</item>
+        ///     </list>
+        /// </returns>
         private static bool AreValuesUnique(Table aTable, params string[] columnNames)
         {
             const string query =
@@ -57,6 +65,8 @@ namespace CfCServiceTester.WEBservice
                 "SELECT COUNT(*) AS [BadRowCounter] FROM tmp WHERE [repo] > 1";
 
             int badRowCounter;
+            if (columnNames.Length < 1)
+                return false;
 
             var sb = new StringBuilder();
             foreach (string name in columnNames)
@@ -96,6 +106,160 @@ namespace CfCServiceTester.WEBservice
 
             primaryKey = null;
             return rzlt.ToArray();
+        }
+
+        private static string[] GetIndexColumns(Index ind)
+        {
+            var rzlt = new List<string>();
+            if (ind != null)
+            {
+                foreach (IndexedColumn clm in ind.IndexedColumns)
+                    rzlt.Add(clm.Name);
+            }
+            return rzlt.ToArray();
+        }
+
+        private static List<DroppedDependencyDbo> RemoveColumnFromPrimarykey(
+                                Table aTable, Column column, bool disableDependencies, Database db)
+        {
+            Index primaryKey;
+            var rzlt = new List<DroppedDependencyDbo>();
+            IndexKeyType oldIndexKeyType;
+            bool oldIsClustered;
+            string oldIndexName;
+
+            string[] newColumns = GetPrimaryKeyColumns(aTable, column.Name, out primaryKey);
+            if (disableDependencies)
+                DropDependentForeignKeys(primaryKey.Name, db, rzlt);
+
+            oldIndexName = primaryKey.Name;
+            oldIndexKeyType = primaryKey.IndexKeyType;
+            oldIsClustered = primaryKey.IsClustered;
+            primaryKey.Drop();
+
+            if (AreValuesUnique(aTable, newColumns))
+                CreateNewPrimaryKey(aTable, oldIndexName, oldIndexKeyType, newColumns);
+            return rzlt;
+        }
+
+        private static List<DroppedDependencyDbo> RestoreNullCondition(
+                                Table aTable, Column column, bool disableDependencies, Database db)
+        {
+            var rzlt = new List<DroppedDependencyDbo>();
+            IndexKeyType oldIndexKeyType;
+            bool oldIsClustered;
+            string oldIndexName;
+
+            for (int i = aTable.Indexes.Count - 1; i >= 0; i--)
+            {
+                Index currentInd = aTable.Indexes[i];
+                string[] indexColumns = GetIndexColumns(currentInd);
+                if (indexColumns.Contains(column.Name))
+                {
+                    if (disableDependencies)
+                        DropDependentForeignKeys(currentInd.Name, db, rzlt);
+
+                    oldIndexName = currentInd.Name;
+                    oldIndexKeyType = currentInd.IndexKeyType;
+                    oldIsClustered = currentInd.IsClustered;
+                    currentInd.Drop();
+
+                    column.Nullable = true;
+                    column.Alter();
+                    CreateNewPrimaryKey(aTable, oldIndexName, oldIndexKeyType, indexColumns);
+                    return rzlt;
+                }
+            }
+
+            // No index contains column
+            column.Nullable = true;
+            column.Alter();
+            return rzlt;
+        }
+
+        private static List<DroppedDependencyDbo> ModifyColumn(ProcessColumnDelegate processor,
+                                    Table aTable, DataColumnDbo column, bool disableDependencies, Database db)
+        {
+            var rzlt = new List<DroppedDependencyDbo>();
+            IndexKeyType oldIndexKeyType;
+            bool oldIsClustered;
+            string oldIndexName;
+
+            for (int i = aTable.Indexes.Count - 1; i >= 0; i--)
+            {
+                Index currentInd = aTable.Indexes[i];
+                string[] indexColumns = GetIndexColumns(currentInd);
+                if (indexColumns.Contains(column.Name))
+                {
+                    if (disableDependencies)
+                        DropDependentForeignKeys(currentInd.Name, db, rzlt);
+
+                    oldIndexName = currentInd.Name;
+                    oldIndexKeyType = currentInd.IndexKeyType;
+                    oldIsClustered = currentInd.IsClustered;
+                    currentInd.Drop();
+
+                    processor(aTable, column);
+                    CreateNewPrimaryKey(aTable, oldIndexName, oldIndexKeyType, indexColumns);
+                    return rzlt;
+                }
+            }
+
+            // No index contains column
+            processor(aTable, column);
+            return rzlt;
+        }
+
+        /// <summary>
+        /// Removes Identity constraint
+        /// </summary>
+        /// <param name="aTable">Table, <see cref="Table"/></param>
+        /// <param name="column">Column, <see cref="DataColumnDbo"/></param>
+        /// <param name="disableDependencies"><code>true></code> - drop dependencies</param>
+        /// <param name="db">Current database, <see cref="Database"/></param>
+        public static List<DroppedDependencyDbo> RemoveOrRestoreIdentity(
+                                    Table aTable, DataColumnDbo column, bool disableDependencies, Database db)
+        {
+            return ModifyColumn(new ProcessColumnDelegate(RecreateColumn), aTable, column, disableDependencies, db);
+        }
+        private static void RecreateColumn(Table aTable, DataColumnDbo column)
+        {
+
+            // Create new column
+            bool oldIsNullable = column.IsNullable;
+            string oldName = column.Name;
+            column.IsNullable = true;
+            column.Name = String.Format("{0}_{1}", oldName, CreateUniqueAppendix());
+            Column newColumn = CreateColumn(aTable, column);
+            aTable.Alter();
+            
+            // Copy data into new column
+            string queryString = String.Format("UPDATE [{0}] SET [{1}] = [{2}]", aTable.Name, column.Name, oldName);
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                var command = new SqlCommand(queryString, connection);
+                command.Connection.Open();
+                command.ExecuteNonQuery();
+            }
+
+            // Drop old column and rename new one.
+            aTable.Columns[oldName].Drop();
+            aTable.Alter();
+            Column clmn = aTable.Columns[column.Name];
+            if (!oldIsNullable)
+                clmn.Nullable = false;
+            column.IsNullable = oldIsNullable;
+
+            clmn.Rename(oldName);
+            clmn.Alter();
+            aTable.Alter();
+            column.Name = oldName;
+        }
+        private static string CreateUniqueAppendix()
+        {
+            string tmp = Guid.NewGuid().ToString();
+            tmp = tmp.Substring(1, tmp.Length - 2);
+            return tmp.Replace("-", String.Empty);
         }
     }
 }

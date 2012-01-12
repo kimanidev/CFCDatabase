@@ -192,6 +192,8 @@ function onSuccess_UpdateColumn(result) {
                     curentElement.text(result.Column.IsPrimaryKey ? '+' : whiteSpace);
                     if (result.Column.IsPrimaryKey)
                         curentElement.parent().attr("class", "primaryKeyRow");
+                    else
+                        curentElement.parent().removeAttr("class");
                     break;
                 case 1:     // Is identity
                     curentElement.text(result.Column.IsIdentity ? '+' : whiteSpace);

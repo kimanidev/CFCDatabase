@@ -65,5 +65,14 @@ namespace CfCServiceTester.WEBservice.DataObjects
         /// </summary>
         [DataMember]
         public string Default { get; set; }
+
+        public static bool RequiresRecreating(DataColumnDbo item1, DataColumnDbo item2)
+        {
+            return item1.SqlDataType != item2.SqlDataType ||
+                   item1.MaximumLength != item2.MaximumLength ||
+                   item1.NumericPrecision != item2.NumericPrecision ||
+                   item1.NumericScale != item2.NumericScale ||
+                   item1.IsIdentity != item2.IsIdentity;
+        }
     }
 }
