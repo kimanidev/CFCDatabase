@@ -32,6 +32,10 @@ function RenameColumn3(renameButton) {
 // Delete the column
 function DeleteColumn3(deleteButton) {
     var manager = $find('CfcTestManager');
+    if ($('#DynamicTable2 table tbody tr').length < 2) {
+        alert('MSSQL server does not support tables without columns.\nConsider deleting table instead.');
+        return false;
+    }
 
     var confirmMessage = String.format("Are you sure to delete the '{0}' column?", $(manager.get_txtColumnName3Id()).val());
     if (!confirm(confirmMessage))

@@ -50,7 +50,14 @@ function PickBackupFiles1() {
 function RestoreDatabase(chkOverwriteId) {
     var manager = $find('CfcTestManager');
 
+    var currentDatabase = $(manager.get_txtCurrentDatabaseName1Id()).val();
     var dbName = $(manager.get_txtDatabaseName1Id()).val();
+    if (dbName == currentDatabase) {
+        var errMessage = "Active database '" + currentDatabase + "' and restored database '" + dbName + "' must be different.";
+        alert(errMessage);
+        return false;
+    }
+
     var directory = $(manager.get_txtBackupDirectoryId()).val();
     var fileName = $(manager.get_txtFileName1Id()).val();
     var overWriteMode = $('#' + chkOverwriteId).attr('checked') == 'checked';
@@ -152,8 +159,9 @@ function onSuccess_RestoreDatabase(result) {
         $(manager.get_spnRestoreError1Id()).hide();
         $(manager.get_spnRestoreOK1Id()).show();
         if ($('#chkSwitchDatabase').attr('checked') == 'checked') {
-            var newDbName = $(ma.get_txtDatabaseName1Id()).val();
+            var newDbName = $(manager.get_txtDatabaseName1Id()).val();
             $(manager.get_txtDatabaseNameId()).val(newDbName);
+            $(manager.get_txtCurrentDatabaseName1Id()).val(newDbName);
         }
     }
     else {

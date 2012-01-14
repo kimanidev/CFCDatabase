@@ -69,11 +69,18 @@
         <td colspan="3"><hr /></td>
     </tr>
     <tr>
-        <td>
-            <a href="#" title="Display structure of the table and modify it." onclick="return GetColumnInfo(this);">Edit table</a>
-        </td>
-        <td colspan="2">
+        <td colspan="3">
             <span id="spnGetColumnsError2" class="ErrorMessage" style="display: none;" />
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3" style="white-space: nowrap;">
+            <asp:Button ID="btnCreateTable" runat="server" Text="Create table" ToolTip="Create new data table and modify it."
+                        CssClass="MpsButton" OnClientClick="return CreateNewTable(this);" />
+            <asp:Button ID="btnEditTable" runat="server" Text="Edit table" ToolTip="Display structure of the table and modify it."
+                        CssClass="MpsButton" OnClientClick="return GetColumnInfo(this);" />
+            <asp:Button ID="btnDeleteTable" runat="server" Text="Delete table" ToolTip="Delete the table."
+                        CssClass="MpsButton" OnClientClick="return DeleteTable(this);" />
         </td>
     </tr>
     <tr>

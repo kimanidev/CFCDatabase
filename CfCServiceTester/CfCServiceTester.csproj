@@ -115,6 +115,7 @@
     <Content Include="Styles\base\jquery.ui.core.css" />
     <Content Include="Styles\base\jquery.ui.theme.css" />
     <Content Include="Styles\boxy.css" />
+    <Content Include="Styles\Buttons.css" />
     <Content Include="Styles\Styles.css" />
     <Content Include="Styles\FormattedTable.css" />
     <Content Include="Styles\ui-lightness\images\ui-anim_basic_16x16.gif" />

@@ -67,8 +67,54 @@ function GetColumnInfo(hrefElement) {
         return false;
     }
 
-    CfCServiceTester.WEBservice.CfcWebService.EnumerateColumns(serverName, databaseName, tableName,
-                                                          onSuccess_EnumerateColumns, onFailure_EnumerateTables);
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateColumns(tableName, onSuccess_EnumerateColumns, onFailure_EnumerateTables);
+    return false;
+}
+
+// Create new table
+function CreateNewTable(aButton) {
+    var manager = $find('CfcTestManager');
+
+    var serverName = $(manager.get_txtServerName2Id()).val();
+    if (!serverName) {
+        alert('Server is not selected.')
+        return false;
+    }
+    var databaseName = $(manager.get_txtDatabaseName2Id()).val();
+    if (!databaseName) {
+        alert('Database is not selected.')
+        return false;
+    }
+    var tableName = $(manager.get_txtTable2Id()).val();
+    if (!tableName) {
+        alert('Table name is not defined.')
+        return false;
+    }
+    CfCServiceTester.WEBservice.CfcWebService.CreateTable(tableName, onSuccess_EnumerateColumns, onFailure_EnumerateTables);
+    return false;
+}
+
+// Delete table
+function DeleteTable(aButton) {
+    var manager = $find('CfcTestManager');
+
+    var serverName = $(manager.get_txtServerName2Id()).val();
+    if (!serverName) {
+        alert('Server is not selected.')
+        return false;
+    }
+    var databaseName = $(manager.get_txtDatabaseName2Id()).val();
+    if (!databaseName) {
+        alert('Database is not selected.')
+        return false;
+    }
+    var tableName = $(manager.get_txtTable2Id()).val();
+    if (!tableName) {
+        alert('Table name is not defined.')
+        return false;
+    }
+    if (confirm("Are you sure to delete table '" + tableName + "'?"))
+        CfCServiceTester.WEBservice.CfcWebService.DeleteTable(tableName, true, onSuccess_DeleteTable, onFailure_EnumerateTables);
     return false;
 }
 
@@ -186,7 +232,23 @@ function onSuccess_RenameTable(result)
     }
 }
 
-// rsult is instance of EnumerateColumnsResponse
+// result is instance of DeleteTableResponse
+function onSuccess_DeleteTable(result) {
+    var manager = $find('CfcTestManager');
+    var errMessage = $('span#spnGetColumnsError2');
+
+    if (!result.IsSuccess) {
+        errMessage.text(result.ErrorMessage);
+        errMessage.show();
+    } else {
+        alert(result.ErrorMessage);     // ErrorMessage says: Table 'xxx' is deleted.
+        $(manager.get_txtTable2Id()).val('');
+        $(manager.get_txtNewTable2Id()).val('');
+        $('#DynamicTable2').hide();
+    }
+}
+
+// result is instance of EnumerateColumnsResponse
 function onSuccess_EnumerateColumns(result) {
     var errMessage = $('span#spnGetColumnsError2');
     if (!result.IsSuccess) {

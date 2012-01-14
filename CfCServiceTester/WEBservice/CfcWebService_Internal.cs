@@ -189,7 +189,7 @@ namespace CfCServiceTester.WEBservice
             return CorrectStoredProcedure(db, oldName, newName);
         }
 
-        public static IEnumerable<DataColumnDbo> GetTableColumns(/*string serverName, string dbName, */string tableName)
+        public static IEnumerable<DataColumnDbo> GetTableColumns(string tableName, bool createNewTable = false)
         {
             var srv = new Server(SqlServerName);
             if (srv == null)
@@ -200,7 +200,17 @@ namespace CfCServiceTester.WEBservice
 
             Table aTable = db.Tables[tableName];
             if (aTable == null)
-                throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName));
+            {
+                if (createNewTable)
+                {
+                    aTable = new Table(db, tableName);  // It is impossible to create table without columns
+                    var col = new Column(aTable, "ID", DataType.Int) { Nullable = false };   
+                    aTable.Columns.Add(col);
+                    aTable.Create();
+                }
+                else
+                    throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName));
+            }
             List<string> primaryKeyColumns = GetPrimaryKeyColumns(aTable);
 
             foreach (Column clmn in aTable.Columns)
@@ -208,6 +218,29 @@ namespace CfCServiceTester.WEBservice
                 yield return CreateDataColumnDbo(clmn, primaryKeyColumns);
             }
         }
+
+        /// <summary>
+        /// Removes table from database
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="disableDependencies"><code>true</code> - remove foreign keys that references the table</param>
+        public static List<DroppedDependencyDbo> DeleteTheTable(string tableName, bool disableDependencies)
+        {
+           var srv = new Server(SqlServerName);
+            if (srv == null)
+                throw new Exception(String.Format("Server '{0}' was not found.", SqlServerName));
+            var db = srv.Databases[DatabaseName];
+            if (srv == null)
+                throw new Exception(String.Format("Database '{0}' was not found.", DatabaseName));
+
+            Table aTable = db.Tables[tableName];
+            if (aTable == null)
+                throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName));
+
+            var droppedForeignKeys = new List<DroppedDependencyDbo>();
+            DeleteTable(aTable, disableDependencies, db, droppedForeignKeys);
+            return droppedForeignKeys;
+         }
 
         /// <summary>
         /// Inserts new column into the table

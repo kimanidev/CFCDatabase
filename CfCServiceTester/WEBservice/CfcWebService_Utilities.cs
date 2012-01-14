@@ -754,28 +754,7 @@ namespace CfCServiceTester.WEBservice
                     select new KeyValuePair<string, string>(fKey.Field<string>("ForeignKeyName"), fKey.Field<string>("TableName"))
                     ).ToList();
             }
-
-            foreach (KeyValuePair<string, string> pair in lstForeignKeys)
-            {
-                Table currentTable = db.Tables[pair.Value];
-                if (currentTable != null)
-                {
-                    ForeignKey fKey = currentTable.ForeignKeys[pair.Key];
-                    if (fKey != null)
-                    {
-                        droppedForeignKeys.Add(new DroppedDependencyDbo()
-                        {
-                            Name = fKey.Name,
-                            ObjectType = DbObjectType.foreignKey,
-                            TableName = currentTable.Name,
-                            Columns = GetColumnNames(fKey)
-                        });
-                        fKey.Drop();
-                    }
-                    currentTable.Alter();
-                }
-            }
-
+            DropCorrentForeignKey(lstForeignKeys, db, droppedForeignKeys);
         }
 
         public static void AddColumnToIndex(Table table, Column column, Index ind)

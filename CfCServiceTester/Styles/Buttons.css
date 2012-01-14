@@ -1,0 +1,53 @@
+﻿/* CSS3 Buttons Without Images */
+ 
+button, input.MpsButton {
+	-moz-border-radius:12px;
+	-webkit-border-radius:12px;
+	border-radius:16px;
+	min-width:100px;
+	min-height:32px;
+	box-shadow: 5px 5px 5px #575757;
+	-moz-box-shadow:0px 0px 2px rgba(0,0,0,0.4);
+	-webkit-box-shadow:0px 0px 2px rgba(0,0,0,0.4);
+	
+	color:rgba(0,0,0,0.9);
+	text-shadow:1px 1px 0px #4D4D4D);
+	text-shadow:1px 1px 0px rgba(255,255,255,0.8);
+	border:1px solid rgba(0,0,0,0.5);
+	
+	background:#5CDCE9;
+	background:-webkit-gradient(linear,0% 100%,0% 0%,from(rgba(92,220,233,1)),to(rgba(151,230,237, 1)));
+	background:-moz-linear-gradient(bottom,rgba(92,220,233,1),rgba(151,230,237, 1));
+	background:linear-gradient(bottom,rgba(92,220,233,1),rgba(151,230,237, 1));
+	
+	padding-left: 1em; 
+	padding-right: 1em; 
+	padding-top: 5px; 
+	padding-bottom: 5px;
+	/* padding:5px 5px 5px 5px; */
+}
+ 
+button:hover, input.MpsButton:hover {
+	background:#D8E691;
+	background:-webkit-gradient(linear,0% 100%,0% 0%,from(rgba(195,206,40,1)),to(rgba(216,223,145, 1)));
+	background:-moz-linear-gradient(bottom,rgba(195,206,40,1),rgba(216,223,145, 1));
+	background:linear-gradient(bottom,rgba(195,206,40,1),rgba(216,223,145, 1));
+}
+ 
+button:active, button:focus, input.MpsButton:active, input.MpsButton:focus {
+	background:-webkit-gradient(linear,0% 100%,0% 0%,from(rgba(255,b6,b7,bc)),to(rgba(185,185,185,1)));
+	background:-moz-linear-gradient(bottom,rgba(255,b6,b7,bc),rgba(185,185,185,1));
+}
+ 
+button[disabled], input.MpsButton[disabled] {
+	color:rgba(0,0,0,0.4);
+	text-shadow:1px 1px 0px rgba(255,255,255,0.5);
+	background:#DCDCDC;
+	background:rgba(220,220,220,1);
+}
+
+.movedUp
+{
+    margin-top: -5px;
+}
+/* ================================ */

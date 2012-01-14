@@ -94,6 +94,33 @@ namespace CfCServiceTester.CustomControls {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl spnRenameTableOK2;
         
         /// <summary>
+        /// btnCreateTable control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCreateTable;
+        
+        /// <summary>
+        /// btnEditTable control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnEditTable;
+        
+        /// <summary>
+        /// btnDeleteTable control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnDeleteTable;
+        
+        /// <summary>
         /// ColumnEditorBox2 control.
         /// </summary>
         /// <remarks>

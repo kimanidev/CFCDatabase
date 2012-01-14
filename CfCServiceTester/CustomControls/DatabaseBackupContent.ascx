@@ -15,8 +15,11 @@
     </tr>
     <tr>
         <td>Selected Server</td>
-        <td colspan="2">
+        <td>
             <asp:TextBox ID="txtServerName1" runat="server" Text="" ReadOnly="true" Width="98%" BackColor="#EAF7FB" />
+        </td>
+        <td>
+            <asp:TextBox ID="txtCurrentDatabaseName1" runat="server" Text="" ReadOnly="true" Width="98%" BackColor="#EAF7FB" />
         </td>
     </tr>
     <tr>

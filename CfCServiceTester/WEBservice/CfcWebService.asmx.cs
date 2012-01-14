@@ -199,7 +199,11 @@ namespace CfCServiceTester.WEBservice
                 return new CreateDbConnectionResponse() { Connected = false, ErrorMessage = message };
             else
             {
-                var rzlt = new CreateDbConnectionResponse() { Connected = true };
+                var rzlt = new CreateDbConnectionResponse() {
+                    Connected = true,
+                    CurrentServer = dataSource,
+                    CurrentDatabase = initialCatalog,
+                };
                 try
                 {
                     var options = new TransactionOptions()
@@ -210,7 +214,6 @@ namespace CfCServiceTester.WEBservice
                     using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
                     {
                         rzlt.Roles = GetUsersRoles(credentials.UserName);
-
                         trScope.Complete();
                         return rzlt;
                     }
@@ -240,42 +243,33 @@ namespace CfCServiceTester.WEBservice
             bool isSingleMode = false;
             try
             {
-                var options = new TransactionOptions() 
-                { 
-                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
-                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
-                };
-                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                if (!directory.EndsWith(@"\"))
+                    directory += @"\";
+                if (!Directory.Exists(directory))
                 {
-                    if (!directory.EndsWith(@"\"))
-                        directory += @"\";
-                    if (!Directory.Exists(directory))
-                    {
-                        string error = String.Format("Backup directory '{0}' was not found.", directory);
-                        return new BackupStatus() { IsSuccess = false, FileSize = 0L, ErrorMessage = error };
-                    }
-
-                    string fileName = Path.Combine(directory, file);
-                    if (overWriteMode)
-                    {
-                        if (File.Exists(fileName))
-                            File.Delete(fileName);
-                    }
-                    else
-                        RenameFile(fileName);
-
-                    long fileSize;
-                    if (singleUserMode)
-                    {
-                        isSingleMode = SetSingleMode(DatabaseName);
-                        fileSize = MakeBackup(fileName);
-                    }
-                    else
-                        fileSize = MakeBackup(fileName);
-
-                    trScope.Complete();
-                    return new BackupStatus() { IsSuccess = true, FileSize = fileSize };
+                    string error = String.Format("Backup directory '{0}' was not found.", directory);
+                    return new BackupStatus() { IsSuccess = false, FileSize = 0L, ErrorMessage = error };
                 }
+
+                string fileName = Path.Combine(directory, file);
+                if (overWriteMode)
+                {
+                    if (File.Exists(fileName))
+                        File.Delete(fileName);
+                }
+                else
+                    RenameFile(fileName);
+
+                long fileSize;
+                if (singleUserMode)
+                {
+                    isSingleMode = SetSingleMode(DatabaseName);
+                    fileSize = MakeBackup(fileName);
+                }
+                else
+                    fileSize = MakeBackup(fileName);
+
+                return new BackupStatus() { IsSuccess = true, FileSize = fileSize };
             }
             catch (Exception ex)
             {
@@ -347,32 +341,23 @@ namespace CfCServiceTester.WEBservice
             bool isSingleMode = false;
             try
             {
-                var options = new TransactionOptions() 
-                { 
-                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
-                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
-                };
-                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                if (!directory.EndsWith(@"\"))
+                    directory += @"\";
+                if (!Directory.Exists(directory))
                 {
-                    if (!directory.EndsWith(@"\"))
-                        directory += @"\";
-                    if (!Directory.Exists(directory))
-                    {
-                        string error = String.Format("Backup directory '{0}' was not found.", directory);
-                        return new EnumerateBackupFilesResponse() { IsSuccess = false, ErrorMessage = error };
-                    }
-                    string fileName = Path.Combine(directory, file);
-
-                    if (singleUserMode)
-                        isSingleMode = SetSingleMode(dbName);
-
-                    Restore(fileName, dbName, withReplace);
-                    if (switchDatabase)
-                        RenameDatabase(dbName);
-
-                    trScope.Complete();
-                    return new RestoreStatus() { IsSuccess = true };
+                    string error = String.Format("Backup directory '{0}' was not found.", directory);
+                    return new EnumerateBackupFilesResponse() { IsSuccess = false, ErrorMessage = error };
                 }
+                string fileName = Path.Combine(directory, file);
+
+                if (singleUserMode)
+                    isSingleMode = SetSingleMode(dbName);
+
+                Restore(fileName, dbName, withReplace);
+                if (switchDatabase)
+                    RenameDatabase(dbName);
+
+                return new RestoreStatus() { IsSuccess = true };
             }
             catch (Exception ex)
             {
@@ -426,12 +411,10 @@ namespace CfCServiceTester.WEBservice
         /// <summary>
         /// Returns description of all columns in the table
         /// </summary>
-        /// <param name="serverName">Server name</param>
-        /// <param name="dbName">database name</param>
         /// <param name="tableName">table name</param>
         /// <returns><see cref="EnumerateColumnsResponse"/></returns>
         [WebMethod(EnableSession = true)]
-        public EnumerateColumnsResponse EnumerateColumns(string serverName, string dbName, string tableName)
+        public EnumerateColumnsResponse EnumerateColumns(string tableName)
         {
             try
             {
@@ -453,6 +436,73 @@ namespace CfCServiceTester.WEBservice
             catch (Exception ex)
             {
                 return new EnumerateColumnsResponse() { IsSuccess = false, ErrorMessage = ex.Message };
+            }
+        }
+
+        /// <summary>
+        /// Creates new table and returns  empty list or description of all columns in the table when the table exists.
+        /// </summary>
+        /// <param name="tableName">table name</param>
+        /// <returns><see cref="EnumerateColumnsResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public EnumerateColumnsResponse CreateTable(string tableName)
+        {
+            try
+            {
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    var rzlt = new EnumerateColumnsResponse();
+                    rzlt.Columns.AddRange(GetTableColumns(tableName, true));
+                    rzlt.IsSuccess = true;
+
+                    trScope.Complete();
+                    return rzlt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return new EnumerateColumnsResponse() { IsSuccess = false, ErrorMessage = ex.Message };
+            }
+        }
+
+        /// <summary>
+        /// Removes table from the database
+        /// </summary>
+        /// <param name="tableName">table name</param>
+        /// <param name="disableDependencies"><code>true</code> - remove foreign keys that references the table</param>
+        /// <returns><see cref="DeleteTableResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public DeleteTableResponse DeleteTable(string tableName, bool disableDependencies)
+        {
+            try
+            {
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    List<DroppedDependencyDbo> droppedKeys = DeleteTheTable(tableName, disableDependencies);
+                    var rzlt = new DeleteTableResponse() 
+                    { 
+                        DroppedDependencies = droppedKeys ,
+                        ErrorMessage = String.Format("Table '{0}' is deleted.", tableName),
+                        IsSuccess = true
+                    };
+
+                    trScope.Complete();
+                    return rzlt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return new DeleteTableResponse() { IsSuccess = false, ErrorMessage = ex.Message };
             }
         }
 

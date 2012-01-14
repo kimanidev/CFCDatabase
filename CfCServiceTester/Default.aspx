@@ -10,6 +10,7 @@
 <head runat="server">
     <title>CfC Service Tester</title>
     <link href="Styles/Styles.css" rel="stylesheet" type="text/css"/>
+    <link href="Styles/Buttons.css" rel="stylesheet" type="text/css"/>
     <link href="Styles/boxy.css" rel="stylesheet" type="text/css"/>
     <link href="Styles/FormattedTable.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -72,6 +73,7 @@
                         'spnBackupErrorId': '#<%= (GetSecondPageControlId("spnBackupError")) %>',
                         'spnBackupOkId': '#<%= (GetSecondPageControlId("spnBackupOK")) %>',
                         'txtServerName1Id': '#<%= (GetSecondPageControlId("txtServerName1")) %>',
+                        'txtCurrentDatabaseName1Id': '#<%= (GetSecondPageControlId("txtCurrentDatabaseName1")) %>',
                         'txtDatabaseName1Id': '#<%= (GetSecondPageControlId("txtDatabaseName1")) %>',
                         'txtFileName1Id': '#<%= (GetSecondPageControlId("txtFileName1")) %>',
                         'spnRestoreOK1Id': '#<%= (GetSecondPageControlId("spnRestoreOK1")) %>',

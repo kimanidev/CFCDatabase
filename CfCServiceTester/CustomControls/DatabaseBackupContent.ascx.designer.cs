@@ -31,6 +31,15 @@ namespace CfCServiceTester.CustomControls {
         protected global::System.Web.UI.WebControls.TextBox txtServerName1;
         
         /// <summary>
+        /// txtCurrentDatabaseName1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtCurrentDatabaseName1;
+        
+        /// <summary>
         /// chkSingleMode control.
         /// </summary>
         /// <remarks>

@@ -261,5 +261,50 @@ namespace CfCServiceTester.WEBservice
             tmp = tmp.Substring(1, tmp.Length - 2);
             return tmp.Replace("-", String.Empty);
         }
+
+        private static void DeleteTable(Table aTable, bool disableDependencies, Database db, List<DroppedDependencyDbo> droppedForeignKeys)
+        {
+            if (disableDependencies)
+            {
+                DataTable foreignKeys = aTable.EnumForeignKeys();
+                List<KeyValuePair<string, string>> lstForeignKeys = (
+                    from fKey in foreignKeys.AsEnumerable()
+                    select new KeyValuePair<string, string>(fKey.Field<string>("Name"), fKey.Field<string>("Table_Name"))
+                    ).ToList();
+                DropCorrentForeignKey(lstForeignKeys, db, droppedForeignKeys);
+            }
+            aTable.Drop();
+        }
+
+        /// <summary>
+        /// Drops foreign keys, listed in lstForeignKeys
+        /// </summary>
+        /// <param name="lstForeignKeys">List with foreign keys</param>
+        /// <param name="db">Current database</param>
+        /// <param name="droppedForeignKeys">Result of the dropping</param>
+        private static void DropCorrentForeignKey(List<KeyValuePair<string, string>> lstForeignKeys,
+                                                   Database db, List<DroppedDependencyDbo> droppedForeignKeys)
+        {
+            foreach (KeyValuePair<string, string> pair in lstForeignKeys)
+            {
+                Table currentTable = db.Tables[pair.Value]; // Value - table name
+                if (currentTable != null)
+                {
+                    ForeignKey fKey = currentTable.ForeignKeys[pair.Key];   // Key - name of the foreign key
+                    if (fKey != null)
+                    {
+                        droppedForeignKeys.Add(new DroppedDependencyDbo()
+                        {
+                            Name = fKey.Name,
+                            ObjectType = DbObjectType.foreignKey,
+                            TableName = currentTable.Name,
+                            Columns = GetColumnNames(fKey)
+                        });
+                        fKey.Drop();
+                    }
+                    currentTable.Alter();
+                }
+            }
+        }
     }
 }

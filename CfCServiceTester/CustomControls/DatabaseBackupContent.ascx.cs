@@ -24,6 +24,7 @@ namespace CfCServiceTester.CustomControls
             if (String.IsNullOrEmpty(this.txtServerName1.Text))
             {
                 this.txtServerName1.Text = CfcWebService.SqlServerName;
+                this.txtCurrentDatabaseName1.Text = CfcWebService.DatabaseName;
             }
         }
     }

@@ -61,4 +61,16 @@ namespace CfCServiceTester.WEBservice.DataObjects
             this.DroppedDependencies = new List<DroppedDependencyDbo>();
         }
     }
+
+    [DataContract(Namespace = "CfCServiceNS")]
+    public class DeleteTableResponse : RestoreStatus
+    {
+        [DataMember]
+        public List<DroppedDependencyDbo> DroppedDependencies { get; set; }
+
+        public DeleteTableResponse(): base()
+        {
+            this.DroppedDependencies = new List<DroppedDependencyDbo>();
+        }
+    }
 }

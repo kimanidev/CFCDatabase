@@ -109,7 +109,7 @@ function onSuccess_CreateDbConnection(result) {
         var loginName = $(manager.get_txtLoginNameId());
         var password = $(manager.get_txtLoginPasswdId());
 
-        PrintConnectionInfo(result.Roles);
+        PrintConnectionInfo(result.Roles, result.CurrentServer, result.CurrentDatabase);
         loginName.val('');
         loginName.attr('disabled', true);
         password.val('');
@@ -191,7 +191,7 @@ function PrintConnectionError(errorMessage) {
     errMessage.show();
 }
 // You are connected to database. Parameter contains list of roles.
-function PrintConnectionInfo(roles) {
+function PrintConnectionInfo(roles, server, database) {
     var manager = $find('CfcTestManager');
     var tmpArray = new Array();
 

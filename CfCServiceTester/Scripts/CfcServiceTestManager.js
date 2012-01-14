@@ -18,6 +18,7 @@ CfcServiceTestManager.CfcComponent = function () {
     this._spnBackupErrorId = '';            // Span with error message
     this._spnBackupOkId = '';               // Span with OK message
     this._txtServerName1Id = '';            // Text box with SQL server's name (Backup/Restore tab)
+    this._txtCurrentDatabaseName1Id = '';   // Text box with name of current database (Backup/Restore tab)
     this._txtDatabaseName1Id = '';          // Text box with Database name (Backup/Restore tab)
     this._txtFileName1Id = '';              // Text box with backup file name (Restore part)
     this._spnRestoreOK1Id = '';             // Span with OK message (Restore part)
@@ -154,6 +155,13 @@ CfcServiceTestManager.CfcComponent.prototype = {
     },
     set_txtServerName1Id: function (value) {
         this._txtServerName1Id = value;
+    },
+
+    get_txtCurrentDatabaseName1Id: function () {
+        return this._txtCurrentDatabaseName1Id;
+    },
+    set_txtCurrentDatabaseName1Id: function (value) {
+        this._txtCurrentDatabaseName1Id = value;
     },
 
     get_txtDatabaseName1Id: function () {

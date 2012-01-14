@@ -30,6 +30,18 @@ namespace CfCServiceTester.WEBservice.DataObjects
         public string ErrorMessage { get; set; }
 
         /// <summary>
+        /// ECurrent server
+        /// </summary>
+        [DataMember]
+        public string CurrentServer { get; set; }
+
+        /// <summary>
+        /// Current Database
+        /// </summary>
+        [DataMember]
+        public string CurrentDatabase { get; set; }
+
+        /// <summary>
         /// User's roles in the database, not empty when <code>Connected == true</code>
         /// </summary>
         [DataMember]
