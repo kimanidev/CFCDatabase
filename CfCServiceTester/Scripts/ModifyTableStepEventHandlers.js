@@ -16,8 +16,7 @@ function PickUpTables() {
 
     $('span#SpanSelectTable2 span.Magnifier').hide();
     $('span#SpanSelectTable2 span.Pauser').show();
-    CfCServiceTester.WEBservice.CfcWebService.EnumerateTables(
-                serverName, databaseName, onSuccess_EnumerateTables, onFailure_EnumerateTables);
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateTables(onSuccess_EnumerateTables, onFailure_EnumerateTables);
     return false;
 }
 

@@ -437,5 +437,102 @@ namespace CfCServiceTester.WEBservice
                 alteredDependencies = droppedDependencies;
             }
         }
+
+        public static List<string> GetAllTables()
+        {
+            var srv = new Server(SqlServerName);
+            if (srv == null)
+                throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
+            var db = srv.Databases[DatabaseName];
+            if (db == null)
+                throw new Exception(String.Format("Database '{0}' is not accessible.", DatabaseName)); ;
+
+            var rzlt = new List<string>();
+            foreach (Table currentTable in db.Tables)
+                rzlt.Add(currentTable.Name);
+            return rzlt;
+        }
+
+        public static List<string> GetAllIndexes(string tableName)
+        {
+            var srv = new Server(SqlServerName);
+            if (srv == null)
+                throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
+            var db = srv.Databases[DatabaseName];
+            if (db == null)
+                throw new Exception(String.Format("Database '{0}' is not accessible.", DatabaseName));
+            Table table = db.Tables[tableName];
+            if (table == null)
+                throw new Exception(String.Format("Tabase '{0}' has no table '{1}'.", DatabaseName, tableName));
+
+            return GetAllIndexes(table);
+        }
+
+        private static List<string> GetAllIndexes(Table table)
+        {
+            var rzlt = new List<string>();
+            foreach (Index currentIndex in table.Indexes)
+                rzlt.Add(currentIndex.Name);
+            return rzlt;
+        }
+
+        public static List<IndexDbo> GetTableIndexes(string tableName)
+        {
+            var srv = new Server(SqlServerName);
+            if (srv == null)
+                throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
+            var db = srv.Databases[DatabaseName];
+            if (db == null)
+                throw new Exception(String.Format("Database '{0}' is not accessible.", DatabaseName));
+            Table table = db.Tables[tableName];
+            if (table == null)
+                throw new Exception(String.Format("Tabase '{0}' has no table '{1}'.", DatabaseName, tableName));
+
+            var rzlt = new List<IndexDbo>();
+            foreach (string indexName in GetAllIndexes(table))
+                rzlt.Add(GetIndexDescription(table, indexName));
+            return rzlt;
+        }
+
+        public static IndexDbo GetIndexDescription(Table table, string indexName)
+        {
+            Index ind = table.Indexes[indexName];
+            if (ind == null)
+                throw new Exception(String.Format("Table '{0}' has no index '{1}'.", table.Name, indexName)); ;
+
+            var dbo = new IndexDbo()
+            {
+                CompactLargeObjects = ind.CompactLargeObjects,
+                DisallowPageLocks = ind.DisallowPageLocks,
+                DisallowRowLocks = ind.DisallowRowLocks,
+                FillFactor = ind.FillFactor,
+                FilterDefinition = ind.FilterDefinition,
+                IgnoreDuplicateKeys = ind.IgnoreDuplicateKeys,
+                IndexKeyType = ind.IndexKeyType.ToString(),
+                IsClustered = ind.IsClustered,
+                IsDisabled = ind.IsDisabled,
+                IsUnique = ind.IsUnique,
+                Name = ind.Name,
+            };
+            foreach (IndexedColumn clmn in ind.IndexedColumns)
+                dbo.IndexedColumns.Add(clmn.Name);
+
+            return dbo;
+        }
+
+        public static IndexDbo GetIndexDescription(string tableName, string indexName)
+        {
+            var srv = new Server(SqlServerName);
+            if (srv == null)
+                throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
+            var db = srv.Databases[DatabaseName];
+            if (db == null)
+                throw new Exception(String.Format("Database '{0}' is not accessible.", DatabaseName)); ;
+            Table table = db.Tables[tableName];
+            if (table == null)
+                throw new Exception(String.Format("Dabase '{0}' has no table '{1}'.", DatabaseName, tableName)); ;
+
+            return GetIndexDescription(table, indexName);
+        }
     }
 }

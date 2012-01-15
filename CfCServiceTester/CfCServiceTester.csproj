@@ -79,6 +79,7 @@
   <ItemGroup>
     <Content Include="CustomControls\ColumnEditBox.ascx" />
     <Content Include="CustomControls\DatabaseBackupContent.ascx" />
+    <Content Include="CustomControls\ModifyIndexesContent.ascx" />
     <Content Include="CustomControls\ModifyTableContent.ascx" />
     <Content Include="CustomControls\StartPageContent.ascx" />
     <Content Include="Images\ajax-loader.gif" />
@@ -94,6 +95,7 @@
     <Content Include="Scripts\jquery-1.7.1.min.js" />
     <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="Scripts\jquery.boxy.js" />
+    <Content Include="Scripts\ModifyIndexesStepEventHandlers.js" />
     <Content Include="Scripts\ModifyTableStepEventHandlers.js" />
     <Content Include="Scripts\RSA.js" />
     <Content Include="Scripts\RSA.min.js" />
@@ -162,6 +164,13 @@
     <Compile Include="CustomControls\DatabaseBackupContent.ascx.designer.cs">
       <DependentUpon>DatabaseBackupContent.ascx</DependentUpon>
     </Compile>
+    <Compile Include="CustomControls\ModifyIndexesContent.ascx.cs">
+      <DependentUpon>ModifyIndexesContent.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CustomControls\ModifyIndexesContent.ascx.designer.cs">
+      <DependentUpon>ModifyIndexesContent.ascx</DependentUpon>
+    </Compile>
     <Compile Include="CustomControls\ModifyTableContent.ascx.cs">
       <DependentUpon>ModifyTableContent.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -211,6 +220,7 @@
     <Compile Include="WEBservice\DataObjects\DbLogicalFileNames.cs" />
     <Compile Include="WEBservice\DataObjects\EnumerateBackupFilesResponse.cs" />
     <Compile Include="WEBservice\DataObjects\EnumerateColumnsResponse.cs" />
+    <Compile Include="WEBservice\DataObjects\IndexDbo.cs" />
     <Compile Include="WEBservice\DataObjects\UpdateColumnRequest.cs" />
     <Compile Include="WEBservice\DataObjects\RsaParametersDbo.cs" />
     <Compile Include="WEBservice\DataObjects\SqlServerDbo.cs" />

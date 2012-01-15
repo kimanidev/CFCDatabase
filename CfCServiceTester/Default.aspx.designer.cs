@@ -74,5 +74,14 @@ namespace CfCServiceTester {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::CfCServiceTester.CustomControls.ModifyTableContent ModifyTablePageContent;
+        
+        /// <summary>
+        /// ModifyIndexesContent control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::CfCServiceTester.CustomControls.ModifyIndexesContent ModifyIndexesContent;
     }
 }

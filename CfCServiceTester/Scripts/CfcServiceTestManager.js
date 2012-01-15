@@ -43,6 +43,22 @@ CfcServiceTestManager.CfcComponent = function () {
     this._hdnOldFieldName3Id = '';          // Old field name (Column Edit window in Edit mode).
     this._txtDefaultValue3Id = '';          // Default value (Column Edit window);
 
+    this._hdnSelectedTable4Id = '';         // Selected table
+    this._hdnSelectedIndex4Id = '';         // Selected index
+    this._lstTableList4Id = '';             // Selected table name
+    this._lstIndexList4Id = '';             // Selected index name
+    this._lstFieldList4Id = '';             // Fields in the index
+    this._chkCompactLargeObjects4Id = '';   // CompactLargeObjects
+    this._chkDisallowPageLocks4Id = '';     // Disallow Page Locks
+    this._chkDisallowRowLocks4Id = '';      // DisallowRowLocks
+    this._txtFillFactor4Id = '';            // Fill Factor
+    this._txtFilterDefinition4Id = '';      // Filter definition
+    this._chkIgnoreDuplicateKeys4Id = '';   // Ignore dublicate keys
+    this._ddlIndexKeyType4Id = ''           // Key type
+    this._chkIsClustered4Id = ''            // Key is clustered
+    this._chkIsDisabled4Id = ''             // Key is disabled
+    this._chkIsUnique4Id = ''               // Key is unique
+
     this._localServersOnly = true;          // true - look for local servers only, false - all available SQL servers
     this._accessibleDatabasesOnly = true;   // true - enumerate accessable databases only, false - all databases on the server
 
@@ -51,6 +67,8 @@ CfcServiceTestManager.CfcComponent = function () {
 
     this._columnEditor = null;      // Column editor (boxy dialog, object)
     this._userRoles = [];
+
+    this._suppressEvents = false;   // Set this field to true for suppressing child events (when content of the list is changed).
 }
 CfcServiceTestManager.CfcComponent.prototype = {
     initialize: function () {
@@ -295,6 +313,111 @@ CfcServiceTestManager.CfcComponent.prototype = {
     },
     set_txtDefaultValue3Id: function (value) {
         this._txtDefaultValue3Id = value;
+    },
+
+    get_hdnSelectedTable4Id: function () {
+        return this._hdnSelectedTable4Id;
+    },
+    set_hdnSelectedTable4Id: function (value) {
+        this._hdnSelectedTable4Id = value;
+    },
+
+    get_hdnSelectedIndex4Id: function () {
+        return this._hdnSelectedIndex4Id;
+    },
+    set_hdnSelectedIndex4Id: function (value) {
+        this._hdnSelectedIndex4Id = value;
+    },
+
+    get_lstTableList4Id: function () {
+        return this._lstTableList4Id;
+    },
+    set_lstTableList4Id: function (value) {
+        this._lstTableList4Id = value;
+    },
+
+    get_lstIndexList4Id: function () {
+        return this._lstIndexList4Id;
+    },
+    set_lstIndexList4Id: function (value) {
+        this._lstIndexList4Id = value;
+    },
+
+    get_lstFieldList4Id: function () {
+        return this._lstFieldList4Id;
+    },
+    set_lstFieldList4Id: function (value) {
+        this._lstFieldList4Id = value;
+    },
+
+    get_chkCompactLargeObjects4Id: function () {
+        return this._chkCompactLargeObjects4Id;
+    },
+    set_chkCompactLargeObjects4Id: function (value) {
+        this._chkCompactLargeObjects4Id = value;
+    },
+
+    get_chkDisallowPageLocks4Id: function () {
+        return this._chkDisallowPageLocks4Id;
+    },
+    set_chkDisallowPageLocks4Id: function (value) {
+        this._chkDisallowPageLocks4Id = value;
+    },
+
+    get_chkDisallowRowLocks4Id: function () {
+        return this._chkDisallowRowLocks4Id;
+    },
+    set_chkDisallowRowLocks4Id: function (value) {
+        this._chkDisallowRowLocks4Id = value;
+    },
+
+    get_txtFillFactor4Id: function () {
+        return this._txtFillFactor4Id;
+    },
+    set_txtFillFactor4Id: function (value) {
+        this._txtFillFactor4Id = value;
+    },
+
+    get_txtFilterDefinition4Id: function () {
+        return this._txtFilterDefinition4Id;
+    },
+    set_txtFilterDefinition4Id: function (value) {
+        this._txtFilterDefinition4Id = value;
+    },
+
+    get_chkIgnoreDuplicateKeys4Id: function () {
+        return this._chkIgnoreDuplicateKeys4Id;
+    },
+    set_chkIgnoreDuplicateKeys4Id: function (value) {
+        this._chkIgnoreDuplicateKeys4Id = value;
+    },
+
+    get_ddlIndexKeyType4Id: function () {
+        return this._ddlIndexKeyType4Id;
+    },
+    set_ddlIndexKeyType4Id: function (value) {
+        this._ddlIndexKeyType4Id = value;
+    },
+
+    get_chkIsClustered4Id: function () {
+        return this._chkIsClustered4Id;
+    },
+    set_chkIsClustered4Id: function (value) {
+        this._chkIsClustered4Id = value;
+    },
+
+    get_chkIsDisabled4Id: function () {
+        return this._chkIsDisabled4Id;
+    },
+    set_chkIsDisabled4Id: function (value) {
+        this._chkIsDisabled4Id = value;
+    },
+
+    get_chkIsUnique4Id: function () {
+        return this._chkIsUnique4Id;
+    },
+    set_chkIsUnique4Id: function (value) {
+        this._chkIsUnique4Id = value;
     },
 
     get_localServersOnly: function () {

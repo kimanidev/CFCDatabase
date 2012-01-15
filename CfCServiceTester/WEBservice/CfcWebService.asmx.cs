@@ -54,7 +54,7 @@ namespace CfCServiceTester.WEBservice
         /// <param name="localOnly"><code>true</code> - enumerate local computers only, <code>false</code> - all available SQL servers</param>
         /// <param name="namePattern">Phrase in the server's name.</param>
         /// <returns>List with server's names</returns>
-        [WebMethod]
+        [WebMethod(EnableSession = true)]
         public IEnumerable<SqlServerDbo> EnumerateSqlServers(bool localOnly, string namePattern)
         {
             var options = new TransactionOptions()
@@ -94,7 +94,7 @@ namespace CfCServiceTester.WEBservice
         /// <param name="namePattern">Name pattern</param>
         /// <param name="accessibleOnly"><code>true</code> - return accessible databases only</param>
         /// <returns>List of available databases</returns>
-        [WebMethod]
+        [WebMethod(EnableSession = true)]
         public IEnumerable<DatabaseDbo> EnumerateDatabases(string serverName, string namePattern, bool accessibleOnly)
         {
             try
@@ -144,11 +144,9 @@ namespace CfCServiceTester.WEBservice
         /// <summary>
         /// List of tables in selected database
         /// </summary>
-        /// <param name="serverName">Server's name</param>
-        /// <param name="databaseName">Name of selected database</param>
         /// <returns><see cref="DataTableListDbo"/></returns>
-        [WebMethod]
-        public DataTableListDbo EnumerateTables(string serverName, string databaseName)
+        [WebMethod(EnableSession = true)]
+        public DataTableListDbo EnumerateTables()
         {
             try
             {
@@ -159,17 +157,7 @@ namespace CfCServiceTester.WEBservice
                 };
                 using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
                 {
-                    Server server = new Server(serverName);
-                    if (server == null)
-                        return new DataTableListDbo() { IsSuccess = false, ErrorMessage = "Invalid server's name." };
-                    Database db = server.Databases[databaseName];
-                    if (db == null)
-                        return new DataTableListDbo() { IsSuccess = false, ErrorMessage = "Invalid name of database." };
-
-                    var rzlt = new List<string>();
-                    foreach (Table currentTable in db.Tables)
-                        rzlt.Add(currentTable.Name);
-
+                    var rzlt = GetAllTables();
                     trScope.Complete();
                     return new DataTableListDbo() { IsSuccess = true, TableNames = rzlt };
                 }
@@ -639,7 +627,67 @@ namespace CfCServiceTester.WEBservice
             {
                 return new InsertColumnResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
             }
+        }
 
+        /// <summary>
+        /// Returns index description
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="indexName">Index name</param>
+        /// <returns><see cref="GetIndexResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public GetIndexResponse GetIndex(string tableName, string indexName)
+        {
+            try
+            {
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    IndexDbo dbo = GetIndexDescription(tableName, indexName);
+                    var rzlt = new GetIndexResponse() { IsSuccess = true, Dbo = dbo };
+
+                    trScope.Complete();
+                    return rzlt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return new GetIndexResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+            }
+        }
+
+        /// <summary>
+        /// Returns descriptions for indexes that belongs to selected table
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <returns><see cref="EnumerateIndexesResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public EnumerateIndexesResponse EnumerateIndexes(string tableName)
+        {
+            try
+            {
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    List<IndexDbo> indexes = GetTableIndexes(tableName);
+                    var rzlt = new EnumerateIndexesResponse() { IsSuccess = true, Indexes = indexes };
+
+                    trScope.Complete();
+                    return rzlt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return new EnumerateIndexesResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+            }
         }
     }
 }

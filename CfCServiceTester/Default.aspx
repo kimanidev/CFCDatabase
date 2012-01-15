@@ -3,6 +3,7 @@
 <%@ Register TagPrefix="con" TagName="StartPageContent" Src="~/CustomControls/StartPageContent.ascx" %>
 <%@ Register TagPrefix="con" TagName="BackupPageContent" Src="~/CustomControls/DatabaseBackupContent.ascx" %>
 <%@ Register TagPrefix="con" TagName="ModifyTablePageContent" Src="~/CustomControls/ModifyTableContent.ascx" %>
+<%@ Register TagPrefix="con" TagName="ModifyIndexesContent" Src="~/CustomControls/ModifyIndexesContent.ascx" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -27,6 +28,7 @@
                 <asp:ScriptReference Path="~/Scripts/BackupStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/ModifyTableStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/ColumnEditBoxEventHandler.js" />
+                <asp:ScriptReference Path="~/Scripts/ModifyIndexesStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/jquery.boxy.js" />
                 <asp:ScriptReference Path="~/Scripts/RSA.min.js" />
 
@@ -44,6 +46,9 @@
                 </asp:WizardStep>
                 <asp:WizardStep runat="server" title="Modify table">
                     <con:ModifyTablePageContent ID="ModifyTablePageContent" runat="server" />
+                </asp:WizardStep>
+                <asp:WizardStep runat="server" title="Indexes">
+                    <con:ModifyIndexesContent ID="ModifyIndexesContent" runat="server" />
                 </asp:WizardStep>
             </WizardSteps>
             <navigationbuttonstyle borderwidth="1" width="80" borderstyle="Solid" backcolor="lightgray" /> 
@@ -97,6 +102,22 @@
                         'txtDefaultValue3Id': '#<%= (GetEditColumnBoxControlId("txtDefaultValue3")) %>',
                         'hdnOldFieldName3Id': '#<%= (GetEditColumnBoxControlId("hdnOldFieldName3")) %>',
                         'txtDefaultValue3Id': '#<%= (GetEditColumnBoxControlId("txtDefaultValue3")) %>',
+
+                        'hdnSelectedTable4Id': '#<%= (GetFourthPageControlId("hdnSelectedTable4")) %>',
+                        'hdnSelectedIndex4Id': '#<%= (GetFourthPageControlId("hdnSelectedIndex4")) %>',
+                        'lstTableList4Id': '#<%= (GetFourthPageControlId("lstTableList4")) %>',
+                        'lstIndexList4Id': '#<%= (GetFourthPageControlId("lstIndexList4")) %>',
+                        'lstFieldList4Id': '#<%= (GetFourthPageControlId("lstFieldList4")) %>',
+                        'chkCompactLargeObjects4Id': '#<%= (GetFourthPageControlId("chkCompactLargeObjects4")) %>',
+                        'chkDisallowPageLocks4Id': '#<%= (GetFourthPageControlId("chkDisallowPageLocks4")) %>',
+                        'chkDisallowRowLocks4Id': '#<%= (GetFourthPageControlId("chkDisallowRowLocks4")) %>',
+                        'txtFillFactor4Id': '#<%= (GetFourthPageControlId("txtFillFactor4")) %>',
+                        'txtFilterDefinition4Id': '#<%= (GetFourthPageControlId("txtFilterDefinition4")) %>',
+                        'chkIgnoreDuplicateKeys4Id': '#<%= (GetFourthPageControlId("chkIgnoreDuplicateKeys4")) %>',
+                        'ddlIndexKeyType4Id': '#<%= (GetFourthPageControlId("ddlIndexKeyType4")) %>',
+                        'chkIsClustered4Id': '#<%= (GetFourthPageControlId("chkIsClustered4")) %>',
+                        'chkIsDisabled4Id': '#<%= (GetFourthPageControlId("chkIsDisabled4")) %>',
+                        'chkIsUnique4Id': '#<%= (GetFourthPageControlId("chkIsUnique4")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",
