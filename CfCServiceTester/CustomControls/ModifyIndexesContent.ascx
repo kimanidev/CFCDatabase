@@ -116,5 +116,19 @@
                         Text="Is unique" TextAlign="Right" />
             </td>
         </tr>
+        <tr>
+            <td colspan="3"><hr /></td>
+        </tr>
+        <tr>
+            <td>New name</td>
+            <td>
+                <asp:TextBox ID="txtNewName4" runat="server" ToolTip="Enter new name for selected index." Text="" />
+            </td>
+            <td>
+                <asp:Button ID="btnRenameIndex4" runat="server" Text="Rename index" 
+                        ToolTip="Click the button for renaming selected index."
+                        CssClass="MpsButton" OnClientClick="return RenameIndex(this);" />
+            </td>
+        </tr>
     </tbody>
 </table>

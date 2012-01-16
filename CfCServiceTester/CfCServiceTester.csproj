@@ -221,6 +221,7 @@
     <Compile Include="WEBservice\DataObjects\EnumerateBackupFilesResponse.cs" />
     <Compile Include="WEBservice\DataObjects\EnumerateColumnsResponse.cs" />
     <Compile Include="WEBservice\DataObjects\IndexDbo.cs" />
+    <Compile Include="WEBservice\DataObjects\UpdateIndexRequest.cs" />
     <Compile Include="WEBservice\DataObjects\UpdateColumnRequest.cs" />
     <Compile Include="WEBservice\DataObjects\RsaParametersDbo.cs" />
     <Compile Include="WEBservice\DataObjects\SqlServerDbo.cs" />

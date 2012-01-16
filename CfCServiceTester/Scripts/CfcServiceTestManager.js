@@ -58,6 +58,7 @@ CfcServiceTestManager.CfcComponent = function () {
     this._chkIsClustered4Id = ''            // Key is clustered
     this._chkIsDisabled4Id = ''             // Key is disabled
     this._chkIsUnique4Id = ''               // Key is unique
+    this._txtNewName4Id = '';               // New index name
 
     this._localServersOnly = true;          // true - look for local servers only, false - all available SQL servers
     this._accessibleDatabasesOnly = true;   // true - enumerate accessable databases only, false - all databases on the server
@@ -418,6 +419,13 @@ CfcServiceTestManager.CfcComponent.prototype = {
     },
     set_chkIsUnique4Id: function (value) {
         this._chkIsUnique4Id = value;
+    },
+
+    get_txtNewName4Id: function () {
+        return this._txtNewName4Id;
+    },
+    set_txtNewName4Id: function (value) {
+        this._txtNewName4Id = value;
     },
 
     get_localServersOnly: function () {

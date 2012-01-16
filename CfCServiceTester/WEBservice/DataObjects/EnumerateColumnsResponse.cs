@@ -82,6 +82,18 @@ namespace CfCServiceTester.WEBservice.DataObjects
     }
 
     [DataContract(Namespace = "CfCServiceNS")]
+    public class UpdateIndexResponse : GetIndexResponse
+    {
+        [DataMember]
+        public List<DroppedDependencyDbo> DroppedDependencies { get; set; }
+
+        public UpdateIndexResponse() : base()
+        {
+            this.DroppedDependencies = new List<DroppedDependencyDbo>();
+        }
+    }
+
+    [DataContract(Namespace = "CfCServiceNS")]
     public class EnumerateIndexesResponse : RestoreStatus
     {
         [DataMember]

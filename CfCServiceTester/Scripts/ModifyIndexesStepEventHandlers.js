@@ -23,8 +23,57 @@ function IndexListOnChange(dropDown) {
     $(manager.get_hdnSelectedIndex4Id()).val(indexName);
 
     CfCServiceTester.WEBservice.CfcWebService.GetIndex(tableName, indexName, onSuccess_GetIndex, onFailure_GetIndex);
-
     return false;
+}
+
+function RenameIndex(aButton)
+{
+    var manager = $find('CfcTestManager');
+
+    var tableName = $(manager.get_lstTableList4Id()).val();
+    if (!tableName)
+    {
+        alert('Table name is not defined.');
+        return false;
+    }
+    var indexName = $(manager.get_lstIndexList4Id()).val();
+    if (!indexName)
+    {
+        alert('Index is not selected.');
+        return false;
+    }
+    var newIndexName = $(manager.get_txtNewName4Id()).val();
+    if (!newIndexName || newIndexName == indexName)
+    {
+        alert('New name for index is not defined.');
+        return false;
+    }
+
+    $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').show();
+    var request = {
+        OperationType: 'Rename',
+        TableName: tableName,
+        OldIndexName: indexName,
+        IndexName: newIndexName
+    };
+    CfCServiceTester.WEBservice.CfcWebService.UpdateIndex(request, false, onSuccess_UpdateIndex, onFailure_GetIndex);
+    return false;
+}
+
+// result is instance of UpdateIndexResponse
+function onSuccess_UpdateIndex(result)
+{
+    var manager = $find('CfcTestManager');
+
+    $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();
+    if (result.IsSuccess) {
+        var selectedIndex = $(manager.get_lstIndexList4Id() + ' option:selected');
+        var newName = result.Dbo.Name;
+        selectedIndex.attr('value', newName);
+        selectedIndex.html(newName);
+    } else {
+        alert(result.ErrorMessage); 
+    }
 }
 
 // result is instance of GetIndexResponse class
@@ -34,17 +83,9 @@ function onSuccess_GetIndex(result) {
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();
     if (result.IsSuccess) {
         ProcessIndex(manager, result.Dbo);
-//        var fldList = $(manager.get_lstFieldList4Id());
-//        fldList.empty();
-//        var sb = new Sys.StringBuilder();
-//        $.each(result.Dbo.IndexedColumns, function (index, value) {
-//            var attrSelected = index == 0 ? 'selected="selected"' : '';
-//            var s = String.format('<option value="{0}" {1}>{0}</option>', value, attrSelected);
-//            sb.append(s);
-//        });
-//        fldList.html(sb.toString());
+    } else {
+        alert(result.ErrorMessage);
     }
-//    ShowIndexCharacteristics(result.Dbo)
 }
 function ProcessIndex(manager, dbo) {
     var fldList = $(manager.get_lstFieldList4Id());
@@ -85,6 +126,8 @@ function onSuccess_EnumerateIndexes(result) {
             ProcessIndex(manager);
 
         manager._suppressEvents = false;
+    } else {
+        alert(result.ErrorMessage);
     }
 }
 

@@ -189,6 +189,28 @@ namespace CfCServiceTester.WEBservice
             return CorrectStoredProcedure(db, oldName, newName);
         }
 
+        /// <summary>
+        /// Renames index or primary key.
+        /// <param name="oldName">Old name</param>
+        /// <param name="newName">New name</param>
+        /// </summary>
+        public static IndexDbo RenameTheIndex(string tableName, string oldName, string newName)
+        {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[DatabaseName];
+            Table aTable = db.Tables[tableName];
+            if (aTable == null)
+                throw new Exception(String.Format("There is no table {0} in the {1} database.", newName, DatabaseName));
+
+            Index ind = aTable.Indexes[oldName];
+            if (ind == null)
+                throw new Exception(String.Format("There is no index {0} in the {1} table.", oldName, tableName));
+
+            ind.Rename(newName);
+            ind.Alter();
+            return GetIndexDescription(aTable, newName); ;
+        }
+
         public static IEnumerable<DataColumnDbo> GetTableColumns(string tableName, bool createNewTable = false)
         {
             var srv = new Server(SqlServerName);

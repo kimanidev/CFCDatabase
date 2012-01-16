@@ -118,6 +118,7 @@
                         'chkIsClustered4Id': '#<%= (GetFourthPageControlId("chkIsClustered4")) %>',
                         'chkIsDisabled4Id': '#<%= (GetFourthPageControlId("chkIsDisabled4")) %>',
                         'chkIsUnique4Id': '#<%= (GetFourthPageControlId("chkIsUnique4")) %>',
+                        'txtNewName4Id': '#<%= (GetFourthPageControlId("txtNewName4")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",

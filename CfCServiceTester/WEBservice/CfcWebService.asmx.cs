@@ -689,5 +689,51 @@ namespace CfCServiceTester.WEBservice
                 return new EnumerateIndexesResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
             }
         }
+
+        /// <summary>
+        /// Performs CRUD operations on indexes
+        /// </summary>
+        /// <param name="request">Request for updating the index, <see cref="UpdateIndexRequest"/></param>
+        /// <param name="singleUserMode"><code>true</code> - set single user mode</param>
+        /// <returns><see cref="UpdateIndexResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public UpdateIndexResponse UpdateIndex(UpdateIndexRequest request, bool singleUserMode)
+        {
+            try
+            {
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    if (singleUserMode)
+                        SetSingleMode(DatabaseName);
+
+                    var dependecies = new List<DroppedDependencyDbo>();
+                    IndexDbo dbo = null;
+
+                    switch (request.OperationType)
+                    {
+                        case UpdateColumnOperation.Rename:
+                            dbo = RenameTheIndex(request.TableName, request.OldIndexName, request.IndexName);
+                            break;
+                    }
+
+                    trScope.Complete();
+                    return new UpdateIndexResponse() { IsSuccess = true, DroppedDependencies = dependecies, Dbo = dbo };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new UpdateIndexResponse() { IsSuccess = false, ErrorMessage = ex.Message };
+            }
+            finally
+            {
+                if (singleUserMode)
+                    SetMultiUserMode(DatabaseName);
+            }
+        }
     }
 }
