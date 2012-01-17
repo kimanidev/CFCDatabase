@@ -185,8 +185,80 @@ namespace CfCServiceTester.WEBservice
             if (aTable == null)
                 throw new Exception(String.Format("There isn no table {0} in the {1} database.", newName, DatabaseName));
 
+            RenameAllIndexes(aTable, newName);
+            RenameThisForeignKeys(aTable, newName);
+            RenameOtherForeignKeys(db, aTable, newName);
+
             aTable.Rename(newName);
             return CorrectStoredProcedure(db, oldName, newName);
+        }
+
+        private static void RenameOtherForeignKeys(Database db, Table aTable, string newTableName)
+        {
+            string pattern = String.Format(@"_{0}\b|_{0}_", aTable.Name);
+            var rg = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            DataTable tbForeignKeys = aTable.EnumForeignKeys();
+
+            var foreignKeyList = 
+                from fKey in tbForeignKeys.AsEnumerable()
+                where rg.IsMatch(fKey.Field<string>("Name"))
+                select new {
+                    TableName = fKey.Field<string>("Table_Name"),
+                    ForeignKeyName = fKey.Field<string>("Name")
+                };
+
+            foreach (var fk in foreignKeyList)
+            {
+                Table currentTable = db.Tables[fk.TableName];
+                ForeignKey key = currentTable.ForeignKeys[fk.ForeignKeyName];
+                string newKeyName = rg.Replace(key.Name, delegate(Match m)
+                {
+                    string mString = m.ToString();
+                    return String.Format("_{0}{1}", newTableName, mString.EndsWith("_") ? "_" : String.Empty);
+                });
+                key.Rename(newKeyName);
+                key.Alter();
+            }
+        }
+
+        private static void RenameThisForeignKeys(Table aTable, string newTableName)
+        {
+            string pattern = String.Format(@"_{0}\b|_{0}_", aTable.Name);
+            var rg = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            for (int i = aTable.ForeignKeys.Count - 1; i >= 0; i--)
+            {
+                ForeignKey key = aTable.ForeignKeys[i];
+                string newKeyName = rg.Replace(key.Name, delegate(Match m)
+                {
+                    string mString = m.ToString();
+                    return String.Format("_{0}{1}", newTableName, mString.EndsWith("_") ? "_" : String.Empty);
+                });
+                if (String.Compare(key.Name, newKeyName, true) != 0)
+                {
+                    key.Rename(newKeyName);
+                    key.Alter();
+                }
+            }
+        }
+
+        private static void RenameAllIndexes(Table aTable, string newTableName)
+        {
+            string pattern = String.Format(@"_{0}\b|_{0}_", aTable.Name);
+            var rg = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            for (int i = aTable.Indexes.Count - 1; i >= 0; i--)
+            {
+                Index ind = aTable.Indexes[i];
+                string newIndexName = rg.Replace(ind.Name, delegate(Match m)
+                {
+                    string mString = m.ToString();
+                    return String.Format("_{0}{1}", newTableName, mString.EndsWith("_") ? "_" : String.Empty);
+                });
+                if (String.Compare(ind.Name, newIndexName, true) != 0)
+                {
+                    ind.Rename(newIndexName);
+                    ind.Alter();
+                }
+            }
         }
 
         /// <summary>
