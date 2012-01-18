@@ -240,13 +240,13 @@ namespace CfCServiceTester.WEBservice
                 }
 
                 string fileName = Path.Combine(directory, file);
-                if (overWriteMode)
+                if (File.Exists(fileName))
                 {
-                    if (File.Exists(fileName))
+                    if (overWriteMode)
                         File.Delete(fileName);
+                    else
+                        throw new Exception(String.Format("File '{0}' exists in the backup directory.", fileName));
                 }
-                else
-                    RenameFile(fileName);
 
                 long fileSize;
                 if (singleUserMode)

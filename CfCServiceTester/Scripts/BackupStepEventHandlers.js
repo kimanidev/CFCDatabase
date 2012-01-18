@@ -1,4 +1,18 @@
-﻿// Backup content of the database
+﻿// Radio button state
+function BackupActionChanged(button) {
+    if (button.checked) {
+        if (button.value == 'backup') {
+            $('#backupBody').css('display', 'table-row-group');
+            $('#restoreBody').css('display', 'none');
+        } else if (button.value == 'restore') {
+            $('#backupBody').css('display', 'none');
+            $('#restoreBody').css('display', 'table-row-group');
+        }
+    }
+    return true;
+}
+
+// Backup content of the database
 function BackupDatabase(overwrite) {
     var manager = $find('CfcTestManager');
 
