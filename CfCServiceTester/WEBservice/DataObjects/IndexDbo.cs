@@ -36,7 +36,7 @@ namespace CfCServiceTester.WEBservice.DataObjects
         /// Gets or sets the percentage of an index page to fill when the index is created or re-created.
         /// </summary>
         [DataMember]
-        public byte FillFactor { get; set; }
+        public byte? FillFactor { get; set; }
 
         /// <summary>
         /// Gets or sets the String value that contains the definition for the filter.
@@ -90,6 +90,51 @@ namespace CfCServiceTester.WEBservice.DataObjects
         public IndexDbo()
         {
             this.IndexedColumns = new List<string>();
+        }
+
+        /// <summary>
+        /// Verifies is the obj equals to this.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (!typeof(IndexDbo).IsInstanceOfType(obj))
+                return false;
+            
+            IndexDbo other = obj as IndexDbo;
+            bool rzlt = this.CompactLargeObjects == other.CompactLargeObjects && this.DisallowPageLocks == other.DisallowPageLocks     &&
+                        this.DisallowRowLocks == other.DisallowRowLocks       && this.FillFactor        == other.FillFactor            &&
+                        this.FilterDefinition == other.FilterDefinition       && this.IgnoreDuplicateKeys == other.IgnoreDuplicateKeys &&
+                        this.IndexedColumns.Count == other.IndexedColumns.Count &&
+                        this.IndexedColumns.TrueForAll(x => other.IndexedColumns.Contains(x)) &&
+                        this.IndexKeyType == other.IndexKeyType               && this.IsClustered == other.IsClustered                 &&
+                        this.IsDisabled == other.IsDisabled                   && this.IsUnique == other.IsUnique                       &&
+                        this.Name == other.Name;
+            return rzlt;
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        /// <summary>
+        /// <see cref="http://msdn.microsoft.com/en-us/library/ms173147(v=vs.80).aspx"/>
+        /// </summary>
+        /// <param name="a">Left operand</param>
+        /// <param name="b">Right operand</param>
+        /// <returns><code>true</code> - operands are equal</returns>
+        public static bool operator ==(IndexDbo a, IndexDbo b)
+        {
+            if (System.Object.ReferenceEquals(a, b))
+                return true;
+            if ((object)a == null || (object)b == null)
+                return false;
+
+            return a.Equals(b);
+        }
+        public static bool operator !=(IndexDbo a, IndexDbo b)
+        {
+            return !(a == b);
         }
     }
 }

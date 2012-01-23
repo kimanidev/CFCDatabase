@@ -218,5 +218,41 @@ namespace CfCServiceTester.CustomControls {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnRenameIndex4;
+        
+        /// <summary>
+        /// btnCreateIndex4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCreateIndex4;
+        
+        /// <summary>
+        /// btnModifyIndex4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnModifyIndex4;
+        
+        /// <summary>
+        /// btnDeleteIndex4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnDeleteIndex4;
+        
+        /// <summary>
+        /// IndexEditorBox4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::CfCServiceTester.CustomControls.IndexEditorBox IndexEditorBox4;
     }
 }

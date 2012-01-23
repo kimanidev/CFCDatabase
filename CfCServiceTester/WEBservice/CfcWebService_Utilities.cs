@@ -133,22 +133,7 @@ namespace CfCServiceTester.WEBservice
                 }
             }
         }
-/*
-        public static long MakeBackup(string fileName)
-        {
-            const string BackupCommand = @"BACKUP DATABASE {0} TO DISK='{1}'";
-            string sql = String.Format(BackupCommand, DatabaseName, fileName);
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand(sql, connection);
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
-            }
-            var fInfo = new FileInfo(fileName);
-            return fInfo.Length;
-        }
-*/
+
         /// <summary>
         /// Writes SQL backup into file defined in the parameter. Procedure is using SMO data objects.
         /// <see cref="http://msdn.microsoft.com/en-us/library/microsoft.sqlserver.management.smo.backup.aspx"/>
@@ -697,29 +682,6 @@ namespace CfCServiceTester.WEBservice
                 AddColumnToIndex(table, column, query);
             }
             return droppedForeignKeys;
-        }
-
-        /// <summary>
-        /// Recreates primary key or index.
-        /// </summary>
-        /// <param name="table">Current table <see cref="Table"/></param>
-        /// <param name="indexName">Name of the index/primary key</param>
-        /// <param name="indexKeyType">Type of index</param>
-        /// <param name="columnNames">Columns in the index</param>
-        private static void CreateNewPrimaryKey(Table table, string indexName, IndexKeyType indexKeyType,
-            params string[] columnNames)
-        {
-            var primaryKeyIndex = new Index(table, indexName)
-            {
-                IndexKeyType = indexKeyType,
-                IsClustered = false,
-                FillFactor = 50
-            };
-            foreach (string columnName in columnNames)
-                primaryKeyIndex.IndexedColumns.Add(new IndexedColumn(primaryKeyIndex, columnName));
-            primaryKeyIndex.Create();
-            primaryKeyIndex.DisallowPageLocks = true;
-            primaryKeyIndex.Alter();
         }
 
         /// <summary>

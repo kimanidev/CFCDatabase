@@ -263,6 +263,7 @@ namespace CfCServiceTester.WEBservice
 
         /// <summary>
         /// Renames index or primary key.
+        /// <param name="tableName">Table name</param>
         /// <param name="oldName">Old name</param>
         /// <param name="newName">New name</param>
         /// </summary>
@@ -272,7 +273,7 @@ namespace CfCServiceTester.WEBservice
             var db = srv.Databases[DatabaseName];
             Table aTable = db.Tables[tableName];
             if (aTable == null)
-                throw new Exception(String.Format("There is no table {0} in the {1} database.", newName, DatabaseName));
+                throw new Exception(String.Format("There is no table {0} in the {1} database.", tableName, DatabaseName));
 
             Index ind = aTable.Indexes[oldName];
             if (ind == null)
@@ -281,6 +282,92 @@ namespace CfCServiceTester.WEBservice
             ind.Rename(newName);
             ind.Alter();
             return GetIndexDescription(aTable, newName); ;
+        }
+
+        /// <summary>
+        /// Modifies trhe index
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="dbo">Index description, <see cref="IndexDbo"/></param>
+        /// <param name="disableDependencies"><code>true</code> - drop dependencies</param>
+        /// <param name="newDbo">New, updated index</param>
+        /// <returns>List of dropped foreign keys</returns>
+        private static List<DroppedDependencyDbo> UpdateTheIndex(string tableName, IndexDbo dbo, bool disableDependencies,
+                                                                 out IndexDbo newDbo)
+        {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[DatabaseName];
+            Table aTable = db.Tables[tableName];
+            if (aTable == null)
+                throw new Exception(String.Format("There is no table {0} in the {1} database.", tableName, DatabaseName));
+            IndexDbo oldIndex = GetIndexDescription(aTable, dbo.Name);
+            if (oldIndex == dbo)
+                throw new Exception("There is nothing to change.");
+
+            List<DroppedDependencyDbo> droppedDependencies =  DeleteTheIndex(db, aTable, dbo.Name, disableDependencies);
+            newDbo = CreateTheIndex(aTable, dbo, aTable.Name);
+            return droppedDependencies;
+        }
+
+        /// <summary>
+        /// Creates index or primary key.
+        /// <param name="tableName">Table name</param>
+        /// <param name="dbo">Index descriptor, <see cref="IndexDbo"/></param>
+        /// <param name="uniqueInTable">If the value is not empty - look for equal names in this table only </param>
+        /// </summary>
+        public static IndexDbo CreateTheIndex(string tableName, IndexDbo dbo, string uniqueInTable = null)
+        {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[DatabaseName];
+            Table aTable = db.Tables[tableName];
+            if (aTable == null)
+                throw new Exception(String.Format("There is no table {0} in the {1} database.", tableName, DatabaseName));
+
+            return CreateTheIndex(aTable, dbo, uniqueInTable);
+        }
+        public static IndexDbo CreateTheIndex(Table aTable, IndexDbo dbo, string uniqueInTable)
+        {
+            string errMessage = IsIndexUnique(dbo.Name, uniqueInTable);
+            if (!String.IsNullOrEmpty(errMessage))
+                throw new Exception(errMessage);
+
+            if (dbo.IsUnique && !AreValuesUnique(aTable, dbo.IndexedColumns.ToArray()))
+                throw new Exception(String.Format("Table '{0}' contains duplicates in selected set of columns.", aTable.Name));
+
+            // See CreateNewPrimaryKey in the Utilities_1
+            CreateNewPrimaryKey(aTable, dbo);
+            return GetIndexDescription(aTable, dbo.Name);
+        }
+
+        /// <summary>
+        /// Renames index or primary key.
+        /// <param name="tableName">Table name</param>
+        /// <param name="indexName">Index Name</param>
+        /// <param name="disableDependencies"><code>true</code> - remove foreign keys that target is current index</param>
+        /// <returns>List of dropped foreign keys, <see cref="DroppedDependencyDbo"/></returns>
+        /// </summary>
+        public static List<DroppedDependencyDbo> DeleteTheIndex(string tableName, string indexName, bool disableDependencies)
+        {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[DatabaseName];
+            Table aTable = db.Tables[tableName];
+            if (aTable == null)
+                throw new Exception(String.Format("There is no table {0} in the {1} database.", tableName, DatabaseName));
+            return DeleteTheIndex(db, aTable, indexName, disableDependencies);
+        }
+        public static List<DroppedDependencyDbo> DeleteTheIndex(Database db, Table aTable, string indexName, bool disableDependencies)
+        {
+            Index ind = aTable.Indexes[indexName];
+            if (ind == null)
+                throw new Exception(String.Format("There is no index {0} in the {1} table.", indexName, aTable.Name));
+
+            var droppedForeignKeys = new List<DroppedDependencyDbo>();
+            if (disableDependencies)
+                DropDependentForeignKeys(indexName, db, droppedForeignKeys);
+            ind.Drop();
+            aTable.Alter();
+
+            return droppedForeignKeys;
         }
 
         public static IEnumerable<DataColumnDbo> GetTableColumns(string tableName, bool createNewTable = false)

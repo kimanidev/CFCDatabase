@@ -50,7 +50,7 @@ CfcServiceTestManager.CfcComponent = function () {
     this._lstFieldList4Id = '';             // Fields in the index
     this._chkCompactLargeObjects4Id = '';   // CompactLargeObjects
     this._chkDisallowPageLocks4Id = '';     // Disallow Page Locks
-    this._chkDisallowRowLocks4Id = '';      // DisallowRowLocks
+    this._chkDisallowRowLocks4Id = '';      // Disallow Row Locks
     this._txtFillFactor4Id = '';            // Fill Factor
     this._txtFilterDefinition4Id = '';      // Filter definition
     this._chkIgnoreDuplicateKeys4Id = '';   // Ignore dublicate keys
@@ -59,6 +59,19 @@ CfcServiceTestManager.CfcComponent = function () {
     this._chkIsDisabled4Id = ''             // Key is disabled
     this._chkIsUnique4Id = ''               // Key is unique
     this._txtNewName4Id = '';               // New index name
+
+    this._txtName5Id = '';                  // Index name (Index edit box)
+    this._chkCompactLargeObjects5Id = '';   // Compact large objects
+    this._chkDisallowPageLocks5Id = '';     // Disallow Page Locks
+    this._chkDisallowRowLocks5Id = '';      // Disallow Row Locks
+    this._txtFillFactor5Id = '';            // Fill Factor
+    this._txtFilterDefinition5Id = '';      // Filter definition
+    this._chkIgnoreDuplicateKeys5Id = '';   // Ignore dublicate keys
+    this._ddlIndexKeyType5Id = '';          // Key type
+    this._chkIsClustered5Id = '';           // Key is clustered
+//    this._chkIsDisabled5Id = '';            // Key is disabled
+    this._chkIsUnique5Id = '';              // Key is unique
+    this._hdIndexOperation5Id = '';         // Index operation code
 
     this._localServersOnly = true;          // true - look for local servers only, false - all available SQL servers
     this._accessibleDatabasesOnly = true;   // true - enumerate accessable databases only, false - all databases on the server
@@ -426,6 +439,88 @@ CfcServiceTestManager.CfcComponent.prototype = {
     },
     set_txtNewName4Id: function (value) {
         this._txtNewName4Id = value;
+    },
+
+
+    get_txtName5Id: function () {
+        return this._txtName5Id;
+    },
+    set_txtName5Id: function (value) {
+        this._txtName5Id = value;
+    },
+
+    get_chkCompactLargeObjects5Id: function () {
+        return this._chkCompactLargeObjects5Id;
+    },
+    set_chkCompactLargeObjects5Id: function (value) {
+        this._chkCompactLargeObjects5Id = value;
+    },
+
+    get_chkDisallowPageLocks5Id: function () {
+        return this._chkDisallowPageLocks5Id;
+    },
+    set_chkDisallowPageLocks5Id: function (value) {
+        this._chkDisallowPageLocks5Id = value;
+    },
+    get_chkDisallowRowLocks5Id: function () {
+        return this._chkDisallowRowLocks5Id;
+    },
+    set_chkDisallowRowLocks5Id: function (value) {
+        this._chkDisallowRowLocks5Id = value;
+    },
+    get_txtFillFactor5Id: function () {
+        return this._txtFillFactor5Id;
+    },
+    set_txtFillFactor5Id: function (value) {
+        this._txtFillFactor5Id = value;
+    },
+    get_txtFilterDefinition5Id: function () {
+        return this._txtFilterDefinition5Id;
+    },
+    set_txtFilterDefinition5Id: function (value) {
+        this._txtFilterDefinition5Id = value;
+    },
+
+    get_chkIgnoreDuplicateKeys5Id: function () {
+        return this._chkIgnoreDuplicateKeys5Id;
+    },
+    set_chkIgnoreDuplicateKeys5Id: function (value) {
+        this._chkIgnoreDuplicateKeys5Id = value;
+    },
+
+    get_ddlIndexKeyType5Id: function () {
+        return this._ddlIndexKeyType5Id;
+    },
+    set_ddlIndexKeyType5Id: function (value) {
+        this._ddlIndexKeyType5Id = value;
+    },
+
+    get_chkIsClustered5Id: function () {
+        return this._chkIsClustered5Id;
+    },
+    set_chkIsClustered5Id: function (value) {
+        this._chkIsClustered5Id = value;
+    },
+/*
+    get_chkIsDisabled5Id: function () {
+        return this._chkIsDisabled5Id;
+    },
+    set_chkIsDisabled5Id: function (value) {
+        this._chkIsDisabled5Id = value;
+    },
+*/
+    get_chkIsUnique5Id: function () {
+        return this._chkIsUnique5Id;
+    },
+    set_chkIsUnique5Id: function (value) {
+        this._chkIsUnique5Id = value;
+    },
+
+    get_hdIndexOperation5Id: function () {
+        return this._hdIndexOperation5Id;
+    },
+    set_hdIndexOperation5Id: function (value) {
+        this._hdIndexOperation5Id = value;
     },
 
     get_localServersOnly: function () {

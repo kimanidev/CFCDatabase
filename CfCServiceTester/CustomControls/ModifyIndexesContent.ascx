@@ -1,4 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ModifyIndexesContent.ascx.cs" Inherits="CfCServiceTester.CustomControls.ModifyIndexesContent" %>
+<%@ Register TagPrefix="con" TagName="IndexEditor" Src="~/CustomControls/IndexEditorBox.ascx" %>
 
 <asp:HiddenField runat="server" ID="hdnSelectedTable4" Value="" />
 <asp:HiddenField runat="server" ID="hdnSelectedIndex4" Value="" />
@@ -9,7 +10,7 @@
         <col style="width:30%" />
         <col style="width:50%" />
     </colgroup>
-    <tbody>
+    <tbody id="IndexInfoFields4">
         <tr>
             <td>Server/Database</td>
             <td>
@@ -55,13 +56,13 @@
         <tr>
             <td>
                 <asp:CheckBox ID="chkDisallowPageLocks4" runat="server" ToolTip="Specifies whether the index allows page locks." 
-                        Text="Allows page locks" TextAlign="Right" />
+                        Text="Forbids page locks" TextAlign="Right" />
             </td>
         </tr>
         <tr>
             <td>
                 <asp:CheckBox ID="chkDisallowRowLocks4" runat="server" ToolTip="Specifies whether the index allows row locks." 
-                        Text="Allows page locks" TextAlign="Right" />
+                        Text="Forbids row locks" TextAlign="Right" />
             </td>
         </tr>
         <tr>
@@ -125,10 +126,31 @@
                 <asp:TextBox ID="txtNewName4" runat="server" ToolTip="Enter new name for selected index." Text="" />
             </td>
             <td>
-                <asp:Button ID="btnRenameIndex4" runat="server" Text="Rename index" 
+                <span style="white-space:nowrap;" >
+                    <asp:Button ID="btnRenameIndex4" runat="server" Text="Rename index" 
                         ToolTip="Click the button for renaming selected index."
                         CssClass="MpsButton" OnClientClick="return RenameIndex(this);" />
+                    <input type="checkbox" id="chkDisableDependencies4" style="padding-right: 1em;" />
+                    <label for="chkDisableDependencies4" >Drop dependencies before deleting</label>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <asp:Button ID="btnCreateIndex4" runat="server" Text="Create Index" CausesValidation="false"
+                        ToolTip="Click the button for creating new index."
+                        CssClass="MpsButton" OnClientClick="return CreateIndex(this);" />
+                <asp:Button ID="btnModifyIndex4" runat="server" Text="Edit Index" CausesValidation="false"
+                        ToolTip="Click the button for editing selected index."
+                        CssClass="MpsButton" OnClientClick="return EditIndex(this);" />
+                <asp:Button ID="btnDeleteIndex4" runat="server" Text="Delete Index" CausesValidation="false"
+                        ToolTip="Click the button for deleting selected index."
+                        CssClass="MpsButton" OnClientClick="return DeleteIndex(this);" />
             </td>
         </tr>
     </tbody>
 </table>
+
+<div id="IndexEditor4" style="display: none; width: 40em; height:auto;" class='boxy' >
+    <con:IndexEditor ID="IndexEditorBox4" runat="server" />
+</div>

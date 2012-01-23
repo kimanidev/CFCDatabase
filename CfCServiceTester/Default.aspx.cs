@@ -62,6 +62,16 @@ namespace CfCServiceTester
             var ctrl = this.ModifyIndexesContent.FindControl(controlName);
             return ctrl == null ? String.Empty : ctrl.ClientID;
         }
+        protected string GetIndexEditColumnBoxControlId(string controlName)
+        {
+            var ctrlRoot = this.ModifyIndexesContent.FindControl("IndexEditorBox4");
+            if (ctrlRoot == null)
+                return String.Empty;
+
+            var ctrl = ((IndexEditorBox)ctrlRoot).FindControl(controlName);
+            return ctrl == null ? String.Empty : ctrl.ClientID;
+        }
+
 
         public _Default() : base()
         {

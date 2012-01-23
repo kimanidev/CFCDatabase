@@ -21,13 +21,53 @@ function IndexListOnChange(dropDown) {
     var tableName = $(manager.get_lstTableList4Id()).val();
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').show();
     $(manager.get_hdnSelectedIndex4Id()).val(indexName);
-
-    CfCServiceTester.WEBservice.CfcWebService.GetIndex(tableName, indexName, onSuccess_GetIndex, onFailure_GetIndex);
+    $(manager.get_hdnSelectedTable4Id()).val(tableName);
+    CfCServiceTester.WEBservice.CfcWebService.GetIndex(tableName, indexName, false, onSuccess_GetIndex, onFailure_GetIndex);
     return false;
 }
 
-function RenameIndex(aButton)
-{
+// Create new index
+function CreateIndex(aButton) {
+    var manager = $find('CfcTestManager');
+    var tableName = $(manager.get_hdnSelectedTable4Id()).val();
+    $(manager.get_txtFillFactor5Id()).val('50');
+
+    $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').show();
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateColumns(tableName, onSuccess_EnumerateColumns4, onFailure_GetIndex);
+
+    return false;
+}
+
+function EditIndex(aButton) {
+    var manager = $find('CfcTestManager');
+    var tableName = $(manager.get_hdnSelectedTable4Id()).val();
+    var indexName = $(manager.get_hdnSelectedIndex4Id()).val();
+
+    $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').show();
+    CfCServiceTester.WEBservice.CfcWebService.GetIndex(tableName, indexName, true, onSuccess_GetIndex4, onFailure_GetIndex);
+
+    return false;
+}
+
+function DeleteIndex(aButton) {
+    var manager = $find('CfcTestManager');
+    var indexName = $(manager.get_hdnSelectedIndex4Id()).val();
+    if (!confirm("Are you sure to delete '" + indexName + "' index?"))
+        return false;
+
+    // Instance of the UpdateIndexRequest class. Delete operation does not require IndexDescriptor.
+    var request = { OperationType: 'Delete' };
+    request.DisableDependencies = $('#chkDisableDependencies4').attr('checked') == 'checked';
+    request.TableName = $(manager.get_hdnSelectedTable4Id()).val();
+    request.OldIndexName = request.IndexName = indexName;
+    $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').show();
+    CfCServiceTester.WEBservice.CfcWebService.UpdateIndex(request, false, onSuccess_DeleteIndex4, onFailure_GetIndex);
+
+    return false;
+}
+
+// Rename selected index
+function RenameIndex(aButton) {
     var manager = $find('CfcTestManager');
 
     var tableName = $(manager.get_lstTableList4Id()).val();
@@ -83,6 +123,17 @@ function onSuccess_GetIndex(result) {
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();
     if (result.IsSuccess) {
         ProcessIndex(manager, result.Dbo);
+    } else {
+        alert(result.ErrorMessage);
+    }
+}
+// result is instance of GetIndexResponse class
+function onSuccess_GetIndex4(result) {
+    var manager = $find('CfcTestManager');
+
+    $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();
+    if (result.IsSuccess) {
+        ShowIndexEditor(manager, result);
     } else {
         alert(result.ErrorMessage);
     }
@@ -148,8 +199,73 @@ function ShowIndexCharacteristics(dbo) {
     $(manager.get_chkIsClustered4Id()).attr('checked', dbo.IsClustered);
     $(manager.get_chkIsDisabled4Id()).attr('checked', dbo.IsDisabled);
     $(manager.get_chkIsUnique4Id()).attr('checked', dbo.IsUnique);
-    //    alert('IndexListOnChange: as jau cia: ');
 }
+
+// result is instance of UpdateIndexResponse
+function onSuccess_DeleteIndex4(result) {
+    var manager = $find('CfcTestManager');
+    $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();
+
+    if (result.IsSuccess) {
+        var indexName = result.Dbo.Name;
+        $(manager.get_lstIndexList4Id() + ' option:selected').remove();
+        var options = $(manager.get_lstIndexList4Id() + ' option');
+        if (options.length < 1)
+            ClearTheForm();
+        else {
+            $(manager.get_lstIndexList4Id()).prop('selectedIndex', 0);
+            var dropDown = $(manager.get_lstIndexList4Id()).get(0); // IndexListOnChange expects DOM element.
+            IndexListOnChange(dropDown);    
+        }
+    } else {
+        alert(result.ErrorMessage);
+    }
+}
+function ClearTheForm() {
+    var manager = $find('CfcTestManager');
+
+    $(manager.get_lstFieldList4Id()).empty();
+    $('#IndexInfoFields4 tr td input:checked').removeAttr('checked');
+    $('#IndexInfoFields4 tr td input:text').val('');
+    $(manager.get_ddlIndexKeyType4Id()).prop('selectedIndex', 0);
+}
+
+// result is instance of EnumerateColumnsResponse
+function onSuccess_EnumerateColumns4(result) {
+    var manager = $find('CfcTestManager');
+    var checkBoxList = $('#IndexFieldList');
+
+    $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();
+    if (result.IsSuccess) {
+        checkBoxList.empty();
+        var sb = new Sys.StringBuilder();
+        Array.forEach(result.Columns, AppendCheckBoxToList, sb);
+        var aList = sb.toString();
+        checkBoxList.html(aList);
+
+        var indexName = $(manager.get_txtNewName4Id()).val();
+        if (indexName)
+            $(manager.get_txtName5Id()).val(indexName);
+        $(manager.get_hdIndexOperation5Id()).val('Insert');
+
+        var dialog = new Boxy('#IndexEditor4',
+            { center: true, modal: true, title: "Create new index", draggable: true, fixed: false });
+        manager.set_columnEditor(dialog);
+        dialog.show();
+    } else {
+        alert(result.ErrorMessage);
+    }
+}
+// Parameters:
+//  The element argument is the array element that the function will take action on. Instance of the DataColumnDbo class.
+//  The index argument is the index of element, and 
+//  The array argument is the array that contains element.
+//  Context (this) represents string builder (innerHtl for the body element).
+function AppendCheckBoxToList(element, index, array) {
+    var s = String.format('<input type="checkbox" value="{0}">{0}<br>', element.Name);
+    this.append(s);
+}
+
 
 function onFailure_GetIndex(result) {
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();

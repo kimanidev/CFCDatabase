@@ -79,6 +79,13 @@ namespace CfCServiceTester.WEBservice.DataObjects
     {
         [DataMember]
         public IndexDbo Dbo { get; set; }
+
+        public IList<TableField> AllFields { get; set; }
+
+        public GetIndexResponse(): base()
+        {
+            this.AllFields = new List<TableField>();
+        }
     }
 
     [DataContract(Namespace = "CfCServiceNS")]

@@ -29,6 +29,7 @@
                 <asp:ScriptReference Path="~/Scripts/ModifyTableStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/ColumnEditBoxEventHandler.js" />
                 <asp:ScriptReference Path="~/Scripts/ModifyIndexesStepEventHandlers.js" />
+                <asp:ScriptReference Path="~/Scripts/IndexEditorEventHandler.js" />
                 <asp:ScriptReference Path="~/Scripts/jquery.boxy.js" />
                 <asp:ScriptReference Path="~/Scripts/RSA.min.js" />
 
@@ -119,6 +120,19 @@
                         'chkIsDisabled4Id': '#<%= (GetFourthPageControlId("chkIsDisabled4")) %>',
                         'chkIsUnique4Id': '#<%= (GetFourthPageControlId("chkIsUnique4")) %>',
                         'txtNewName4Id': '#<%= (GetFourthPageControlId("txtNewName4")) %>',
+
+                        'txtName5Id': '#<%= (GetIndexEditColumnBoxControlId("txtName5")) %>',
+                        'chkCompactLargeObjects5Id': '#<%= (GetIndexEditColumnBoxControlId("chkCompactLargeObjects5")) %>',
+                        'chkDisallowPageLocks5Id': '#<%= (GetIndexEditColumnBoxControlId("chkDisallowPageLocks5")) %>',
+                        'chkDisallowRowLocks5Id': '#<%= (GetIndexEditColumnBoxControlId("chkDisallowRowLocks5")) %>',
+                        'txtFillFactor5Id': '#<%= (GetIndexEditColumnBoxControlId("txtFillFactor5")) %>',
+                        'txtFilterDefinition5Id': '#<%= (GetIndexEditColumnBoxControlId("txtFilterDefinition5")) %>',
+                        'chkIgnoreDuplicateKeys5Id': '#<%= (GetIndexEditColumnBoxControlId("chkIgnoreDuplicateKeys5")) %>',
+                        'ddlIndexKeyType5Id': '#<%= (GetIndexEditColumnBoxControlId("ddlIndexKeyType5")) %>',
+                        'chkIsClustered5Id': '#<%= (GetIndexEditColumnBoxControlId("chkIsClustered5")) %>',
+//                        'chkIsDisabled5Id': '#<%= (GetIndexEditColumnBoxControlId("chkIsDisabled5")) %>',
+                        'chkIsUnique5Id': '#<%= (GetIndexEditColumnBoxControlId("chkIsUnique5")) %>',
+                        'hdIndexOperation5Id': '#<%= (GetIndexEditColumnBoxControlId("hdIndexOperation5")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",

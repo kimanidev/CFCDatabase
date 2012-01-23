@@ -87,6 +87,47 @@ namespace CfCServiceTester.WEBservice
             return badRowCounter < 1;
         }
 
+        /// <summary>
+        /// Function returns error message if database contains the index
+        /// </summary>
+        /// <param name="indexName">Name that needs to be tested</param>
+        /// <param name="uniqueInTable">Look for unique indexes in this table only when this parameter is not empty</param>
+        /// <returns>Empty string when name is unique and error message when name is in use.</returns>
+        private static string IsIndexUnique(string indexName, string uniqueInTable = null)
+        {
+            const string queryString =
+                "SELECT obj.[name] AS TableName, idx.[name] AS IdxName " +
+                "FROM [sys].[indexes] idx " +
+                    "JOIN sys.objects obj ON obj.object_id = idx.object_id " +
+                "WHERE idx.[name] LIKE @IndexName";
+
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                var da = new SqlDataAdapter(queryString, connection);
+                da.SelectCommand.Parameters.AddWithValue("@IndexName", indexName);
+                da.TableMappings.Add("Table", "IndexList");
+
+                var ds = new DataSet();
+                da.Fill(ds);
+                DataTable indexes = ds.Tables["IndexList"];
+                var tmp = 
+                    from index in indexes.AsEnumerable()
+                    select new
+                        {
+                            TableName = index.Field<string>("TableName"),
+                            IdxName = index.Field<string>("IdxName")
+                        };
+                if (!String.IsNullOrEmpty(uniqueInTable))
+                    tmp = tmp.Where(x => x.TableName == uniqueInTable);
+                
+                var rzlt = tmp.ToArray();
+                if (rzlt.Length < 1)
+                    return String.Empty;
+                else
+                    return String.Format("Index '{0} is created in the table '{1}'.",  rzlt[0].IdxName, rzlt[0].TableName);
+            }
+        }
+
         private static string[] GetPrimaryKeyColumns(Table aTable, string excludeColumn, out Index primaryKey)
         {
             var rzlt = new List<string>();
@@ -306,5 +347,84 @@ namespace CfCServiceTester.WEBservice
                 }
             }
         }
+
+        /// <summary>
+        /// Recreates primary key or index.
+        /// </summary>
+        /// <param name="table">Current table <see cref="Table"/></param>
+        /// <param name="indexName">Name of the index/primary key</param>
+        /// <param name="indexKeyType">Type of index</param>
+        /// <param name="columnNames">Columns in the index</param>
+        private static void CreateNewPrimaryKey(Table table, string indexName, IndexKeyType indexKeyType,
+            params string[] columnNames)
+        {
+            var primaryKeyIndex = new Index(table, indexName)
+            {
+                IndexKeyType = indexKeyType,
+                IsClustered = false,
+                FillFactor = 50
+            };
+            foreach (string columnName in columnNames)
+                primaryKeyIndex.IndexedColumns.Add(new IndexedColumn(primaryKeyIndex, columnName));
+            primaryKeyIndex.Create();
+            primaryKeyIndex.DisallowPageLocks = true;
+            primaryKeyIndex.Alter();
+        }
+
+        /// <summary>
+        /// Recreates primary key or index.
+        /// </summary>
+        /// <param name="table">Current table <see cref="Table"/></param>
+        /// <param name="descriptor">Index descriptor</param>
+        private static void CreateNewPrimaryKey(Table table, IndexDbo descriptor)
+        {
+            var indexKeyType = (IndexKeyType)Enum.Parse(typeof(IndexKeyType), descriptor.IndexKeyType);
+            byte fillFactor = (byte)(descriptor.FillFactor ?? 0);
+
+            var primaryKeyIndex = new Index(table, descriptor.Name)
+            {
+                CompactLargeObjects = descriptor.CompactLargeObjects,
+                FillFactor = fillFactor > 0 ? fillFactor : (byte)50,
+                FilterDefinition = descriptor.FilterDefinition,
+                IgnoreDuplicateKeys = descriptor.IgnoreDuplicateKeys,
+                IndexKeyType = indexKeyType,
+                IsClustered = descriptor.IsClustered,
+                IsUnique = descriptor.IsUnique,
+            };
+            foreach (string columnName in descriptor.IndexedColumns)
+                primaryKeyIndex.IndexedColumns.Add(new IndexedColumn(primaryKeyIndex, columnName));
+            primaryKeyIndex.Create();
+            primaryKeyIndex.DisallowPageLocks = descriptor.DisallowPageLocks;
+            primaryKeyIndex.DisallowRowLocks = descriptor.DisallowRowLocks;
+            primaryKeyIndex.Alter();
+            //if (descriptor.IsDisabled)
+            //{
+            //    primaryKeyIndex.Disable();
+            //    table.Alter();
+            //}
+        }
+
+        private static void BuildListOfFields(string tableName, List<string> includedFields, IList<TableField> allFields)
+        {
+            var srv = new Server(SqlServerName);
+            if (srv == null)
+                throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
+            var db = srv.Databases[DatabaseName];
+            if (db == null)
+                throw new Exception(String.Format("Database '{0}' is not accessible.", DatabaseName));
+            Table table = db.Tables[tableName];
+            if (table == null)
+                throw new Exception(String.Format("Tabase '{0}' has no table '{1}'.", DatabaseName, tableName));
+
+            foreach (Column clmn in table.Columns)
+            {
+                allFields.Add(new TableField()
+                        {
+                            Name = clmn.Name,
+                            IsIncluded = includedFields.Contains(clmn.Name)
+                        });
+            }
+        }
+
     }
 }

@@ -31,9 +31,21 @@ namespace CfCServiceTester.WEBservice.DataObjects
         public string OldIndexName { get; set; }
 
         /// <summary>
-        /// Old name, for renaming operation only
+        /// New name, for renaming operation only
         /// </summary>
         [DataMember]
         public string IndexName { get; set; }
+
+        /// <summary>
+        /// <code>true></code> - disable dependencies before deleting (for delete and modify operations only)
+        /// </summary>
+        [DataMember]
+        public bool DisableDependencies { get; set; }
+
+        /// <summary>
+        /// Index descriptor is used in Insert and Modify operations
+        /// </summary>
+        [DataMember]
+        public IndexDbo IndexDescriptor { get; set; }
     }
 }

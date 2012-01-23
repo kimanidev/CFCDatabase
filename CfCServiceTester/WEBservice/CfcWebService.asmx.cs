@@ -634,9 +634,10 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         /// <param name="tableName">Table name</param>
         /// <param name="indexName">Index name</param>
+        /// <param name="withAllFields"><code>true</code> - add list with all fields i nthe table</param>
         /// <returns><see cref="GetIndexResponse"/></returns>
         [WebMethod(EnableSession = true)]
-        public GetIndexResponse GetIndex(string tableName, string indexName)
+        public GetIndexResponse GetIndex(string tableName, string indexName, bool withAllFields)
         {
             try
             {
@@ -649,7 +650,8 @@ namespace CfCServiceTester.WEBservice
                 {
                     IndexDbo dbo = GetIndexDescription(tableName, indexName);
                     var rzlt = new GetIndexResponse() { IsSuccess = true, Dbo = dbo };
-
+                    if (withAllFields)
+                        BuildListOfFields(tableName, dbo.IndexedColumns, rzlt.AllFields);
                     trScope.Complete();
                     return rzlt;
                 }
@@ -719,6 +721,16 @@ namespace CfCServiceTester.WEBservice
                         case UpdateColumnOperation.Rename:
                             dbo = RenameTheIndex(request.TableName, request.OldIndexName, request.IndexName);
                             break;
+                        case UpdateColumnOperation.Insert:
+                            dbo = CreateTheIndex(request.TableName, request.IndexDescriptor);
+                            break;
+                        case UpdateColumnOperation.Delete:
+                            dependecies = DeleteTheIndex(request.TableName, request.IndexName, request.DisableDependencies);
+                            dbo = new IndexDbo() { Name = request.IndexName, IsDisabled = true };
+                            break;
+                        case UpdateColumnOperation.Modify:
+                            dependecies = UpdateTheIndex(request.TableName, request.IndexDescriptor, request.DisableDependencies, out dbo);
+                            break;
                     }
 
                     trScope.Complete();
@@ -727,7 +739,7 @@ namespace CfCServiceTester.WEBservice
             }
             catch (Exception ex)
             {
-                return new UpdateIndexResponse() { IsSuccess = false, ErrorMessage = ex.Message };
+                return new UpdateIndexResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
             }
             finally
             {
