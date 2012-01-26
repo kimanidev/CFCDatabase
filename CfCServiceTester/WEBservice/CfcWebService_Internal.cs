@@ -644,16 +644,62 @@ namespace CfCServiceTester.WEBservice
                 throw new Exception(String.Format("Database '{0}' is not accessible.", DatabaseName));
             Table table = db.Tables[tableName];
             if (table == null)
-                throw new Exception(String.Format("Tabase '{0}' has no table '{1}'.", DatabaseName, tableName));
+                throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName));
 
             return GetAllIndexes(table);
         }
-
         private static List<string> GetAllIndexes(Table table)
         {
             var rzlt = new List<string>();
             foreach (Index currentIndex in table.Indexes)
                 rzlt.Add(currentIndex.Name);
+            return rzlt;
+        }
+
+        public static List<string> GetForeignKeys(string tableName)
+        {
+            var srv = new Server(SqlServerName);
+            if (srv == null)
+                throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
+            var db = srv.Databases[DatabaseName];
+            if (db == null)
+                throw new Exception(String.Format("Database '{0}' is not accessible.", DatabaseName));
+            Table table = db.Tables[tableName];
+            if (table == null)
+                throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName));
+
+            return GetForeignKeys(table);
+        }
+        private static List<string> GetForeignKeys(Table table)
+        {
+            var rzlt = new List<string>();
+            foreach (ForeignKey currentKey in table.ForeignKeys)
+                rzlt.Add(currentKey.Name);
+            return rzlt;
+        }
+
+        public static List<KeyValuePair<string, string>> GetForeignKeyColumns(string tableName, string fKeyName)
+        {
+            var srv = new Server(SqlServerName);
+            if (srv == null)
+                throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
+            var db = srv.Databases[DatabaseName];
+            if (db == null)
+                throw new Exception(String.Format("Database '{0}' is not accessible.", DatabaseName));
+            Table table = db.Tables[tableName];
+            if (table == null)
+                throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName));
+            ForeignKey fKey = table.ForeignKeys[fKeyName];
+            if (fKey == null)
+                throw new Exception(String.Format("Datatable '{0}' has no foreign key '{1}'.", tableName, fKeyName));
+
+            return GetForeignKeyColumns(fKey);
+        }
+        public static List<KeyValuePair<string, string>> GetForeignKeyColumns(ForeignKey fKey)
+        {
+            var rzlt = new List<KeyValuePair<string, string>>();
+            foreach (ForeignKeyColumn fkColumn in fKey.Columns)
+                rzlt.Add(new KeyValuePair<string, string>(fkColumn.Name, fkColumn.ReferencedColumn));
             return rzlt;
         }
 
@@ -711,7 +757,7 @@ namespace CfCServiceTester.WEBservice
                 throw new Exception(String.Format("Database '{0}' is not accessible.", DatabaseName)); ;
             Table table = db.Tables[tableName];
             if (table == null)
-                throw new Exception(String.Format("Dabase '{0}' has no table '{1}'.", DatabaseName, tableName)); ;
+                throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName)); ;
 
             return GetIndexDescription(table, indexName);
         }

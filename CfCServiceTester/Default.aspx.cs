@@ -71,6 +71,11 @@ namespace CfCServiceTester
             var ctrl = ((IndexEditorBox)ctrlRoot).FindControl(controlName);
             return ctrl == null ? String.Empty : ctrl.ClientID;
         }
+        protected string GetFifthPageControlId(string controlName)
+        {
+            var ctrl = this.ModifyForeignKeysContent.FindControl(controlName);
+            return ctrl == null ? String.Empty : ctrl.ClientID;
+        }
 
 
         public _Default() : base()
@@ -139,6 +144,9 @@ namespace CfCServiceTester
                         break;
                     case 3:
                         this.ModifyIndexesContent.SetupPage();
+                        break;
+                    case 4:
+                        this.ModifyForeignKeysContent.SetupPage();
                         break;
                 }
             }

@@ -7,90 +7,99 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CfCServiceTester {
+namespace CfCServiceTester.CustomControls {
     
     
-    public partial class _Default {
+    public partial class ModifyForeignKeys {
         
         /// <summary>
-        /// form1 control.
+        /// hdnSelectedTable6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.WebControls.HiddenField hdnSelectedTable6;
         
         /// <summary>
-        /// ScriptManager1 control.
+        /// hdnSelectedForeignKey6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.ScriptManager ScriptManager1;
+        protected global::System.Web.UI.WebControls.HiddenField hdnSelectedForeignKey6;
         
         /// <summary>
-        /// Wizard1 control.
+        /// txtServerName6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Wizard Wizard1;
+        protected global::System.Web.UI.WebControls.TextBox txtServerName6;
         
         /// <summary>
-        /// ConnectionStep control.
+        /// txtDatabaseName6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.WizardStep ConnectionStep;
+        protected global::System.Web.UI.WebControls.TextBox txtDatabaseName6;
         
         /// <summary>
-        /// StartPageContent control.
+        /// lstTableList6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::CfCServiceTester.CustomControls.StartPageContent StartPageContent;
+        protected global::System.Web.UI.WebControls.DropDownList lstTableList6;
         
         /// <summary>
-        /// BackupPageContent control.
+        /// lblErrorMessage6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::CfCServiceTester.CustomControls.DatabaseBackupContent BackupPageContent;
+        protected global::System.Web.UI.WebControls.Label lblErrorMessage6;
         
         /// <summary>
-        /// ModifyTablePageContent control.
+        /// lstForeignKeyList6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::CfCServiceTester.CustomControls.ModifyTableContent ModifyTablePageContent;
+        protected global::System.Web.UI.WebControls.ListBox lstForeignKeyList6;
         
         /// <summary>
-        /// ModifyIndexesContent control.
+        /// lstSourceColumnList6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::CfCServiceTester.CustomControls.ModifyIndexesContent ModifyIndexesContent;
+        protected global::System.Web.UI.WebControls.ListBox lstSourceColumnList6;
         
         /// <summary>
-        /// ModifyForeignKeysContent control.
+        /// lstTargetColumnList6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::CfCServiceTester.CustomControls.ModifyForeignKeys ModifyForeignKeysContent;
+        protected global::System.Web.UI.WebControls.ListBox lstTargetColumnList6;
+        
+        /// <summary>
+        /// Image1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Image Image1;
     }
 }

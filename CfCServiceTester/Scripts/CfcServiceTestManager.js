@@ -69,9 +69,16 @@ CfcServiceTestManager.CfcComponent = function () {
     this._chkIgnoreDuplicateKeys5Id = '';   // Ignore dublicate keys
     this._ddlIndexKeyType5Id = '';          // Key type
     this._chkIsClustered5Id = '';           // Key is clustered
-//    this._chkIsDisabled5Id = '';            // Key is disabled
+    //    this._chkIsDisabled5Id = '';            // Key is disabled
     this._chkIsUnique5Id = '';              // Key is unique
     this._hdIndexOperation5Id = '';         // Index operation code
+
+    this._hdnSelectedTable6Id = '';         // Current table
+    this._hdnSelectedForeignKey6Id = '';    // Selected foreign key
+    this._lstTableList6Id = '';             // Selected table
+    this._lstForeignKeyList6Id = '';        // Selected foreign key
+    this._lstSourceColumnList6Id = '';      // Source columns
+    this._lstTargetColumnList6Id = '';      // Target columns
 
     this._localServersOnly = true;          // true - look for local servers only, false - all available SQL servers
     this._accessibleDatabasesOnly = true;   // true - enumerate accessable databases only, false - all databases on the server
@@ -501,14 +508,14 @@ CfcServiceTestManager.CfcComponent.prototype = {
     set_chkIsClustered5Id: function (value) {
         this._chkIsClustered5Id = value;
     },
-/*
+    /*
     get_chkIsDisabled5Id: function () {
-        return this._chkIsDisabled5Id;
+    return this._chkIsDisabled5Id;
     },
     set_chkIsDisabled5Id: function (value) {
-        this._chkIsDisabled5Id = value;
+    this._chkIsDisabled5Id = value;
     },
-*/
+    */
     get_chkIsUnique5Id: function () {
         return this._chkIsUnique5Id;
     },
@@ -521,6 +528,48 @@ CfcServiceTestManager.CfcComponent.prototype = {
     },
     set_hdIndexOperation5Id: function (value) {
         this._hdIndexOperation5Id = value;
+    },
+
+    get_hdnSelectedTable6Id: function () {
+        return this._hdnSelectedTable6Id;
+    },
+    set_hdnSelectedTable6Id: function (value) {
+        this._hdnSelectedTable6Id = value;
+    },
+
+    get_hdnSelectedForeignKey6Id: function () {
+        return this._hdnSelectedForeignKey6Id;
+    },
+    set_hdnSelectedForeignKey6Id: function (value) {
+        this._hdnSelectedForeignKey6Id = value;
+    },
+
+    get_lstTableList6Id: function () {
+        return this._lstTableList6Id;
+    },
+    set_lstTableList6Id: function (value) {
+        this._lstTableList6Id = value;
+    },
+
+    get_lstForeignKeyList6Id: function () {
+        return this._lstForeignKeyList6Id;
+    },
+    set_lstForeignKeyList6Id: function (value) {
+        this._lstForeignKeyList6Id = value;
+    },
+
+    get_lstSourceColumnList6Id: function () {
+        return this._lstSourceColumnList6Id;
+    },
+    set_lstSourceColumnList6Id: function (value) {
+        this._lstSourceColumnList6Id = value;
+    },
+
+    get_lstTargetColumnList6Id: function () {
+        return this._lstTargetColumnList6Id;
+    },
+    set_lstTargetColumnList6Id: function (value) {
+        this._lstTargetColumnList6Id = value;
     },
 
     get_localServersOnly: function () {

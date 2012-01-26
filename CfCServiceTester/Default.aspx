@@ -4,6 +4,7 @@
 <%@ Register TagPrefix="con" TagName="BackupPageContent" Src="~/CustomControls/DatabaseBackupContent.ascx" %>
 <%@ Register TagPrefix="con" TagName="ModifyTablePageContent" Src="~/CustomControls/ModifyTableContent.ascx" %>
 <%@ Register TagPrefix="con" TagName="ModifyIndexesContent" Src="~/CustomControls/ModifyIndexesContent.ascx" %>
+<%@ Register TagPrefix="con" TagName="ModifyFKeysContent" Src="~/CustomControls/ModifyForeignKeys.ascx" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -50,6 +51,9 @@
                 </asp:WizardStep>
                 <asp:WizardStep runat="server" title="Indexes">
                     <con:ModifyIndexesContent ID="ModifyIndexesContent" runat="server" />
+                </asp:WizardStep>
+                <asp:WizardStep runat="server" title="Foreign keys">
+                    <con:ModifyFKeysContent ID="ModifyForeignKeysContent" runat="server" />
                 </asp:WizardStep>
             </WizardSteps>
             <navigationbuttonstyle borderwidth="1" width="80" borderstyle="Solid" backcolor="lightgray" /> 
@@ -133,6 +137,13 @@
 //                        'chkIsDisabled5Id': '#<%= (GetIndexEditColumnBoxControlId("chkIsDisabled5")) %>',
                         'chkIsUnique5Id': '#<%= (GetIndexEditColumnBoxControlId("chkIsUnique5")) %>',
                         'hdIndexOperation5Id': '#<%= (GetIndexEditColumnBoxControlId("hdIndexOperation5")) %>',
+
+                        'hdnSelectedTable6Id': '#<%= (GetFifthPageControlId("hdnSelectedTable6")) %>',
+                        'hdnSelectedForeignKey6Id': '#<%= (GetFifthPageControlId("hdnSelectedForeignKey6")) %>',
+                        'lstTableList6Id': '#<%= (GetFifthPageControlId("lstTableList6")) %>',
+                        'lstForeignKeyList6Id': '#<%= (GetFifthPageControlId("lstForeignKeyList6")) %>',
+                        'lstSourceColumnList6Id': '#<%= (GetFifthPageControlId("lstSourceColumnList6")) %>',
+                        'lstTargetColumnList6Id': '#<%= (GetFifthPageControlId("lstTargetColumnList6")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",

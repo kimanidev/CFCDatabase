@@ -80,6 +80,7 @@
     <Content Include="CustomControls\ColumnEditBox.ascx" />
     <Content Include="CustomControls\DatabaseBackupContent.ascx" />
     <Content Include="CustomControls\IndexEditorBox.ascx" />
+    <Content Include="CustomControls\ModifyForeignKeys.ascx" />
     <Content Include="CustomControls\ModifyIndexesContent.ascx" />
     <Content Include="CustomControls\ModifyTableContent.ascx" />
     <Content Include="CustomControls\StartPageContent.ascx" />
@@ -97,6 +98,7 @@
     <Content Include="Scripts\jquery-1.7.1.min.js" />
     <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="Scripts\jquery.boxy.js" />
+    <Content Include="Scripts\ModifyForeignKeysStepEventHandler.js" />
     <Content Include="Scripts\ModifyIndexesStepEventHandlers.js" />
     <Content Include="Scripts\ModifyTableStepEventHandlers.js" />
     <Content Include="Scripts\RSA.js" />
@@ -173,6 +175,13 @@
     <Compile Include="CustomControls\IndexEditorBox.ascx.designer.cs">
       <DependentUpon>IndexEditorBox.ascx</DependentUpon>
     </Compile>
+    <Compile Include="CustomControls\ModifyForeignKeys.ascx.cs">
+      <DependentUpon>ModifyForeignKeys.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CustomControls\ModifyForeignKeys.ascx.designer.cs">
+      <DependentUpon>ModifyForeignKeys.ascx</DependentUpon>
+    </Compile>
     <Compile Include="CustomControls\ModifyIndexesContent.ascx.cs">
       <DependentUpon>ModifyIndexesContent.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -229,6 +238,7 @@
     <Compile Include="WEBservice\DataObjects\DbLogicalFileNames.cs" />
     <Compile Include="WEBservice\DataObjects\EnumerateBackupFilesResponse.cs" />
     <Compile Include="WEBservice\DataObjects\EnumerateColumnsResponse.cs" />
+    <Compile Include="WEBservice\DataObjects\ForeignKeyDbo.cs" />
     <Compile Include="WEBservice\DataObjects\IndexDbo.cs" />
     <Compile Include="WEBservice\DataObjects\TableField.cs" />
     <Compile Include="WEBservice\DataObjects\UpdateIndexRequest.cs" />
