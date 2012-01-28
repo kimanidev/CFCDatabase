@@ -1,6 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ModifyForeignKeys.ascx.cs" Inherits="CfCServiceTester.CustomControls.ModifyForeignKeys" %>
 
-<asp:HiddenField runat="server" ID="hdnSelectedTable6" Value="Employees" />
+<asp:HiddenField runat="server" ID="hdnSelectedTable6" Value="" />
 <asp:HiddenField runat="server" ID="hdnSelectedForeignKey6" Value="" />
 
 <table style="width:45em;" id="FKeyDefinition6">
@@ -34,13 +34,17 @@
         </tr>
         <tr>
             <td style="text-align: left; padding-left: 10px; font-weight:bolder;">Foreign keys</td>
-            <td style="text-align: left; padding-left: 10px; font-weight:bolder;">Fields (source)</td>
-            <td style="text-align: left; padding-left: 10px; font-weight:bolder;">Fields (target)</td>
+            <td style="text-align: left; padding-left: 10px; font-weight:bolder;">
+                <span runat="server" id="SourceFieldLabel" class="SourceFields">Fields (source)</span>
+            </td>
+            <td style="text-align: left; padding-left: 10px; font-weight:bolder;">
+                <span runat="server" id="TargetFieldLabel" class="TargetFields">Fields (target)</span>
+            </td>
         </tr>
         <tr>
             <td style="vertical-align: top; padding-left: 5px; padding-top: 5px;">
                 <asp:ListBox ID="lstForeignKeyList6" runat="server" OnDataBound="lstIndexList6_OnDataBound" 
-                    onchange='return IndexListOnChange(this);' Rows="10" Width="18em" />
+                    onchange='return ForeignKeyListOnChange6(this);' Rows="10" Width="18em" />
             </td>
             <td>
                 <asp:ListBox ID="lstSourceColumnList6" runat="server" Rows="10" Width="18em" />
@@ -50,11 +54,33 @@
             </td>
         </tr>
         <tr class="Pauser">
-            <td colspan="2">&nbsp;</td>
-            <td>
+            <td colspan="2">
+                <span style="white-space:nowrap;" >
+                    <label runat="server" id="lblNewName6" for="txtNewName6">New name</label>
+                    <asp:TextBox ID="txtNewName6" runat="server" ToolTip="Enter new name for selected foreign key." 
+                                 Text="" Width="19em" />
+                    <asp:Button ID="btnRenameFkey6" runat="server" Text="Rename" CausesValidation="false"
+                        ToolTip="Click the button for renaming selected foreign key."
+                        CssClass="MpsButton" OnClientClick="return RenameForeignKey6(this);" />
+               </span>
+            </td>
+            <td rowspan="2">
                 <span class="Pauser" style="display:none;">
                     <asp:Image ID="Image1" runat="server" ImageUrl="~/Images/ajax-loader.gif" />
                 </span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <asp:Button ID="btnCreateFkey6" runat="server" Text="Create" CausesValidation="false"
+                        ToolTip="Click the button for creating new foreign key."
+                        CssClass="MpsButton" OnClientClick="return CreateForeignKey(this);" />
+                <asp:Button ID="btnModifyFkey6" runat="server" Text="Edit" CausesValidation="false"
+                        ToolTip="Click the button for editing selected foreign key."
+                        CssClass="MpsButton" OnClientClick="return EditForeignKey(this);" />
+                <asp:Button ID="btnDeleteFkey6" runat="server" Text="Delete" CausesValidation="false"
+                        ToolTip="Click the button for deleting selected foreign key."
+                        CssClass="MpsButton" OnClientClick="return DeleteForeignKey(this);" />
             </td>
         </tr>
     </tbody>

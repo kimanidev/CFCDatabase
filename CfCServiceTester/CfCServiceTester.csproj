@@ -241,6 +241,7 @@
     <Compile Include="WEBservice\DataObjects\ForeignKeyDbo.cs" />
     <Compile Include="WEBservice\DataObjects\IndexDbo.cs" />
     <Compile Include="WEBservice\DataObjects\TableField.cs" />
+    <Compile Include="WEBservice\DataObjects\UpdateForeignKeyRequest.cs" />
     <Compile Include="WEBservice\DataObjects\UpdateIndexRequest.cs" />
     <Compile Include="WEBservice\DataObjects\UpdateColumnRequest.cs" />
     <Compile Include="WEBservice\DataObjects\RsaParametersDbo.cs" />

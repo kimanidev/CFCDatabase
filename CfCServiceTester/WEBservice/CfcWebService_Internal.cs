@@ -285,6 +285,29 @@ namespace CfCServiceTester.WEBservice
         }
 
         /// <summary>
+        /// Renames foreign key.
+        /// <param name="tableName">Table name</param>
+        /// <param name="oldName">Old name</param>
+        /// <param name="newName">New name</param>
+        /// </summary>
+        public static ForeignKeyDbo RenameTheForeignKey(string tableName, string oldName, string newName)
+        {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[DatabaseName];
+            Table aTable = db.Tables[tableName];
+            if (aTable == null)
+                throw new Exception(String.Format("There is no table {0} in the {1} database.", tableName, DatabaseName));
+
+            ForeignKey fKey = aTable.ForeignKeys[oldName];
+            if (fKey == null)
+                throw new Exception(String.Format("There is no foreign key {0} in the {1} table.", oldName, tableName));
+
+            fKey.Rename(newName);
+            fKey.Alter();
+            return CreateForeignKeyDbo(fKey);
+        }
+
+        /// <summary>
         /// Modifies trhe index
         /// </summary>
         /// <param name="tableName">Table name</param>
@@ -656,7 +679,7 @@ namespace CfCServiceTester.WEBservice
             return rzlt;
         }
 
-        public static List<string> GetForeignKeys(string tableName)
+        public static List<ForeignKeyDbo> GetForeignKeys(string tableName)
         {
             var srv = new Server(SqlServerName);
             if (srv == null)
@@ -670,15 +693,15 @@ namespace CfCServiceTester.WEBservice
 
             return GetForeignKeys(table);
         }
-        private static List<string> GetForeignKeys(Table table)
+        private static List<ForeignKeyDbo> GetForeignKeys(Table table)
         {
-            var rzlt = new List<string>();
+            var rzlt = new List<ForeignKeyDbo>();
             foreach (ForeignKey currentKey in table.ForeignKeys)
-                rzlt.Add(currentKey.Name);
+                rzlt.Add(CreateForeignKeyDbo(currentKey));
             return rzlt;
         }
 
-        public static List<KeyValuePair<string, string>> GetForeignKeyColumns(string tableName, string fKeyName)
+        public static ForeignKeyDbo GetThisForeignKey(string tableName, string foreignKeyName)
         {
             var srv = new Server(SqlServerName);
             if (srv == null)
@@ -689,18 +712,11 @@ namespace CfCServiceTester.WEBservice
             Table table = db.Tables[tableName];
             if (table == null)
                 throw new Exception(String.Format("Database '{0}' has no table '{1}'.", DatabaseName, tableName));
-            ForeignKey fKey = table.ForeignKeys[fKeyName];
-            if (fKey == null)
-                throw new Exception(String.Format("Datatable '{0}' has no foreign key '{1}'.", tableName, fKeyName));
+            ForeignKey aKey = table.ForeignKeys[foreignKeyName];
+            if (aKey == null)
+                throw new Exception(String.Format("Table '{0}' has no key '{1}'.", tableName, foreignKeyName));
 
-            return GetForeignKeyColumns(fKey);
-        }
-        public static List<KeyValuePair<string, string>> GetForeignKeyColumns(ForeignKey fKey)
-        {
-            var rzlt = new List<KeyValuePair<string, string>>();
-            foreach (ForeignKeyColumn fkColumn in fKey.Columns)
-                rzlt.Add(new KeyValuePair<string, string>(fkColumn.Name, fkColumn.ReferencedColumn));
-            return rzlt;
+            return CreateForeignKeyDbo(aKey);
         }
 
         public static List<IndexDbo> GetTableIndexes(string tableName)

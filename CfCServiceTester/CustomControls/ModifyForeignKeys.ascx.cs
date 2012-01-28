@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using CfCServiceTester.WEBservice;
+using CfCServiceTester.WEBservice.DataObjects;
 
 namespace CfCServiceTester.CustomControls
 {
@@ -14,7 +15,9 @@ namespace CfCServiceTester.CustomControls
         private string currentTable;
         private string currentForeignKey;
         private List<string> tableList;
-        private List<string> fKeyList;
+
+        private List<ForeignKeyDbo> foreignKeys;
+//        private List<string> fKeyList;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -50,34 +53,58 @@ namespace CfCServiceTester.CustomControls
                 }
                 else
                     setDefaultItem(0);
+
+                this.SourceFieldLabel.InnerText = String.Format("Fields ({0})", this.currentTable);
                 ShowForeignKeys();
             }
         }
         private void ShowForeignKeys()
         {
-            lstForeignKeyList6.DataSource = fKeyList = CfcWebService.GetForeignKeys(this.currentTable);
+            this.foreignKeys = CfcWebService.GetForeignKeys(this.currentTable);
+            var fKeyNames = new List<string>();
+            foreach (ForeignKeyDbo dbo in foreignKeys)
+                fKeyNames.Add(dbo.Name);
+            lstForeignKeyList6.DataSource = fKeyNames;
             lstForeignKeyList6.DataBind();
         }
 
         protected void lstIndexList6_OnDataBound(Object sender, EventArgs e)
         {
-            Action<int> setDefaultItem = delegate(int i)
+            int selectedIndex = 0;
+            Func<string, ForeignKeyDbo> currentKey = delegate(string fKeyName)
             {
-                this.lstForeignKeyList6.SelectedIndex = i;
-                this.hdnSelectedForeignKey6.Value = this.currentForeignKey = fKeyList[i];
+                selectedIndex = this.foreignKeys.Count - 1;
+                while(selectedIndex > 0 && this.foreignKeys[selectedIndex].Name != fKeyName) 
+                    selectedIndex--;
+                return this.foreignKeys[selectedIndex];
             };
-            if (lstForeignKeyList6.Items.Count > 0)
+
+            if (this.foreignKeys.Count > 0)
             {
+                ForeignKeyDbo selectedItem = null;
                 if (!String.IsNullOrEmpty(this.hdnSelectedForeignKey6.Value))
                 {
-                    if (fKeyList.Contains(this.hdnSelectedForeignKey6.Value))
-                        this.lstForeignKeyList6.SelectedValue = this.currentForeignKey = this.hdnSelectedForeignKey6.Value;
-                    else
-                        setDefaultItem(0);
+                    selectedItem = currentKey(this.hdnSelectedForeignKey6.Value);
+                    this.lstForeignKeyList6.SelectedIndex = selectedIndex;
+                    this.hdnSelectedForeignKey6.Value = this.currentForeignKey = selectedItem.Name;
                 }
                 else
-                    setDefaultItem(0);
-                ShowFields(this.currentForeignKey);
+                {
+                    selectedItem = this.foreignKeys[0];
+                    this.lstForeignKeyList6.SelectedIndex = 0;
+                    this.hdnSelectedForeignKey6.Value = this.currentForeignKey = selectedItem.Name;
+                }
+                ShowFields(selectedItem);
+            }
+            else
+            {
+                this.hdnSelectedForeignKey6.Value = this.currentForeignKey = String.Empty;
+            }
+            if (String.IsNullOrEmpty(this.currentForeignKey))
+            {
+                this.btnRenameFkey6.Attributes["disabled"] = "disabled";
+                this.btnModifyFkey6.Attributes["disabled"] = "disabled";
+                this.btnDeleteFkey6.Attributes["disabled"] = "disabled";
             }
         }
 
@@ -87,13 +114,14 @@ namespace CfCServiceTester.CustomControls
         /// <seealso cref="http://msdn.microsoft.com/en-us/library/ms162566.aspx"/>
         /// </summary>
         /// <param name="fKeyName"></param>
-        protected void ShowFields(string fKeyName)
+        protected void ShowFields(ForeignKeyDbo selectedItem)
         {
-            foreach (KeyValuePair<string, string> pair in CfcWebService.GetForeignKeyColumns(this.currentTable, this.currentForeignKey))
+            foreach (ForeignKeyColumnDbo dbo in selectedItem.Columns)
             {
-                lstSourceColumnList6.Items.Add(new ListItem(pair.Key, pair.Key));
-                lstTargetColumnList6.Items.Add(new ListItem(pair.Value, pair.Value));
+                lstSourceColumnList6.Items.Add(new ListItem(dbo.Name, dbo.Name));
+                lstTargetColumnList6.Items.Add(new ListItem(dbo.ReferencedColumn, dbo.ReferencedColumn));
             }
+            this.TargetFieldLabel.InnerText = String.Format("Fields ({0})", selectedItem.ReferencedTable);
         }
     }
 }

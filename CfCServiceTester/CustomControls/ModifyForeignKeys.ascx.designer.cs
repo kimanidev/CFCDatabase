@@ -67,6 +67,24 @@ namespace CfCServiceTester.CustomControls {
         protected global::System.Web.UI.WebControls.Label lblErrorMessage6;
         
         /// <summary>
+        /// SourceFieldLabel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SourceFieldLabel;
+        
+        /// <summary>
+        /// TargetFieldLabel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TargetFieldLabel;
+        
+        /// <summary>
         /// lstForeignKeyList6 control.
         /// </summary>
         /// <remarks>
@@ -94,6 +112,33 @@ namespace CfCServiceTester.CustomControls {
         protected global::System.Web.UI.WebControls.ListBox lstTargetColumnList6;
         
         /// <summary>
+        /// lblNewName6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl lblNewName6;
+        
+        /// <summary>
+        /// txtNewName6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtNewName6;
+        
+        /// <summary>
+        /// btnRenameFkey6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnRenameFkey6;
+        
+        /// <summary>
         /// Image1 control.
         /// </summary>
         /// <remarks>
@@ -101,5 +146,32 @@ namespace CfCServiceTester.CustomControls {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Image Image1;
+        
+        /// <summary>
+        /// btnCreateFkey6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCreateFkey6;
+        
+        /// <summary>
+        /// btnModifyFkey6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnModifyFkey6;
+        
+        /// <summary>
+        /// btnDeleteFkey6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnDeleteFkey6;
     }
 }

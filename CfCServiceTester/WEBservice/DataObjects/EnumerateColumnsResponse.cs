@@ -111,4 +111,38 @@ namespace CfCServiceTester.WEBservice.DataObjects
             this.Indexes = new List<IndexDbo>();
         }
     }
+
+    [DataContract(Namespace = "CfCServiceNS")]
+    public class EnumerateForeignKeysResponse : RestoreStatus
+    {
+        [DataMember]
+        public List<ForeignKeyDbo> ForeignKeys { get; set; }
+
+        public EnumerateForeignKeysResponse(): base()
+        {
+            this.ForeignKeys = new List<ForeignKeyDbo>();
+        }
+    }
+
+    [DataContract(Namespace = "CfCServiceNS")]
+    public class GetForeignKeysResponse : RestoreStatus
+    {
+        [DataMember]
+        public ForeignKeyDbo Dbo { get; set; }
+
+        public GetForeignKeysResponse(): base()
+        { }
+    }
+
+    [DataContract(Namespace = "CfCServiceNS")]
+    public class UpdateForeignKeyResponse : RestoreStatus
+    {
+        [DataMember]
+        public ForeignKeyDbo Dbo { get; set; }
+
+        public UpdateForeignKeyResponse() : base()
+        {
+        }
+    }
+
 }

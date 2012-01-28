@@ -747,5 +747,122 @@ namespace CfCServiceTester.WEBservice
                     SetMultiUserMode(DatabaseName);
             }
         }
+
+        /// <summary>
+        /// Returns descriptions for foreign keys that belongs to selected table
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <returns><see cref="EnumerateIndexesResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public EnumerateForeignKeysResponse EnumerateForeignKeys(string tableName)
+        {
+            try
+            {
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    List<ForeignKeyDbo> foreignKeys = GetForeignKeys(tableName);
+                    var rzlt = new EnumerateForeignKeysResponse() { IsSuccess = true, ForeignKeys = foreignKeys };
+
+                    trScope.Complete();
+                    return rzlt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return new EnumerateForeignKeysResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+            }
+        }
+
+        /// <summary>
+        /// Returns descriptions of the foreign key.
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="foreignKeyName">Foreign key name</param>
+        /// <returns>Foreign key description<see cref="GetForeignKeysResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public GetForeignKeysResponse GetForeignKeyDescription(string tableName, string foreignKeyName)
+        {
+            try
+            {
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    ForeignKeyDbo foreignKey = GetThisForeignKey(tableName, foreignKeyName);
+                    var rzlt = new GetForeignKeysResponse() { IsSuccess = true, Dbo = foreignKey };
+
+                    trScope.Complete();
+                    return rzlt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return new GetForeignKeysResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+            }
+        }
+
+        /// <summary>
+        /// Performs CRUD operations on foreign keys
+        /// </summary>
+        /// <param name="request">Request for updating the foreign key, <see cref="UpdateForeignKeyRequest"/></param>
+        /// <param name="singleUserMode"><code>true</code> - set single user mode</param>
+        /// <returns><see cref="UpdateForeignKeyResponse"/></returns>
+        [WebMethod(EnableSession = true)]
+        public UpdateForeignKeyResponse UpdateForeignKey(UpdateForeignKeyRequest request, bool singleUserMode)
+        {
+            try
+            {
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    if (singleUserMode)
+                        SetSingleMode(DatabaseName);
+
+                    ForeignKeyDbo dbo = null;
+                    switch (request.OperationType)
+                    {
+                        case UpdateColumnOperation.Rename:
+                            dbo = RenameTheForeignKey(request.TableName, request.OldForeignKeyName, request.ForeignKeyName);
+                            break;
+/*
+                        case UpdateColumnOperation.Insert:
+                            dbo = CreateTheIndex(request.TableName, request.IndexDescriptor);
+                            break;
+                        case UpdateColumnOperation.Delete:
+                            dependecies = DeleteTheIndex(request.TableName, request.IndexName, request.DisableDependencies);
+                            dbo = new IndexDbo() { Name = request.IndexName, IsDisabled = true };
+                            break;
+                        case UpdateColumnOperation.Modify:
+                            dependecies = UpdateTheIndex(request.TableName, request.IndexDescriptor, request.DisableDependencies, out dbo);
+                            break;
+*/
+                    }
+                    trScope.Complete();
+                    return new UpdateForeignKeyResponse() { IsSuccess = true, Dbo = dbo };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new UpdateForeignKeyResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+            }
+            finally
+            {
+                if (singleUserMode)
+                    SetMultiUserMode(DatabaseName);
+            }
+        }
+
     }
 }

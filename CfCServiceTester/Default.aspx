@@ -31,6 +31,7 @@
                 <asp:ScriptReference Path="~/Scripts/ColumnEditBoxEventHandler.js" />
                 <asp:ScriptReference Path="~/Scripts/ModifyIndexesStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/IndexEditorEventHandler.js" />
+                <asp:ScriptReference Path="~/Scripts/ModifyForeignKeysStepEventHandler.js" />
                 <asp:ScriptReference Path="~/Scripts/jquery.boxy.js" />
                 <asp:ScriptReference Path="~/Scripts/RSA.min.js" />
 
@@ -134,7 +135,6 @@
                         'chkIgnoreDuplicateKeys5Id': '#<%= (GetIndexEditColumnBoxControlId("chkIgnoreDuplicateKeys5")) %>',
                         'ddlIndexKeyType5Id': '#<%= (GetIndexEditColumnBoxControlId("ddlIndexKeyType5")) %>',
                         'chkIsClustered5Id': '#<%= (GetIndexEditColumnBoxControlId("chkIsClustered5")) %>',
-//                        'chkIsDisabled5Id': '#<%= (GetIndexEditColumnBoxControlId("chkIsDisabled5")) %>',
                         'chkIsUnique5Id': '#<%= (GetIndexEditColumnBoxControlId("chkIsUnique5")) %>',
                         'hdIndexOperation5Id': '#<%= (GetIndexEditColumnBoxControlId("hdIndexOperation5")) %>',
 
@@ -144,6 +144,11 @@
                         'lstForeignKeyList6Id': '#<%= (GetFifthPageControlId("lstForeignKeyList6")) %>',
                         'lstSourceColumnList6Id': '#<%= (GetFifthPageControlId("lstSourceColumnList6")) %>',
                         'lstTargetColumnList6Id': '#<%= (GetFifthPageControlId("lstTargetColumnList6")) %>',
+                        'btnRenameFkey6Id': '#<%= (GetFifthPageControlId("btnRenameFkey6")) %>',
+                        'btnCreateFkey6Id': '#<%= (GetFifthPageControlId("btnCreateFkey6")) %>',
+                        'btnModifyFkey6Id': '#<%= (GetFifthPageControlId("btnModifyFkey6")) %>',
+                        'btnDeleteFkey6Id': '#<%= (GetFifthPageControlId("btnDeleteFkey6")) %>',
+                        'txtNewName6Id': '#<%= (GetFifthPageControlId("txtNewName6")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",

@@ -50,6 +50,11 @@ namespace CfCServiceTester.WEBservice.DataObjects
         /// </summary>
         [DataMember]
         public string ReferencedTable { get; set; }
+
+        public ForeignKeyDbo()
+        {
+            this.Columns = new List<ForeignKeyColumnDbo>();
+        }
     }
 
     /// <summary>

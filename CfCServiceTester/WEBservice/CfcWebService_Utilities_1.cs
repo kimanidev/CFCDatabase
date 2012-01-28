@@ -426,5 +426,26 @@ namespace CfCServiceTester.WEBservice
             }
         }
 
+        private static ForeignKeyDbo CreateForeignKeyDbo(ForeignKey aKey)
+        {
+            var rzlt = new ForeignKeyDbo()
+            {
+                Name = aKey.Name,
+                DeleteAction = aKey.DeleteAction,
+                UpdateAction = aKey.UpdateAction,
+                IsChecked = aKey.IsChecked,
+                ReferencedTable = aKey.ReferencedTable
+            };
+            foreach (ForeignKeyColumn clmn in aKey.Columns)
+            {
+                rzlt.Columns.Add(new ForeignKeyColumnDbo()
+                                    {
+                                        Name = clmn.Name,
+                                        ReferencedColumn = clmn.ReferencedColumn
+                                    });
+            }
+            return rzlt;
+        }
+
     }
 }

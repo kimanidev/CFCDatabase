@@ -69,7 +69,6 @@ CfcServiceTestManager.CfcComponent = function () {
     this._chkIgnoreDuplicateKeys5Id = '';   // Ignore dublicate keys
     this._ddlIndexKeyType5Id = '';          // Key type
     this._chkIsClustered5Id = '';           // Key is clustered
-    //    this._chkIsDisabled5Id = '';            // Key is disabled
     this._chkIsUnique5Id = '';              // Key is unique
     this._hdIndexOperation5Id = '';         // Index operation code
 
@@ -79,6 +78,11 @@ CfcServiceTestManager.CfcComponent = function () {
     this._lstForeignKeyList6Id = '';        // Selected foreign key
     this._lstSourceColumnList6Id = '';      // Source columns
     this._lstTargetColumnList6Id = '';      // Target columns
+    this._btnRenameFkey6Id = '';            // Rename button
+    this._btnCreateFkey6Id = '';            // Create button
+    this._btnModifyFkey6Id = '';            // Modify button
+    this._btnDeleteFkey6Id = '';            // Delete button
+    this._txtNewName6Id = '';               // New name for the foreign key
 
     this._localServersOnly = true;          // true - look for local servers only, false - all available SQL servers
     this._accessibleDatabasesOnly = true;   // true - enumerate accessable databases only, false - all databases on the server
@@ -571,6 +575,42 @@ CfcServiceTestManager.CfcComponent.prototype = {
     set_lstTargetColumnList6Id: function (value) {
         this._lstTargetColumnList6Id = value;
     },
+
+    get_btnRenameFkey6Id: function () {
+        return this._btnRenameFkey6Id;
+    },
+    set_btnRenameFkey6Id: function (value) {
+        this._btnRenameFkey6Id = value;
+    },
+
+    get_btnCreateFkey6Id: function () {
+        return this._btnCreateFkey6Id;
+    },
+    set_btnCreateFkey6Id: function (value) {
+        this._btnCreateFkey6Id = value;
+    },
+
+    get_btnModifyFkey6Id: function () {
+        return this._btnModifyFkey6Id;
+    },
+    set_btnModifyFkey6Id: function (value) {
+        this._btnModifyFkey6Id = value;
+    },
+
+    get_btnDeleteFkey6Id: function () {
+        return this._btnDeleteFkey6Id;
+    },
+    set_btnDeleteFkey6Id: function (value) {
+        this._btnDeleteFkey6Id = value;
+    },
+
+    get_txtNewName6Id: function () {
+        return this._txtNewName6Id;
+    },
+    set_txtNewName6Id: function (value) {
+        this._txtNewName6Id = value;
+    },
+
 
     get_localServersOnly: function () {
         return this._localServersOnly;
