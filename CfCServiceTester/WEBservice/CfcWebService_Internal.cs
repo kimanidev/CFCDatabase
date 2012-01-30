@@ -393,6 +393,31 @@ namespace CfCServiceTester.WEBservice
             return droppedForeignKeys;
         }
 
+        /// <summary>
+        /// Renames index or primary key.
+        /// <param name="tableName">Table name</param>
+        /// <param name="fKeyName">Index Name</param>
+        /// </summary>
+        public static void DeleteTheForeignKey(string tableName, string fKeyName)
+        {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[DatabaseName];
+            Table aTable = db.Tables[tableName];
+            if (aTable == null)
+                throw new Exception(String.Format("There is no table {0} in the {1} database.", tableName, DatabaseName));
+            DeleteTheForeignKey(db, aTable, fKeyName);
+        }
+        public static void DeleteTheForeignKey(Database db, Table aTable, string fKeyName)
+        {
+            ForeignKey fKey = aTable.ForeignKeys[fKeyName];
+            if (fKey == null)
+                throw new Exception(String.Format("There is no foreign key {0} in the {1} table.", fKeyName, aTable.Name));
+
+            fKey.Drop();
+            aTable.Alter();
+        }
+
+
         public static IEnumerable<DataColumnDbo> GetTableColumns(string tableName, bool createNewTable = false)
         {
             var srv = new Server(SqlServerName);

@@ -54,6 +54,53 @@ function RenameForeignKey6(button) {
     return false;
 }
 
+function DeleteForeignKey(button) {
+    var manager = $find('CfcTestManager');
+
+    var tableName = $(manager.get_hdnSelectedTable6Id()).val();
+    if (!tableName) {
+        alert('Table name is not defined.');
+        return false;
+    }
+    var fKeyName = $(manager.get_hdnSelectedForeignKey6Id()).val();
+    if (!fKeyName) {
+        alert('Foreign key is not selected.');
+        return false;
+    }
+    if (!confirm('Are you sure to delete foreign key ' + fKeyName + '?'))
+        return false;
+
+    var request = {
+        OperationType: 'Delete',
+        TableName: tableName,
+        OldForeignKeyName: fKeyName,
+        ForeignKeyName: fKeyName
+    };
+    CfCServiceTester.WEBservice.CfcWebService.UpdateForeignKey(request, false, onSuccess_DeleteForeignKey, onFailure_EnumerateForeignKeys);
+    return false;
+}
+
+// result is instance of UpdateForeignKeyResponse
+function onSuccess_DeleteForeignKey(result) {
+    var manager = $find('CfcTestManager');
+
+    $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').hide();
+    if (result.IsSuccess) {
+        var selectedForeignKey = $(manager.get_lstForeignKeyList6Id() + ' option:selected').remove();
+        var newOption = $(manager.get_lstForeignKeyList6Id() + ' option:first');
+        if (newOption.length > 0) {
+            newOption.attr("selected", "selected");
+            ForeignKeyListOnChange6(newOption.get(0));
+        } else {
+        $(manager.get_lstSourceColumnList6Id()).empty();
+        $(manager.get_lstTargetColumnList6Id()).empty();
+    }
+    } else {
+        alert(result.ErrorMessage);
+    }
+}
+
+
 // result is instance of UpdateForeignKeyResponse
 function onSuccess_RenameForeignKey(result) {
     var manager = $find('CfcTestManager');

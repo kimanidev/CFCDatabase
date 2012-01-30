@@ -140,6 +140,9 @@ namespace CfCServiceTester.WEBservice.DataObjects
         [DataMember]
         public ForeignKeyDbo Dbo { get; set; }
 
+        [DataMember]
+        public bool IsDeleted { get; set; }
+
         public UpdateForeignKeyResponse() : base()
         {
         }

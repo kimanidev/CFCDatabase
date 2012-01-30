@@ -836,13 +836,13 @@ namespace CfCServiceTester.WEBservice
                         case UpdateColumnOperation.Rename:
                             dbo = RenameTheForeignKey(request.TableName, request.OldForeignKeyName, request.ForeignKeyName);
                             break;
+                        case UpdateColumnOperation.Delete:
+                            DeleteTheForeignKey(request.TableName, request.OldForeignKeyName);
+                            dbo = new ForeignKeyDbo() { Name = request.OldForeignKeyName };
+                            break;
 /*
                         case UpdateColumnOperation.Insert:
                             dbo = CreateTheIndex(request.TableName, request.IndexDescriptor);
-                            break;
-                        case UpdateColumnOperation.Delete:
-                            dependecies = DeleteTheIndex(request.TableName, request.IndexName, request.DisableDependencies);
-                            dbo = new IndexDbo() { Name = request.IndexName, IsDisabled = true };
                             break;
                         case UpdateColumnOperation.Modify:
                             dependecies = UpdateTheIndex(request.TableName, request.IndexDescriptor, request.DisableDependencies, out dbo);
