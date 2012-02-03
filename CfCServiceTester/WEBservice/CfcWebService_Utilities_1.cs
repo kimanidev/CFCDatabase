@@ -447,5 +447,29 @@ namespace CfCServiceTester.WEBservice
             return rzlt;
         }
 
+        /// <summary>
+        /// Return column names from Unique constraint
+        /// </summary>
+        /// <param name="aTable">Table</param>
+        /// <returns>List with names of the columns</returns>
+        private static List<string> GetColumnsInUniqueConstraints(Table aTable)
+        {
+            var rzlt = new List<string>();
+
+            var keyQuery =
+                from Index ind in aTable.Indexes
+                where ind.IndexKeyType == IndexKeyType.DriUniqueKey
+                select ind;
+            
+            foreach (var ind in keyQuery)
+            {
+                var aList = 
+                    from IndexedColumn col in ind.IndexedColumns
+                    select col.Name;
+                rzlt.AddRange(aList);
+            }
+
+            return rzlt;
+        }
     }
 }

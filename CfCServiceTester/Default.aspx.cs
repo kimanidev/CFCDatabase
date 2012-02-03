@@ -76,6 +76,15 @@ namespace CfCServiceTester
             var ctrl = this.ModifyForeignKeysContent.FindControl(controlName);
             return ctrl == null ? String.Empty : ctrl.ClientID;
         }
+        protected string GetForeignKeyEditBoxControlId(string controlName)
+        {
+            var ctrlRoot = this.ModifyForeignKeysContent.FindControl("ForeignKeyEditorBox6");
+            if (ctrlRoot == null)
+                return String.Empty;
+
+            var ctrl = ((ForeignKeyEditor)ctrlRoot).FindControl(controlName);
+            return ctrl == null ? String.Empty : ctrl.ClientID;
+        }
 
 
         public _Default() : base()

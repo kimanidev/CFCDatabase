@@ -864,5 +864,42 @@ namespace CfCServiceTester.WEBservice
             }
         }
 
+        /// <summary>
+        /// Returns list of columns that may be used in the foreign keys (columns that belongs to primary key or unique constraint)
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="singleUserMode"><code>true</code> - set single user mode</param>
+        /// <returns>List with column names</returns>
+        [WebMethod(EnableSession = true)]
+        public EnumerateBackupFilesResponse GetTargetColumns(string tableName, bool singleUserMode)
+        {
+            try
+            {
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    if (singleUserMode)
+                        SetSingleMode(DatabaseName);
+
+                    List<string> rzlt = GetTargetColumns(tableName);
+
+                    trScope.Complete();
+                    return new EnumerateBackupFilesResponse() { IsSuccess = true, NameList = rzlt };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new EnumerateBackupFilesResponse() { IsSuccess = false, ErrorMessage = ParseErrorMessage(ex) };
+            }
+            finally
+            {
+                if (singleUserMode)
+                    SetMultiUserMode(DatabaseName);
+            }
+        }
     }
 }

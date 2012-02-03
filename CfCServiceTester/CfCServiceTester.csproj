@@ -79,6 +79,7 @@
   <ItemGroup>
     <Content Include="CustomControls\ColumnEditBox.ascx" />
     <Content Include="CustomControls\DatabaseBackupContent.ascx" />
+    <Content Include="CustomControls\ForeignKeyEditor.ascx" />
     <Content Include="CustomControls\IndexEditorBox.ascx" />
     <Content Include="CustomControls\ModifyForeignKeys.ascx" />
     <Content Include="CustomControls\ModifyIndexesContent.ascx" />
@@ -94,6 +95,7 @@
     <Content Include="Scripts\CfcServiceTestManager.js" />
     <Content Include="Scripts\ConnectionStepEventHandlers.js" />
     <Content Include="Scripts\ColumnEditBoxEventHandler.js" />
+    <Content Include="Scripts\ForeignKeyEditorEventHandler.js" />
     <Content Include="Scripts\IndexEditorEventHandler.js" />
     <Content Include="Scripts\jquery-1.7.1.min.js" />
     <Content Include="Scripts\jquery-ui-1.8.16.custom.min.js" />
@@ -167,6 +169,13 @@
     </Compile>
     <Compile Include="CustomControls\DatabaseBackupContent.ascx.designer.cs">
       <DependentUpon>DatabaseBackupContent.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\ForeignKeyEditor.ascx.cs">
+      <DependentUpon>ForeignKeyEditor.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CustomControls\ForeignKeyEditor.ascx.designer.cs">
+      <DependentUpon>ForeignKeyEditor.ascx</DependentUpon>
     </Compile>
     <Compile Include="CustomControls\IndexEditorBox.ascx.cs">
       <DependentUpon>IndexEditorBox.ascx</DependentUpon>

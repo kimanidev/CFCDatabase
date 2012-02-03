@@ -1,4 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ModifyForeignKeys.ascx.cs" Inherits="CfCServiceTester.CustomControls.ModifyForeignKeys" %>
+<%@ Register TagPrefix="con" TagName="fKeyEditor" Src="~/CustomControls/ForeignKeyEditor.ascx" %>
 
 <asp:HiddenField runat="server" ID="hdnSelectedTable6" Value="" />
 <asp:HiddenField runat="server" ID="hdnSelectedForeignKey6" Value="" />
@@ -85,3 +86,7 @@
         </tr>
     </tbody>
 </table>
+
+<div id="ForeignKeyEditor6" style="display: none; width: 40em; height:auto;" class='boxy' >
+    <con:fKeyEditor ID="ForeignKeyEditorBox6" runat="server" />
+</div>

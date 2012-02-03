@@ -24,6 +24,7 @@ function ForeignKeyListOnChange6(aList) {
     return false;
 }
 
+// Rename foreign key
 function RenameForeignKey6(button) {
     var manager = $find('CfcTestManager');
 
@@ -54,6 +55,7 @@ function RenameForeignKey6(button) {
     return false;
 }
 
+// Delete foreign key
 function DeleteForeignKey(button) {
     var manager = $find('CfcTestManager');
 
@@ -78,6 +80,77 @@ function DeleteForeignKey(button) {
     };
     CfCServiceTester.WEBservice.CfcWebService.UpdateForeignKey(request, false, onSuccess_DeleteForeignKey, onFailure_EnumerateForeignKeys);
     return false;
+}
+
+// Create new foreign key
+function CreateForeignKey(aButton) {
+    var manager = $find('CfcTestManager');
+
+    $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').show();
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateTables(onSuccess_EnumerateTables6, onFailure_EnumerateForeignKeys);
+
+    var tableName = $(manager.get_hdnSelectedTable6Id()).val();
+    $(manager.get_txtFkeyName7Id()).val('');
+    $(manager.get_txtSourceTblName7Id()).val(tableName);
+
+    return false;
+}
+
+// result is instance of DataTableListDbo class.
+function onSuccess_EnumerateTables6(result) {
+    var manager = $find('CfcTestManager');
+    var targetTables = $(manager.get_ddlTargetTblName7Id());
+    targetTables.empty();
+    if (result.IsSuccess)
+    {
+        var sb = new Sys.StringBuilder();
+        sb.append('<option value="">Select target table</option>');
+        Array.forEach(result.TableNames, AppendTableToList, sb);
+        targetTables.html(sb.toString());
+        var tableName = $(manager.get_hdnSelectedTable6Id()).val();
+        CfCServiceTester.WEBservice.CfcWebService.EnumerateColumns(tableName, onSuccess_EnumerateColumns6, onFailure_EnumerateForeignKeys);
+    } else {
+        alert(result.ErrorMessage);
+    }
+}
+function AppendTableToList(element, index, array) {
+    var s = String.format('<option value="{0}">{0}</option>', element);
+    this.append(s);
+}
+
+// result is instance of EnumerateColumnsResponse
+function onSuccess_EnumerateColumns6(result) {
+    var manager = $find('CfcTestManager');
+    $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').hide();
+    var sourceFieldList = $(manager.get_ddlSourceColumns7Id());
+    $(manager.get_ddlTargetColumns7Id()).empty();
+
+    if (result.IsSuccess) {
+        sourceFieldList.empty();
+        var sb = new Sys.StringBuilder();
+        Array.forEach(result.Columns, AppendFieldToList, sb);
+        sourceFieldList.html(sb.toString());
+
+        var dialog = new Boxy('#ForeignKeyEditor6',
+            { center: true, modal: true, title: "Create new index", draggable: true, fixed: false });
+        manager.set_columnEditor(dialog);
+        dialog.show();
+    } else {
+        alert(result.ErrorMessage);
+    }
+}
+// Parameters:
+//  The element argument is the array element that the function will take action on. Instance of the DataColumnDbo class.
+//  The index argument is the index of element, and 
+//  The array argument is the array that contains element.
+//  Context (this) represents string builder (innerHtl for the body element).
+function AppendFieldToList(element, index, array) {
+    var selected = index == 0 ? 'selected="selected"' : '';
+    var s = String.format('<option value="{0}" {1}>{0}</option>', element.Name, selected);
+    this.append(s);
+}
+
+function PrepareForeignKeyDialog(manager, tableName) {
 }
 
 // result is instance of UpdateForeignKeyResponse

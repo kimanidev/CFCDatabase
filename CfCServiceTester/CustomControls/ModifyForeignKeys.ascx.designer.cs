@@ -173,5 +173,14 @@ namespace CfCServiceTester.CustomControls {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnDeleteFkey6;
+        
+        /// <summary>
+        /// ForeignKeyEditorBox6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::CfCServiceTester.CustomControls.ForeignKeyEditor ForeignKeyEditorBox6;
     }
 }

@@ -802,5 +802,23 @@ namespace CfCServiceTester.WEBservice
 
             return GetIndexDescription(table, indexName);
         }
+
+        public static List<string> GetTargetColumns(string tableName)
+        {
+            var srv = new Server(SqlServerName);
+            if (srv == null)
+                throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
+            var db = srv.Databases[DatabaseName];
+            if (db == null)
+                throw new Exception(String.Format("Database '{0}' is not accessible.", DatabaseName));
+            Table table = db.Tables[tableName];
+            if (table == null)
+                throw new Exception(String.Format("Tabase '{0}' has no table '{1}'.", DatabaseName, tableName));
+
+            var rzlt = new List<string>(GetPrimaryKeyColumns(table));
+            rzlt.AddRange(GetColumnsInUniqueConstraints(table));
+
+            return rzlt;
+        }
     }
 }

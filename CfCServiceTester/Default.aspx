@@ -32,6 +32,7 @@
                 <asp:ScriptReference Path="~/Scripts/ModifyIndexesStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/IndexEditorEventHandler.js" />
                 <asp:ScriptReference Path="~/Scripts/ModifyForeignKeysStepEventHandler.js" />
+                <asp:scriptreference Path="~/Scripts/ForeignKeyEditorEventHandler.js" />
                 <asp:ScriptReference Path="~/Scripts/jquery.boxy.js" />
                 <asp:ScriptReference Path="~/Scripts/RSA.min.js" />
 
@@ -149,6 +150,14 @@
                         'btnModifyFkey6Id': '#<%= (GetFifthPageControlId("btnModifyFkey6")) %>',
                         'btnDeleteFkey6Id': '#<%= (GetFifthPageControlId("btnDeleteFkey6")) %>',
                         'txtNewName6Id': '#<%= (GetFifthPageControlId("txtNewName6")) %>',
+
+                        'txtFkeyName7Id': '#<%= (GetForeignKeyEditBoxControlId("txtFkeyName7")) %>',
+                        'txtSourceTblName7Id': '#<%= (GetForeignKeyEditBoxControlId("txtSourceTblName7")) %>',
+                        'ddlTargetTblName7Id': '#<%= (GetForeignKeyEditBoxControlId("ddlTargetTblName7")) %>',
+                        'lbxSourceColumns7Id': '#<%= (GetForeignKeyEditBoxControlId("lbxSourceColumns7")) %>',
+                        'lbxTargetColumns7Id': '#<%= (GetForeignKeyEditBoxControlId("lbxTargetColumns7")) %>',
+                        'ddlSourceColumns7Id': '#<%= (GetForeignKeyEditBoxControlId("ddlSourceColumns7")) %>',
+                        'ddlTargetColumns7Id': '#<%= (GetForeignKeyEditBoxControlId("ddlTargetColumns7")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",

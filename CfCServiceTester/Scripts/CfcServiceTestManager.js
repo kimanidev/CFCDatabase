@@ -84,6 +84,14 @@ CfcServiceTestManager.CfcComponent = function () {
     this._btnDeleteFkey6Id = '';            // Delete button
     this._txtNewName6Id = '';               // New name for the foreign key
 
+    this._txtFkeyName7Id = ''               // Foreign key name
+    this._txtSourceTblName7Id = '';         // Source table name
+    this._ddlTargetTblName7Id = '';         // Target table name
+    this._lbxSourceColumns7Id = '';         // Source columns
+    this._lbxTargetColumns7Id = '';         // Target columns
+    this._ddlSourceColumns7Id = '';         // Source columns
+    this._ddlTargetColumns7Id = '';         // Target columns
+
     this._localServersOnly = true;          // true - look for local servers only, false - all available SQL servers
     this._accessibleDatabasesOnly = true;   // true - enumerate accessable databases only, false - all databases on the server
 
@@ -611,6 +619,54 @@ CfcServiceTestManager.CfcComponent.prototype = {
         this._txtNewName6Id = value;
     },
 
+    get_txtFkeyName7Id: function () {
+        return this._txtFkeyName7Id;
+    },
+    set_txtFkeyName7Id: function (value) {
+        this._txtFkeyName7Id = value;
+    },
+
+    get_txtSourceTblName7Id: function() {
+        return this._txtSourceTblName7Id;
+    },
+    set_txtSourceTblName7Id: function(value) {
+        this._txtSourceTblName7Id = value;
+    },
+
+    get_ddlTargetTblName7Id: function() {
+        return this._ddlTargetTblName7Id;
+    },
+    set_ddlTargetTblName7Id: function(value) {
+        this._ddlTargetTblName7Id = value;
+    },
+
+    get_lbxSourceColumns7Id: function() {
+        return this._lbxSourceColumns7Id;
+    },
+    set_lbxSourceColumns7Id: function(value) {
+        this._lbxSourceColumns7Id = value;
+    },
+
+    get_lbxTargetColumns7Id: function() {
+        return this._lbxTargetColumns7Id;
+    },
+    set_lbxTargetColumns7Id: function(value) {
+        this._lbxTargetColumns7Id = value;
+    },
+
+    get_ddlSourceColumns7Id: function() {
+        return this._ddlSourceColumns7Id;
+    },
+    set_ddlSourceColumns7Id: function(value) {
+        this._ddlSourceColumns7Id = value;
+    },
+
+    get_ddlTargetColumns7Id: function() {
+        return this._ddlTargetColumns7Id;
+    },
+    set_ddlTargetColumns7Id: function(value) {
+        this._ddlTargetColumns7Id = value;
+    },
 
     get_localServersOnly: function () {
         return this._localServersOnly;
