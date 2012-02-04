@@ -840,10 +840,10 @@ namespace CfCServiceTester.WEBservice
                             DeleteTheForeignKey(request.TableName, request.OldForeignKeyName);
                             dbo = new ForeignKeyDbo() { Name = request.OldForeignKeyName };
                             break;
-/*
                         case UpdateColumnOperation.Insert:
-                            dbo = CreateTheIndex(request.TableName, request.IndexDescriptor);
+                            //dbo = CreateTheIndex(request.TableName, request.IndexDescriptor);
                             break;
+/*
                         case UpdateColumnOperation.Modify:
                             dependecies = UpdateTheIndex(request.TableName, request.IndexDescriptor, request.DisableDependencies, out dbo);
                             break;

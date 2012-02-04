@@ -130,9 +130,10 @@ function onSuccess_EnumerateColumns6(result) {
         var sb = new Sys.StringBuilder();
         Array.forEach(result.Columns, AppendFieldToList, sb);
         sourceFieldList.html(sb.toString());
+        $(manager.get_hdnOperationType7Id()).val('Insert');
 
         var dialog = new Boxy('#ForeignKeyEditor6',
-            { center: true, modal: true, title: "Create new index", draggable: true, fixed: false });
+            { center: true, modal: true, title: "Create new foreign key", draggable: true, fixed: false });
         manager.set_columnEditor(dialog);
         dialog.show();
     } else {

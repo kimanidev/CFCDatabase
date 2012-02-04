@@ -31,9 +31,16 @@ namespace CfCServiceTester.WEBservice.DataObjects
         public string OldForeignKeyName { get; set; }
 
         /// <summary>
-        /// New name, for renaming and delete operation only
+        /// New name, for renaming and delete operation only. 
+        /// Both names are equal for the Insert and Delete operations.
         /// </summary>
         [DataMember]
         public string ForeignKeyName { get; set; }
+
+        /// <summary>
+        /// Description of the new foreign key
+        /// </summary>
+        [DataMember]
+        public ForeignKeyDbo Dbo { get; set; }
     }
 }

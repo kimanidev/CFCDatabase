@@ -158,6 +158,7 @@
                         'lbxTargetColumns7Id': '#<%= (GetForeignKeyEditBoxControlId("lbxTargetColumns7")) %>',
                         'ddlSourceColumns7Id': '#<%= (GetForeignKeyEditBoxControlId("ddlSourceColumns7")) %>',
                         'ddlTargetColumns7Id': '#<%= (GetForeignKeyEditBoxControlId("ddlTargetColumns7")) %>',
+                        'hdnOperationType7Id': '#<%= (GetForeignKeyEditBoxControlId("hdnOperationType7")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",

@@ -13,6 +13,15 @@ namespace CfCServiceTester.CustomControls {
     public partial class ForeignKeyEditor {
         
         /// <summary>
+        /// hdnOperationType7 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hdnOperationType7;
+        
+        /// <summary>
         /// txtFkeyName7 control.
         /// </summary>
         /// <remarks>
@@ -76,6 +85,15 @@ namespace CfCServiceTester.CustomControls {
         protected global::System.Web.UI.WebControls.DropDownList ddlTargetColumns7;
         
         /// <summary>
+        /// spnRemoveFkeyColumn7 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button spnRemoveFkeyColumn7;
+        
+        /// <summary>
         /// lbxSourceColumns7 control.
         /// </summary>
         /// <remarks>
@@ -92,5 +110,14 @@ namespace CfCServiceTester.CustomControls {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ListBox lbxTargetColumns7;
+        
+        /// <summary>
+        /// btnCreateForeignKey control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCreateForeignKey;
     }
 }
