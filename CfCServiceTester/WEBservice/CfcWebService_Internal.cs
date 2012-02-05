@@ -417,6 +417,24 @@ namespace CfCServiceTester.WEBservice
             aTable.Alter();
         }
 
+        /// <summary>
+        /// Creates new foreign key
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="dbo">Foreign key description <see cref="ForeignKeyDbo"/></param>
+        /// <returns>Description of created foreign key</returns>
+        public static ForeignKeyDbo CreateForeignKey(string tableName, ForeignKeyDbo dbo)
+        {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[DatabaseName];
+            Table aTable = db.Tables[tableName];
+            if (aTable == null)
+                throw new Exception(String.Format("There is no table {0} in the {1} database.", tableName, DatabaseName));
+            if (aTable.ForeignKeys[dbo.Name] != null)
+                throw new Exception(String.Format("There is {0} foreign key in the table {1}.", dbo.Name, tableName));
+            
+            return CreateForeignKey(aTable, dbo);
+        }
 
         public static IEnumerable<DataColumnDbo> GetTableColumns(string tableName, bool createNewTable = false)
         {

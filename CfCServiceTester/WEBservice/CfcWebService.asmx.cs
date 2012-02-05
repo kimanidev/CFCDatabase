@@ -841,7 +841,7 @@ namespace CfCServiceTester.WEBservice
                             dbo = new ForeignKeyDbo() { Name = request.OldForeignKeyName };
                             break;
                         case UpdateColumnOperation.Insert:
-                            //dbo = CreateTheIndex(request.TableName, request.IndexDescriptor);
+                            dbo = CreateForeignKey(request.TableName, request.Dbo);
                             break;
 /*
                         case UpdateColumnOperation.Modify:

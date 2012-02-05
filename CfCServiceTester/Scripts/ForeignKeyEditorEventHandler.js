@@ -41,12 +41,17 @@ function SelectionChanged7(aList) {
 }
 
 // Store information about new foreign key in the database
-function CreateThisForeignKey(aButton) {
+function CreateThisForeignKey7(aButton) {
     var manager = $find('CfcTestManager');
     var fKeyName = $(manager.get_txtFkeyName7Id()).val();
     if (!ValidateName(fKeyName))
         return false;
     var request = PrepareUpdateForeignKeyRequest(fKeyName);
+
+    $('span#spnAddFkeyColumn7 span.Pauser').show();
+    CfCServiceTester.WEBservice.CfcWebService.UpdateForeignKey(request, false, onSuccess_CreateForeignKey7, onFailure_GetTargetColumns7);
+    
+    return false;
 }
 function PrepareUpdateForeignKeyRequest(fKeyName) {
     var manager = $find('CfcTestManager');
@@ -58,11 +63,14 @@ function PrepareUpdateForeignKeyRequest(fKeyName) {
         ForeignKeyName: fKeyName,
         Dbo: {      // Dbo is instance of ForeignKeyDbo class
             Name: fKeyName,
-            Columns: GetForeignKeyColumns7(manager.get_lbxSourceColumns7Id(), manager.get_ddlTargetColumns7Id())
-            // TODO:
+            Columns: GetForeignKeyColumns7(manager.get_lbxSourceColumns7Id(), manager.get_ddlTargetColumns7Id()),
+            DeleteAction: $('#ddlDeleteAction7').val(),
+            UpdateAction: $('#ddlUpdateAction7').val(),
+            IsChecked: $('#chkCheckAfterConstruction').is(':checked'),
+            ReferencedTable: $(manager.get_ddlTargetTblName7Id()).val()
         }
     };
-
+    return rzlt;
 }
 function GetForeignKeyColumns7(sourceNames, targetNames) {
     var listSource = $(String.format("{0} option", sourceNames));
@@ -72,7 +80,7 @@ function GetForeignKeyColumns7(sourceNames, targetNames) {
     listSource.each(function (index) {
         rzlt[index] = { // Each element in the array is instance of ForeignKeyColumnDbo object
             Name: this.value,
-            ReferencedColumn: listTarget.get(index) // Both lists are of the same length
+            ReferencedColumn: listTarget.get(index).value // Both lists are of the same length
         }
     });
     return rzlt;
@@ -96,7 +104,7 @@ function ValidateName(fKeyName) {
         return false;
     }
 
-    var rzlt = false;
+    var rzlt = true;
     var fKeyNameUpperCase = fKeyName.toUpperCase();
     $(manager.get_lstForeignKeyList6Id() + ' option').each(function (index) {
         var foreignKeyName = this.value.toUpperCase();
@@ -143,6 +151,26 @@ function AddOneColumn7(listId, name) {
     return true;
 }
 
+// result is instance of UpdateForeignKeyRequest class.
+function onSuccess_CreateForeignKey7(result) {
+    var manager = $find('CfcTestManager');
+    $('span#spnAddFkeyColumn7 span.Pauser').hide();
+
+    if (result.IsSuccess) {
+        AddForeignKeyDescription(manager, result.Dbo);
+        ShowFkeyColumns6(manager, result.Dbo);
+        manager.get_columnEditor().hide();
+    } else {
+        alert(result.ErrorMessage);
+    }
+}
+// dbo is instance of ForeignKeyDbo class
+function AddForeignKeyDescription(manager, dbo)
+{
+    var fKeylist = $(manager.get_lstForeignKeyList6Id());
+    fKeylist.find('option:selected').removeAttr('selected');
+    fKeylist.append($("<option/>", { value: dbo.Name, text: dbo.Name, selected: "selected" }));
+}
 
 // result is instance of EnumerateBackupFilesResponse class.
 function onSuccess_GetTargetColumns7(result) {

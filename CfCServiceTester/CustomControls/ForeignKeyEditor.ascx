@@ -94,10 +94,17 @@
             <td colspan="3"><hr /></td>
         </tr>
         <tr>
-            <td colspan="3" style="text-align:right;">
+            <td>
+                <span style="white-space:nowrap;">
+                    <input type="checkbox" id="chkCheckAfterConstruction" checked="checked" 
+                           title="Verify values in the source table after constructing the key." />
+                    <label for="chkCheckAfterConstruction">Check values after construction</label>
+                </span>
+            </td>
+            <td colspan="2" style="text-align:right;">
                 <asp:Button ID="btnCreateForeignKey" runat="server" Text="Create key" CausesValidation="false"
                         ToolTip="Click the button for creating foreign key." Width="9em"
-                        CssClass="MpsButton" OnClientClick="return CreateThisForeignKey(this);" />
+                        CssClass="MpsButton" OnClientClick="return CreateThisForeignKey7(this);" />
             </td>
         </tr>
     </tfoot>

@@ -251,14 +251,22 @@ function onSuccess_GetForeignKey(result, context, operation) {
     $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').hide();
 
     if (result.IsSuccess) {
-        var sourceColumns = $(manager.get_lstSourceColumnList6Id());
+        ShowFkeyColumns6(manager, result.Dbo);
+        /*        var sourceColumns = $(manager.get_lstSourceColumnList6Id());
         var targetColumns = $(manager.get_lstTargetColumnList6Id());
         sourceColumns.empty();
         targetColumns.empty();
-        _ShowForeignKeyFields(manager, result.Dbo, sourceColumns, targetColumns);
+        _ShowForeignKeyFields(manager, result.Dbo, sourceColumns, targetColumns); */
     } else {
         alert(result.ErrorMessage);
     }
+}
+function ShowFkeyColumns6(manager, dbo) {
+    var sourceColumns = $(manager.get_lstSourceColumnList6Id());
+    var targetColumns = $(manager.get_lstTargetColumnList6Id());
+    sourceColumns.empty();
+    targetColumns.empty();
+    _ShowForeignKeyFields(manager, dbo, sourceColumns, targetColumns);
 }
 
 function onFailure_EnumerateForeignKeys(result, context, operation) {
