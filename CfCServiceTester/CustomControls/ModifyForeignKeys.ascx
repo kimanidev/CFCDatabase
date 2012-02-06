@@ -39,7 +39,7 @@
                 <span runat="server" id="SourceFieldLabel" class="SourceFields">Fields (source)</span>
             </td>
             <td style="text-align: left; padding-left: 10px; font-weight:bolder;">
-                <span runat="server" id="TargetFieldLabel" class="TargetFields">Fields (target)</span>
+                <span runat="server" id="TargetFieldLabel6" class="TargetFields">Fields (target)</span>
             </td>
         </tr>
         <tr>
@@ -75,10 +75,10 @@
             <td colspan="2">
                 <asp:Button ID="btnCreateFkey6" runat="server" Text="Create" CausesValidation="false"
                         ToolTip="Click the button for creating new foreign key."
-                        CssClass="MpsButton" OnClientClick="return CreateForeignKey(this);" />
+                        CssClass="MpsButton" OnClientClick="return CreateForeignKey6(this);" />
                 <asp:Button ID="btnModifyFkey6" runat="server" Text="Edit" CausesValidation="false"
                         ToolTip="Click the button for editing selected foreign key."
-                        CssClass="MpsButton" OnClientClick="return EditForeignKey(this);" />
+                        CssClass="MpsButton" OnClientClick="return EditForeignKey6(this);" />
                 <asp:Button ID="btnDeleteFkey6" runat="server" Text="Delete" CausesValidation="false"
                         ToolTip="Click the button for deleting selected foreign key."
                         CssClass="MpsButton" OnClientClick="return DeleteForeignKey(this);" />

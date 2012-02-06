@@ -797,7 +797,10 @@ namespace CfCServiceTester.WEBservice
                 using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
                 {
                     ForeignKeyDbo foreignKey = GetThisForeignKey(tableName, foreignKeyName);
-                    var rzlt = new GetForeignKeysResponse() { IsSuccess = true, Dbo = foreignKey };
+                    var rzlt = new GetForeignKeysResponse() { 
+                        IsSuccess = true, 
+                        Dbo = foreignKey
+                    };
 
                     trScope.Complete();
                     return rzlt;
@@ -843,11 +846,10 @@ namespace CfCServiceTester.WEBservice
                         case UpdateColumnOperation.Insert:
                             dbo = CreateForeignKey(request.TableName, request.Dbo);
                             break;
-/*
                         case UpdateColumnOperation.Modify:
-                            dependecies = UpdateTheIndex(request.TableName, request.IndexDescriptor, request.DisableDependencies, out dbo);
+                            DeleteTheForeignKey(request.TableName, request.OldForeignKeyName);
+                            dbo = CreateForeignKey(request.TableName, request.Dbo);
                             break;
-*/
                     }
                     trScope.Complete();
                     return new UpdateForeignKeyResponse() { IsSuccess = true, Dbo = dbo };

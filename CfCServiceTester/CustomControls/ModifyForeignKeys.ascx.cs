@@ -121,7 +121,7 @@ namespace CfCServiceTester.CustomControls
                 lstSourceColumnList6.Items.Add(new ListItem(dbo.Name, dbo.Name));
                 lstTargetColumnList6.Items.Add(new ListItem(dbo.ReferencedColumn, dbo.ReferencedColumn));
             }
-            this.TargetFieldLabel.InnerText = String.Format("Fields ({0})", selectedItem.ReferencedTable);
+            this.TargetFieldLabel6.InnerText = String.Format("Fields ({0})", selectedItem.ReferencedTable);
         }
     }
 }

@@ -83,6 +83,7 @@ CfcServiceTestManager.CfcComponent = function () {
     this._btnModifyFkey6Id = '';            // Modify button
     this._btnDeleteFkey6Id = '';            // Delete button
     this._txtNewName6Id = '';               // New name for the foreign key
+    this._TargetFieldLabel6Id = '';         // Name of the target table
 
     this._txtFkeyName7Id = ''               // Foreign key name
     this._txtSourceTblName7Id = '';         // Source table name
@@ -92,6 +93,7 @@ CfcServiceTestManager.CfcComponent = function () {
     this._ddlSourceColumns7Id = '';         // Source columns
     this._ddlTargetColumns7Id = '';         // Target columns
     this._hdnOperationType7Id = '';         // Operation type: Insert, Modify
+    this._btnCreateForeignKey7Id = '';      // Create button
 
     this._localServersOnly = true;          // true - look for local servers only, false - all available SQL servers
     this._accessibleDatabasesOnly = true;   // true - enumerate accessable databases only, false - all databases on the server
@@ -613,6 +615,13 @@ CfcServiceTestManager.CfcComponent.prototype = {
         this._btnDeleteFkey6Id = value;
     },
 
+    get_TargetFieldLabel6Id: function () {
+        return this._TargetFieldLabel6Id;
+    },
+    set_TargetFieldLabel6Id: function (value) {
+        this._TargetFieldLabel6Id = value;
+    },
+
     get_txtNewName6Id: function () {
         return this._txtNewName6Id;
     },
@@ -674,6 +683,13 @@ CfcServiceTestManager.CfcComponent.prototype = {
     },
     set_hdnOperationType7Id: function (value) {
         this._hdnOperationType7Id = value;
+    },
+
+    get_btnCreateForeignKey7Id: function () {
+        return this._btnCreateForeignKey7Id;
+    },
+    set_btnCreateForeignKey7Id: function (value) {
+        this._btnCreateForeignKey7Id = value;
     },
 
     get_localServersOnly: function () {

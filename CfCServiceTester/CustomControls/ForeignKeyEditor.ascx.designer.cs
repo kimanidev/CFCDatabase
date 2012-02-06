@@ -112,12 +112,12 @@ namespace CfCServiceTester.CustomControls {
         protected global::System.Web.UI.WebControls.ListBox lbxTargetColumns7;
         
         /// <summary>
-        /// btnCreateForeignKey control.
+        /// btnCreateForeignKey7 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCreateForeignKey;
+        protected global::System.Web.UI.WebControls.Button btnCreateForeignKey7;
     }
 }

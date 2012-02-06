@@ -759,7 +759,9 @@ namespace CfCServiceTester.WEBservice
             if (aKey == null)
                 throw new Exception(String.Format("Table '{0}' has no key '{1}'.", tableName, foreignKeyName));
 
-            return CreateForeignKeyDbo(aKey);
+            ForeignKeyDbo foreignKey = CreateForeignKeyDbo(aKey);
+            foreignKey.AvailableTargetColumns = GetTargetColumns(foreignKey.ReferencedTable);
+            return foreignKey;
         }
 
         public static List<IndexDbo> GetTableIndexes(string tableName)

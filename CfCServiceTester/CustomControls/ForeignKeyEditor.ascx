@@ -102,7 +102,7 @@
                 </span>
             </td>
             <td colspan="2" style="text-align:right;">
-                <asp:Button ID="btnCreateForeignKey" runat="server" Text="Create key" CausesValidation="false"
+                <asp:Button ID="btnCreateForeignKey7" runat="server" Text="Create key" CausesValidation="false"
                         ToolTip="Click the button for creating foreign key." Width="9em"
                         CssClass="MpsButton" OnClientClick="return CreateThisForeignKey7(this);" />
             </td>

@@ -51,6 +51,12 @@ namespace CfCServiceTester.WEBservice.DataObjects
         [DataMember]
         public string ReferencedTable { get; set; }
 
+        /// <summary>
+        /// Columns from primary key and unique constraints in the ReferencedTable table.  
+        /// </summary>
+        [DataMember]
+        public IList<string> AvailableTargetColumns { get; set; }
+
         public ForeignKeyDbo()
         {
             this.Columns = new List<ForeignKeyColumnDbo>();

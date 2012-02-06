@@ -105,17 +105,19 @@ function ValidateName(fKeyName) {
     }
 
     var rzlt = true;
-    var fKeyNameUpperCase = fKeyName.toUpperCase();
-    $(manager.get_lstForeignKeyList6Id() + ' option').each(function (index) {
-        var foreignKeyName = this.value.toUpperCase();
-        if (foreignKeyName == fKeyNameUpperCase) {
-            var message = String.format("Table {0} contains foreign key {1}.", $(manager.get_txtSourceTblName7Id()).val(), fKeyName);
-            alert(message);
-            rzlt = false;
-            fKeyNameControl.focus();
-            return false;
-        }
-    });
+    if ($(manager.get_hdnOperationType7Id()).val() == 'Insert') {
+        var fKeyNameUpperCase = fKeyName.toUpperCase();
+        $(manager.get_lstForeignKeyList6Id() + ' option').each(function (index) {
+            var foreignKeyName = this.value.toUpperCase();
+            if (foreignKeyName == fKeyNameUpperCase) {
+                var message = String.format("Table {0} contains foreign key {1}.", $(manager.get_txtSourceTblName7Id()).val(), fKeyName);
+                alert(message);
+                rzlt = false;
+                fKeyNameControl.focus();
+                return false;
+            }
+        });
+    }
     return rzlt;
 }
 
@@ -157,7 +159,9 @@ function onSuccess_CreateForeignKey7(result) {
     $('span#spnAddFkeyColumn7 span.Pauser').hide();
 
     if (result.IsSuccess) {
-        AddForeignKeyDescription(manager, result.Dbo);
+        if ($(manager.get_hdnOperationType7Id()).val() == 'Insert') {
+            AddForeignKeyDescription(manager, result.Dbo);
+        }
         ShowFkeyColumns6(manager, result.Dbo);
         manager.get_columnEditor().hide();
     } else {

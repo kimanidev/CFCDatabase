@@ -83,11 +83,11 @@ function DeleteForeignKey(button) {
 }
 
 // Create new foreign key
-function CreateForeignKey(aButton) {
+function CreateForeignKey6(aButton) {
     var manager = $find('CfcTestManager');
 
     $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').show();
-    CfCServiceTester.WEBservice.CfcWebService.EnumerateTables(onSuccess_EnumerateTables6, onFailure_EnumerateForeignKeys);
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateTables(onSuccess_EnumerateTables6, onFailure_EnumerateForeignKeys, true);
 
     var tableName = $(manager.get_hdnSelectedTable6Id()).val();
     $(manager.get_txtFkeyName7Id()).val('');
@@ -96,8 +96,24 @@ function CreateForeignKey(aButton) {
     return false;
 }
 
+// Update existing foreign key
+function EditForeignKey6(aButton) {
+    var manager = $find('CfcTestManager');
+
+    $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').show();
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateTables(onSuccess_EnumerateTables6, onFailure_EnumerateForeignKeys, false);
+
+    var tableName = $(manager.get_hdnSelectedTable6Id()).val();
+    var fKeyName = $(manager.get_hdnSelectedForeignKey6Id()).val();
+    $(manager.get_txtFkeyName7Id()).val(fKeyName);
+    $(manager.get_txtSourceTblName7Id()).val(tableName);
+
+    return false;
+}
+
 // result is instance of DataTableListDbo class.
-function onSuccess_EnumerateTables6(result) {
+// context: true - create new foreign key, false - edit existing one
+function onSuccess_EnumerateTables6(result, context, methodName) {
     var manager = $find('CfcTestManager');
     var targetTables = $(manager.get_ddlTargetTblName7Id());
     targetTables.empty();
@@ -108,7 +124,8 @@ function onSuccess_EnumerateTables6(result) {
         Array.forEach(result.TableNames, AppendTableToList, sb);
         targetTables.html(sb.toString());
         var tableName = $(manager.get_hdnSelectedTable6Id()).val();
-        CfCServiceTester.WEBservice.CfcWebService.EnumerateColumns(tableName, onSuccess_EnumerateColumns6, onFailure_EnumerateForeignKeys);
+        CfCServiceTester.WEBservice.CfcWebService.EnumerateColumns(tableName, onSuccess_EnumerateColumns6,
+                                                                   onFailure_EnumerateForeignKeys, context);
     } else {
         alert(result.ErrorMessage);
     }
@@ -119,9 +136,9 @@ function AppendTableToList(element, index, array) {
 }
 
 // result is instance of EnumerateColumnsResponse
-function onSuccess_EnumerateColumns6(result) {
+// context: true - create new foreign key, false - edit existing one
+function onSuccess_EnumerateColumns6(result, context, methodName) {
     var manager = $find('CfcTestManager');
-    $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').hide();
     var sourceFieldList = $(manager.get_ddlSourceColumns7Id());
     $(manager.get_ddlTargetColumns7Id()).empty();
 
@@ -130,16 +147,65 @@ function onSuccess_EnumerateColumns6(result) {
         var sb = new Sys.StringBuilder();
         Array.forEach(result.Columns, AppendFieldToList, sb);
         sourceFieldList.html(sb.toString());
-        $(manager.get_hdnOperationType7Id()).val('Insert');
+        if (context) {
+            $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').hide();
+            $(manager.get_hdnOperationType7Id()).val('Insert');
+            $(manager.get_btnCreateForeignKey7Id()).attr('value', 'Create key');
+            var dialog = new Boxy('#ForeignKeyEditor6',
+                { center: true, modal: true, title: "Create new foreign key", draggable: true, fixed: false });
+            manager.set_columnEditor(dialog);
+            dialog.show();
+        } else {
+            $(manager.get_hdnOperationType7Id()).val('Modify');
+            var tableName = $(manager.get_hdnSelectedTable6Id()).val();
+            var fKeyName = $(manager.get_hdnSelectedForeignKey6Id()).val();
+            CfCServiceTester.WEBservice.CfcWebService.GetForeignKeyDescription(
+                                                tableName, fKeyName, onSuccess_GetForeignKeyDescription6, onFailure_EnumerateForeignKeys);
+        }
+    } else {
+        $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').hide();
+        alert(result.ErrorMessage);
+    }
+}
 
+// result is instance of GetForeignKeysResponse class
+function onSuccess_GetForeignKeyDescription6(result) {
+    var manager = $find('CfcTestManager');
+    $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').hide();
+
+    if (result.IsSuccess) {
+        ShowForeignKey6($(manager.get_hdnSelectedTable6Id()).val(), result.Dbo);
         var dialog = new Boxy('#ForeignKeyEditor6',
-            { center: true, modal: true, title: "Create new foreign key", draggable: true, fixed: false });
+            { center: true, modal: true, title: "Update foreign key", draggable: true, fixed: false });
         manager.set_columnEditor(dialog);
         dialog.show();
     } else {
         alert(result.ErrorMessage);
     }
 }
+function ShowForeignKey6(tableName, dbo) {
+    var manager = $find('CfcTestManager');
+
+    $(manager.get_txtFkeyName7Id()).attr('disabled', 'disabled');
+
+    ShowAction6($(manager.get_ddlTargetTblName7Id()), dbo.ReferencedTable); 
+    ShowAction6($('#ddlUpdateAction7'), dbo.UpdateAction); 
+    ShowAction6($('#ddlDeleteAction7'), dbo.DeleteAction); 
+    
+    ShowFkeyColumnsInDialog6(manager, dbo)
+    if (dbo.IsChecked)
+        $('#chkCheckAfterConstruction').attr('checked', 'checked');
+    else
+        $('#chkCheckAfterConstruction').removeAttr('checked');
+    $(manager.get_btnCreateForeignKey7Id()).attr('value', 'Update key');
+}
+
+function ShowAction6(jQuerySelect, action) {
+    jQuerySelect.find('option:selected').removeAttr('selected');
+    var argument = String.format('option[value="{0}"]', action);
+    jQuerySelect.find(argument).attr('selected', 'selected');
+}
+
 // Parameters:
 //  The element argument is the array element that the function will take action on. Instance of the DataColumnDbo class.
 //  The index argument is the index of element, and 
@@ -149,9 +215,6 @@ function AppendFieldToList(element, index, array) {
     var selected = index == 0 ? 'selected="selected"' : '';
     var s = String.format('<option value="{0}" {1}>{0}</option>', element.Name, selected);
     this.append(s);
-}
-
-function PrepareForeignKeyDialog(manager, tableName) {
 }
 
 // result is instance of UpdateForeignKeyResponse
@@ -252,21 +315,41 @@ function onSuccess_GetForeignKey(result, context, operation) {
 
     if (result.IsSuccess) {
         ShowFkeyColumns6(manager, result.Dbo);
-        /*        var sourceColumns = $(manager.get_lstSourceColumnList6Id());
-        var targetColumns = $(manager.get_lstTargetColumnList6Id());
-        sourceColumns.empty();
-        targetColumns.empty();
-        _ShowForeignKeyFields(manager, result.Dbo, sourceColumns, targetColumns); */
     } else {
         alert(result.ErrorMessage);
     }
 }
 function ShowFkeyColumns6(manager, dbo) {
+    var manager = $find('CfcTestManager');
     var sourceColumns = $(manager.get_lstSourceColumnList6Id());
     var targetColumns = $(manager.get_lstTargetColumnList6Id());
     sourceColumns.empty();
     targetColumns.empty();
-    _ShowForeignKeyFields(manager, dbo, sourceColumns, targetColumns);
+    $.each(dbo.Columns, function (index, value) {
+        sourceColumns.append($("<option/>", { value: value.Name, text: value.Name }));
+        targetColumns.append($("<option/>", { value: value.ReferencedColumn, text: value.ReferencedColumn }));
+    });
+    $(manager.get_TargetFieldLabel6Id()).text(String.format("Fields ({0})", dbo.ReferencedTable));
+}
+function ShowFkeyColumnsInDialog6(manager, dbo) {
+    var sourceColumns = $(manager.get_lbxSourceColumns7Id());
+    var targetColumns = $(manager.get_lbxTargetColumns7Id());
+    var availableColumns = $(manager.get_ddlTargetColumns7Id());
+    sourceColumns.empty();
+    targetColumns.empty();
+    availableColumns.empty();
+    $.each(dbo.Columns, function (index, value) {
+        sourceColumns.append($("<option/>", { value: value.Name, text: value.Name }));
+        targetColumns.append($("<option/>", { value: value.ReferencedColumn, text: value.ReferencedColumn }));
+    });
+    $.each(dbo.AvailableTargetColumns, function (index, colName) {
+        var attributes = { value: colName, text: colName };
+        if (colName == dbo.Columns[0].ReferencedColumn)
+            attributes.selected = 'selected';
+        availableColumns.append($("<option/>", attributes));
+    });
+    var argument = String.format('{0} option[value="{1}"]', manager.get_ddlSourceColumns7Id(), dbo.Columns[0].Name);
+    $(argument).attr('selected', 'selected');
 }
 
 function onFailure_EnumerateForeignKeys(result, context, operation) {

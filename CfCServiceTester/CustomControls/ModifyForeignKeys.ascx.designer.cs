@@ -76,13 +76,13 @@ namespace CfCServiceTester.CustomControls {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl SourceFieldLabel;
         
         /// <summary>
-        /// TargetFieldLabel control.
+        /// TargetFieldLabel6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TargetFieldLabel;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TargetFieldLabel6;
         
         /// <summary>
         /// lstForeignKeyList6 control.

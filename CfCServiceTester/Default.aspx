@@ -150,6 +150,7 @@
                         'btnModifyFkey6Id': '#<%= (GetFifthPageControlId("btnModifyFkey6")) %>',
                         'btnDeleteFkey6Id': '#<%= (GetFifthPageControlId("btnDeleteFkey6")) %>',
                         'txtNewName6Id': '#<%= (GetFifthPageControlId("txtNewName6")) %>',
+                        'TargetFieldLabel6Id': '#<%= (GetFifthPageControlId("TargetFieldLabel6")) %>',
 
                         'txtFkeyName7Id': '#<%= (GetForeignKeyEditBoxControlId("txtFkeyName7")) %>',
                         'txtSourceTblName7Id': '#<%= (GetForeignKeyEditBoxControlId("txtSourceTblName7")) %>',
@@ -159,6 +160,7 @@
                         'ddlSourceColumns7Id': '#<%= (GetForeignKeyEditBoxControlId("ddlSourceColumns7")) %>',
                         'ddlTargetColumns7Id': '#<%= (GetForeignKeyEditBoxControlId("ddlTargetColumns7")) %>',
                         'hdnOperationType7Id': '#<%= (GetForeignKeyEditBoxControlId("hdnOperationType7")) %>',
+                        'btnCreateForeignKey7Id': '#<%= (GetForeignKeyEditBoxControlId("btnCreateForeignKey7")) %>',
 
                         'localServersOnly': "<%= LocalServersOnly %>",
                         'accessibleDatabasesOnly': "<%= AccessibleDatabasesOnly %>",
