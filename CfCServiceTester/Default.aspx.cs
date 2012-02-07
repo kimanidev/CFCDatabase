@@ -99,6 +99,10 @@ namespace CfCServiceTester
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            Page.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Expires = 0;
+            Response.Cache.SetNoStore();
+            Response.AddHeader("Pragma", "no-cache");
         }
 
         public string LocalServersOnly

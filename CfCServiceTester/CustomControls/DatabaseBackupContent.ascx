@@ -10,8 +10,11 @@
         <tr>
             <td>Backup directory</td>
             <td colspan="2">
+<%--
                 <asp:TextBox ID="txtBackupDirectory" runat="server" Text="<%$ appSettings:BackupDirectory %>" ReadOnly="true" Width="98%" 
                      BackColor="#EAF7FB" />
+--%>
+                <asp:TextBox ID="txtBackupDirectory" runat="server" Text="" Width="98%" />
             </td>
         </tr>
         <tr>

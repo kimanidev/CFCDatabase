@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using CfCServiceTester.WEBservice;
+using System.Web.Configuration;
 
 namespace CfCServiceTester.CustomControls
 {
@@ -12,6 +13,7 @@ namespace CfCServiceTester.CustomControls
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            this.txtBackupDirectory.Text = (string)WebConfigurationManager.AppSettings["BackupDirectory"];
         }
 
         public void SetDefaultFileName()

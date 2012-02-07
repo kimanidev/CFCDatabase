@@ -39,7 +39,7 @@ function PickDatabases1() {
     $('span#SpanSelectDatabase1 span.Magnifier').hide();
     $('span#SpanSelectDatabase1 span.Pauser').show();
     CfCServiceTester.WEBservice.CfcWebService.EnumerateDatabases(
-                serverName, template, manager.get_accessibleDatabasesOnly(), onSuccess_PickDatabases1, onFailure_PickDatabases);
+                serverName, template, manager.get_accessibleDatabasesOnly(), onSuccess_PickDatabases1, onFailure_PickDatabases1);
     return false;
 }
 
@@ -56,7 +56,7 @@ function PickBackupFiles1() {
     $('span#SpanSelectFile1 span.Magnifier').hide();
     $('span#SpanSelectFile1 span.Pauser').show();
     CfCServiceTester.WEBservice.CfcWebService.EnumerateBackupFiles(
-                backupDirectory, template, onSuccess_EnumerateBackupFiles, onFailure_PickDatabases);
+                backupDirectory, template, onSuccess_EnumerateBackupFiles, onFailure_EnumerateBackupFiles);
     return false;
 }
 
@@ -129,17 +129,15 @@ function onSuccess_BackupDatabase(result) {
 }
 function onSuccess_PickDatabases1(result) {
     var manager = $find('CfcTestManager');
+    $('span#SpanSelectDatabase1 span.Magnifier').show();
+    $('span#SpanSelectDatabase1 span.Pauser').hide();
 
     var serverName = $(manager.get_txtServerNameId()).val();
     if (result.length < 1) {
         alert("SQL server " + serverName + " contains no available databases.");
-        $('span#SpanSelectDatabase1 span.Magnifier').show();
-        $('span#SpanSelectDatabase1 span.Pauser').hide();
     }
     else if (result.length == 1) {
         $(manager.get_txtDatabaseName1Id()).val(result[0]);
-        $('span#SpanSelectDatabase1 span.Magnifier').show();
-        $('span#SpanSelectDatabase1 span.Pauser').hide();
     }
     else {
         FillDatabaseDropDown1(result);
@@ -148,17 +146,15 @@ function onSuccess_PickDatabases1(result) {
 // result is instance of the EnumerateBackupFilesResponse class.
 function onSuccess_EnumerateBackupFiles(result) {
     var manager = $find('CfcTestManager');
+    $('span#SpanSelectFile1 span.Magnifier').show();
+    $('span#SpanSelectFile1 span.Pauser').hide();
 
     var backupDirectory = $(manager.get_txtBackupDirectoryId()).val();
     if (result.NameList.length < 1) {
         alert("Directory " + backupDirectory + " contains no available files.");
-        $('span#SpanSelectDatabase1 span.Magnifier').show();
-        $('span#SpanSelectDatabase1 span.Pauser').hide();
     }
     else if (result.NameList.length == 1) {
         $(manager.get_txtFileName1Id()).val(result.NameList[0]);
-        $('span#SpanSelectDatabase1 span.Magnifier').show();
-        $('span#SpanSelectDatabase1 span.Pauser').hide();
     }
     else {
         FillBackupFilesDropDown1(result.NameList);
@@ -215,4 +211,13 @@ function FillBackupFilesDropDown1(result) {
 function onFailure_BackupDatabase(result) {
     alert(result.get_message());
 }
-
+function onFailure_PickDatabases1(result) {
+    $('span#SpanSelectDatabase1 span.Magnifier').show();
+    $('span#SpanSelectDatabase1 span.Pauser').hide();
+    alert(result.get_message());
+}
+function onFailure_EnumerateBackupFiles(result) {
+    $('span#SpanSelectDatabase1 span.Magnifier').show();
+    $('span#SpanSelectDatabase1 span.Pauser').hide();
+    alert(result.get_message());
+}
