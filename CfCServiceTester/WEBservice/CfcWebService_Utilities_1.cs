@@ -490,5 +490,32 @@ namespace CfCServiceTester.WEBservice
 
             return CreateForeignKeyDbo(fKey);
         }
+
+        public static void KillUsers(string procedureName)
+        {
+            var srv = new Server(SqlServerName);
+            var db = srv.Databases[DatabaseName];
+            StoredProcedure sp = db.StoredProcedures[procedureName];
+
+            if (sp != null)
+            {
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                {
+                    try
+                    {
+                        var command = new SqlCommand(procedureName, connection) { CommandType = CommandType.StoredProcedure };
+                        command.Parameters.AddWithValue("@dbname", db.Name);
+                        command.Connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        string msg = ex.Message;
+                        if (!msg.EndsWith("Done"))
+                            throw;
+                    }
+                }
+            }
+        }
     }
 }

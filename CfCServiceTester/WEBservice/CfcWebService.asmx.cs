@@ -321,10 +321,11 @@ namespace CfCServiceTester.WEBservice
         /// <param name="file">Restore database from this file</param>
         /// <param name="withReplace"><code>true</code> - replace existing database</param>
         /// <param name="singleUserMode"><code>true</code> - put database to single user mode</param>
+        /// <param name="killUsersProcedure">Procedure that will be called before switching to single user mode</param>
         /// <returns><see cref="RestoreStatus"/></returns>
         [WebMethod(EnableSession = true)]
         public RestoreStatus RestoreDatabase(string dbName, string directory, string file, bool withReplace, 
-                                             bool singleUserMode, bool switchDatabase)
+                                             string killUsersProcedure, bool singleUserMode, bool switchDatabase)
         {
             bool isSingleMode = false;
             try
@@ -339,7 +340,7 @@ namespace CfCServiceTester.WEBservice
                 string fileName = Path.Combine(directory, file);
 
                 if (singleUserMode)
-                    isSingleMode = SetSingleMode(dbName);
+                    isSingleMode = SetSingleMode(dbName, killUsersProcedure);
 
                 Restore(fileName, dbName, withReplace);
                 if (switchDatabase)

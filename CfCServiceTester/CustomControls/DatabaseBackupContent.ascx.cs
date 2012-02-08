@@ -14,6 +14,7 @@ namespace CfCServiceTester.CustomControls
         protected void Page_Load(object sender, EventArgs e)
         {
             this.txtBackupDirectory.Text = (string)WebConfigurationManager.AppSettings["BackupDirectory"];
+            this.hdnKillUserProcedure.Value = (string)WebConfigurationManager.AppSettings["KillUserProcedure"];
         }
 
         public void SetDefaultFileName()

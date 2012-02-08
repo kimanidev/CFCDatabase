@@ -91,6 +91,7 @@
                         'spnRestoreOK1Id': '#<%= (GetSecondPageControlId("spnRestoreOK1")) %>',
                         'spnRestoreError1Id': '#<%= (GetSecondPageControlId("spnRestoreError1")) %>',
                         'chkSingleModeId': '#<%= (GetSecondPageControlId("chkSingleMode")) %>',
+                        'hdnKillUserProcedureId': '#<%= (GetSecondPageControlId("hdnKillUserProcedure")) %>',
 
                         'txtServerName2Id': '#<%= (GetThirdPageControlId("txtServerName2")) %>',
                         'txtDatabaseName2Id': '#<%= (GetThirdPageControlId("txtDatabaseName2")) %>',

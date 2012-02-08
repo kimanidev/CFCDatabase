@@ -1,5 +1,7 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="DatabaseBackupContent.ascx.cs" Inherits="CfCServiceTester.CustomControls.DatabaseBackupContent" %>
 
+<asp:HiddenField ID="hdnKillUserProcedure" runat="server" Value="" />
+
 <table style="width:45em;">
     <colgroup>
         <col style="width:20%;" />
@@ -50,8 +52,26 @@
         </tr>
         <tr>
             <td>File name</td>
-            <td colspan="2">
+            <td>
+                <span class="Nowrap" id="SpanSelectBackupFile1">
+                    <asp:TextBox runat="server" ID="txtBackupFileName" Width="85%" ToolTip="Backup file name." />
+                    <span class="Magnifier" style="display:inline-block">
+                        <asp:ImageButton ID="ImageButton2" ImageUrl="~/Images/Magnifier-24.png"
+                            OnClientClick='return SelectBackupFiles1();'
+                            runat="server" ToolTip="Backup file name." />
+                    </span>
+                    <span class="Pauser" style="display:none;">
+                        <asp:Image ID="Image3" runat="server" ImageUrl="~/Images/ajax-loader.gif" />
+                    </span>
+                </span>
+<%--
                 <asp:TextBox ID="txtBackupFileName" runat="server" Text="" Width="98%" />
+--%>
+            </td>
+            <td>
+                <span id="BackupFileSelector1" style="display:none;">
+                    <select onchange='javascript:fileSelectionChanged1a(this);'/>
+                </span>
             </td>
         </tr>
         <tr>

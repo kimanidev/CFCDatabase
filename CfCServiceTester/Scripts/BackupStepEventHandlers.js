@@ -43,6 +43,23 @@ function PickDatabases1() {
     return false;
 }
 
+// Get list of available Files in the backup directory
+function SelectBackupFiles1() {
+    var manager = $find('CfcTestManager');
+
+    var backupDirectory = $(manager.get_txtBackupDirectoryId()).val();
+    if (!backupDirectory) {
+        alert('Backup directory not defined.')
+        return false;
+    }
+    var template = $(manager.get_txtBackupFileNameId()).val();
+    $('span#SpanSelectBackupFile1 span.Magnifier').hide();
+    $('span#SpanSelectBackupFile1 span.Pauser').show();
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateBackupFiles(
+                backupDirectory, template, onSuccess_EnumerateBackupFiles1, onFailure_EnumerateBackupFiles1);
+    return false;
+}
+
 // Get list of available backup files.
 function PickBackupFiles1() {
     var manager = $find('CfcTestManager');
@@ -77,6 +94,7 @@ function RestoreDatabase(chkOverwriteId) {
     var overWriteMode = $('#' + chkOverwriteId).attr('checked') == 'checked';
     var singleUserMode = $(manager.get_chkSingleModeId()).attr('checked') == 'checked';
     var switchDatabase = $('#chkSwitchDatabase').attr('checked') == 'checked';
+    var killUserProcedure = $(manager.get_hdnKillUserProcedureId()).val();
 
     if (!dbName) {
         alert('Data base name is not defined.');
@@ -92,7 +110,7 @@ function RestoreDatabase(chkOverwriteId) {
     }
 
     CfCServiceTester.WEBservice.CfcWebService.RestoreDatabase(dbName, directory, fileName,
-                overWriteMode, singleUserMode, switchDatabase, onSuccess_RestoreDatabase, onFailure_PickDatabases);
+                overWriteMode, killUserProcedure, singleUserMode, switchDatabase, onSuccess_RestoreDatabase, onFailure_PickDatabases);
 
     $('span#RestoreDatabase1 span.Pauser').show();
     return false;
@@ -111,6 +129,13 @@ function dbFileSelectionChanged1(selectElement) {
     $(manager.get_txtFileName1Id()).val(selectElement.value);
     $('span#FileSelector1').hide();
     $('span#SpanSelectFile1 span.Magnifier').show();
+}
+function fileSelectionChanged1a(selectElement) {
+    var manager = $find('CfcTestManager');
+
+    $(manager.get_txtBackupFileNameId()).val(selectElement.value);
+    $('span#BackupFileSelector1').hide();
+    $('span#SpanSelectBackupFile1 span.Magnifier').show();
 }
 
 // result is instance of the BackupStatus class
@@ -160,6 +185,24 @@ function onSuccess_EnumerateBackupFiles(result) {
         FillBackupFilesDropDown1(result.NameList);
     }
 }
+// result is instance of the EnumerateBackupFilesResponse class.
+function onSuccess_EnumerateBackupFiles1(result) {
+    var manager = $find('CfcTestManager');
+    $('span#SpanSelectBackupFile1 span.Magnifier').show();
+    $('span#SpanSelectBackupFile1 span.Pauser').hide();
+
+    var backupDirectory = $(manager.get_txtBackupDirectoryId()).val();
+    if (result.NameList.length < 1) {
+        alert("Directory " + backupDirectory + " contains no available files.");
+    }
+    else if (result.NameList.length == 1) {
+        $(manager.get_txtBackupFileNameId()).val(result.NameList[0]);
+    }
+    else {
+        FillBackupFilesDropDown1a(result.NameList);
+    }
+}
+
 // result is instance of the RestoreStatus class
 function onSuccess_RestoreDatabase(result) {
     var manager = $find('CfcTestManager');
@@ -204,8 +247,20 @@ function FillBackupFilesDropDown1(result) {
         comboHtml += GetOptionString(flName, flName);
     }
     dbCombo.html(comboHtml);
-    $('span#SpanSelectFile1 span.Pauser').hide();
     $('span#FileSelector1').show();
+}
+function FillBackupFilesDropDown1a(result) {
+    var dbCombo = $('span#BackupFileSelector1 select');
+    dbCombo.empty();
+
+    var comboHtml = GetOptionString('', 'Select backup file');
+    for (i = 0; i < result.length; i++) {
+        var flName = result[i];
+        comboHtml += GetOptionString(flName, flName);
+    }
+    dbCombo.html(comboHtml);
+    $('span#SpanSelectBackupFile1 span.Magnifier').hide();
+    $('span#BackupFileSelector1').show();
 }
 
 function onFailure_BackupDatabase(result) {
@@ -219,5 +274,10 @@ function onFailure_PickDatabases1(result) {
 function onFailure_EnumerateBackupFiles(result) {
     $('span#SpanSelectDatabase1 span.Magnifier').show();
     $('span#SpanSelectDatabase1 span.Pauser').hide();
+    alert(result.get_message());
+}
+function onFailure_EnumerateBackupFiles1(result) {
+    $('span#SpanSelectBackupFile1 span.Magnifier').show();
+    $('span#SpanSelectBackupFile1 span.Pauser').hide();
     alert(result.get_message());
 }

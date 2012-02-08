@@ -24,6 +24,7 @@ CfcServiceTestManager.CfcComponent = function () {
     this._spnRestoreOK1Id = '';             // Span with OK message (Restore part)
     this._spnRestoreError1Id = '';          // Span with error message (Restore part)
     this._chkSingleModeId = '';             // Checkbox for switching to single user mode (Common part)
+    this._hdnKillUserProcedureId = '';      // Name of the procedure that performs killing connections to the database
 
     this._txtServerName2Id = '';            // Text box with SQL server's name (Modify table tab)
     this._txtDatabaseName2Id = '';          // Text box with Database name (Modify table tab)
@@ -251,6 +252,13 @@ CfcServiceTestManager.CfcComponent.prototype = {
     },
     set_chkSingleModeId: function (value) {
         this._chkSingleModeId = value;
+    },
+
+    get_hdnKillUserProcedureId: function () {
+        return this._hdnKillUserProcedureId;
+    },
+    set_hdnKillUserProcedureId: function (value) {
+        this._hdnKillUserProcedureId = value;
     },
 
     get_txtServerName2Id: function () {

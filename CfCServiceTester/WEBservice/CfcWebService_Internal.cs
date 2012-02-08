@@ -118,18 +118,21 @@ namespace CfCServiceTester.WEBservice
         /// Sends message to connected users and switches databas to single user mode.
         /// <see cref="http://www.codeproject.com/KB/database/SqlServer_Backup_Restore.aspx?msg=3221753"/>
         /// <param name="dbName">Database name</param>
+        /// <param name="procedureName">Call the procedure before switching to single user mode</param>
         /// </summary>
-        public static bool SetSingleMode(string dbName)
+        public static bool SetSingleMode(string dbName, string procedureName = null)
         {
             var srv = new Server(SqlServerName);
             var db = srv.Databases[dbName];
             // db == null for new databases; there is no need for switching to single mode in this case
-            return db == null ? true : SetSingleMode(db);
+            return db == null ? true : SetSingleMode(db, procedureName);
         }
-        private static bool SetSingleMode(Database db)
+        private static bool SetSingleMode(Database db, string procedureName = null)
         {
             try
             {
+                if (!String.IsNullOrEmpty(procedureName))
+                    KillUsers(procedureName);
                 DisconnectedHosts = GetConnectedHosts();
                 SendNotification(String.Format("Access to the [{0}].[{1}] database is locked.", SqlServerName, db.Name));
                 db.DatabaseOptions.UserAccess = DatabaseUserAccess.Single;
