@@ -86,6 +86,7 @@ namespace CfCServiceTester.WEBservice
                 DatabaseName = initialCatalog;
 
                 isValid = true;
+                sqlConnection.Close();
                 return csb.ConnectionString;
             }
             catch (Exception ex)
@@ -715,6 +716,7 @@ namespace CfCServiceTester.WEBservice
                     from fKey in foreignKeys.AsEnumerable()
                     select new KeyValuePair<string, string>(fKey.Field<string>("ForeignKeyName"), fKey.Field<string>("TableName"))
                     ).ToList();
+                connection.Close();
             }
             DropCorrentForeignKey(lstForeignKeys, db, droppedForeignKeys);
         }

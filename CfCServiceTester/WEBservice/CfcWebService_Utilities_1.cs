@@ -33,6 +33,7 @@ namespace CfCServiceTester.WEBservice
                 SqlCommand cmd = new SqlCommand(sql, connection);
                 connection.Open();
                 nullCounter = (Int32)cmd.ExecuteScalar();
+                connection.Close();
             }
             if (nullCounter > 0)
                 throw new Exception(String.Format("Table {0} contains NULLs in the {1} column.", aTable.Name, currentColumn.Name));
@@ -82,6 +83,7 @@ namespace CfCServiceTester.WEBservice
                 SqlCommand cmd = new SqlCommand(sql, connection);
                 connection.Open();
                 badRowCounter = (Int32)cmd.ExecuteScalar();
+                connection.Close();
             }
             
             return badRowCounter < 1;
@@ -281,6 +283,7 @@ namespace CfCServiceTester.WEBservice
                 var command = new SqlCommand(queryString, connection);
                 command.Connection.Open();
                 command.ExecuteNonQuery();
+                command.Connection.Close();
             }
 
             // Drop old column and rename new one.
@@ -507,6 +510,7 @@ namespace CfCServiceTester.WEBservice
                         command.Parameters.AddWithValue("@dbname", db.Name);
                         command.Connection.Open();
                         command.ExecuteNonQuery();
+                        command.Connection.Close();
                     }
                     catch (Exception ex)
                     {
@@ -515,6 +519,19 @@ namespace CfCServiceTester.WEBservice
                             throw;
                     }
                 }
+            }
+        }
+
+        public static int CountRecords(string tableName)
+        {
+            string sql = String.Format("SELECT COUNT(*) as RecordCount FROM {0}", tableName);
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                connection.Open();
+                int rzlt = (Int32)cmd.ExecuteScalar();
+                connection.Close();
+                return rzlt;
             }
         }
     }

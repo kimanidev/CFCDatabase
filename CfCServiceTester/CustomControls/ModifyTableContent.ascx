@@ -19,6 +19,7 @@
             <asp:TextBox ID="txtDatabaseName2" runat="server" Text="" ReadOnly="true" Width="98%" BackColor="#EAF7FB" />
         </td>
     </tr>
+<%--
     <tr>
         <td>&nbsp;</td>
         <td colspan="2">
@@ -26,6 +27,7 @@
                           ToolTip="Check this control for switching to single user mode." />
         </td>
     </tr>
+--%>
     <tr>
         <td>Table name</td>
         <td>

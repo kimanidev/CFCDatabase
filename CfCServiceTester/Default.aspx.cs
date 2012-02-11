@@ -136,7 +136,8 @@ namespace CfCServiceTester
                 return sb.ToString();
             };
 
-            List<string> roles = CfcWebService.GetUsersRoles();
+            bool noSession = HttpContext.Current.Session == null || String.IsNullOrEmpty(HttpContext.Current.Session.SessionID);
+            List<string> roles = noSession ? new List<string>() : CfcWebService.GetUsersRoles();
             if (roles == null || roles.Count < 1)
             {
                 wizard.ActiveStepIndex = 0;

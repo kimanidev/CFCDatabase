@@ -20,10 +20,25 @@ function BackupDatabase(overwrite) {
     var singleUserMode = $(manager.get_chkSingleModeId()).attr('checked') == 'checked';
     var directory = $(manager.get_txtBackupDirectoryId()).val();
     var file = $(manager.get_txtBackupFileNameId()).val();
+    if (!ValidateBackupFileName(manager, file))
+        return false;
 
     CfCServiceTester.WEBservice.CfcWebService.BackupDatabase(directory, file,
                         overWriteMode, singleUserMode, onSuccess_BackupDatabase, onFailure_BackupDatabase);
     return false;
+}
+
+function ValidateBackupFileName(manager, file) {
+    var rg = /^[a-z][a-z\d_\.]*bak$/i;
+    if (!rg.test(file)) {
+        var message = 'File name contains invalid characters.\n' +
+                      'The system accepts letters, digits and underscores only.\n' +
+                      'File extension must be "bak".';
+        alert(message);
+        $(manager.get_txtBackupFileNameId()).focus();
+        return false;
+    }
+    return true;
 }
 
 // Get list of available databases on the selected server

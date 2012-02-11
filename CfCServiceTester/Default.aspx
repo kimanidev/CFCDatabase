@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="CfCServiceTester._Default" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="CfCServiceTester._Default" EnableEventValidation="false" %>
 
 <%@ Register TagPrefix="con" TagName="StartPageContent" Src="~/CustomControls/StartPageContent.ascx" %>
 <%@ Register TagPrefix="con" TagName="BackupPageContent" Src="~/CustomControls/DatabaseBackupContent.ascx" %>
@@ -99,7 +99,7 @@
                         'txtNewTable2Id': '#<%= (GetThirdPageControlId("txtNewTable2")) %>',
                         'spnRenameTableError2Id': '#<%= (GetThirdPageControlId("spnRenameTableError2")) %>',
                         'spnRenameTableOK2Id': '#<%= (GetThirdPageControlId("spnRenameTableOK2")) %>',
-                        'chkSingleMode2Id': '#<%= (GetThirdPageControlId("chkSingleMode2")) %>',
+//                        'chkSingleMode2Id': '#<%= (GetThirdPageControlId("chkSingleMode2")) %>',
 
                         'txtColumnName3Id': '#<%= (GetEditColumnBoxControlId("txtColumnName3")) %>',
                         'ddlDatatype3Id': '#<%= (GetEditColumnBoxControlId("ddlDatatype3")) %>',

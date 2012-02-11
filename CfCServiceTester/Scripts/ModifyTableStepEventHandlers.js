@@ -39,8 +39,8 @@ function RenameTable(oldNameId, newNameId) {
         alert('New table name is equal to old one.');
         return false;
     }
-    var singleUserMode = $(manager.get_chkSingleMode2Id()).attr('checked') == 'checked';
-
+    var singleUserMode = false; // $(manager.get_chkSingleMode2Id()).attr('checked') == 'checked';
+    $('span#SpanSelectTable2 span.Pauser').show();
     CfCServiceTester.WEBservice.CfcWebService.RenameTable(oldName, newName, singleUserMode, 
                                                           onSuccess_RenameTable, onFailure_EnumerateTables);
     return false;
@@ -216,12 +216,16 @@ function onSuccess_EnumerateTables(result) {
 function onSuccess_RenameTable(result)
 {
     var manager = $find('CfcTestManager');
+    $('span#SpanSelectTable2 span.Pauser').hide();
 
     if (result.IsSuccess) {
         $(manager.get_spnRenameTableError2Id()).hide();
         var newName = $(manager.get_txtNewTable2Id()).val();
         $(manager.get_txtTable2Id()).val(newName);
-        $(manager.get_spnRenameTableOK2Id()).show();
+        
+        var message = $(manager.get_spnRenameTableOK2Id());
+        message.text(String.format("New name of the table is '{0}'. Total count of records in the table: {1}.", newName, result.RecordCount));
+        message.show();
     }
     else {
         var errorSpan = $(manager.get_spnRenameTableError2Id());
@@ -331,5 +335,6 @@ function tblSelectionChanged2(selectElement) {
 }
 
 function onFailure_EnumerateTables(result) {
+    $('span#SpanSelectTable2 span.Pauser').hide();
     alert(result.get_message());
 }

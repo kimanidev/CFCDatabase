@@ -30,6 +30,12 @@ namespace CfCServiceTester.WEBservice.DataObjects
         /// </summary>
         [DataMember]
         public string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Number of rows in the table.
+        /// </summary>
+        [DataMember]
+        public int RecordCount { get; set; }
     }
 
     [DataContract(Namespace = "CfCServiceNS")]

@@ -174,7 +174,7 @@ function CreateUpdateRequest(updateMode) {
     rzlt.Table = $(manager.get_txtTable2Id()).val();
     rzlt.OldColumnName = $(manager.get_hdnOldFieldName3Id()).val();
     rzlt.Column = column;
-    rzlt.SingleUserMode = $(manager.get_chkSingleMode2Id()).attr('checked') == 'checked';
+    rzlt.SingleUserMode = false; // $(manager.get_chkSingleMode2Id()).attr('checked') == 'checked';
     rzlt.DisableDependencies = $('#ColumnEditor2 input#chkDisableDependencies').attr('checked') == 'checked';
     
     $('#ColumnEditor2 span.Pauser').show();
@@ -230,6 +230,10 @@ function onSuccess_UpdateColumn(result) {
                 jqThis.attr('class', className);
         });
 
+        var message = $(manager.get_spnRenameTableOK2Id());
+        message.text(String.format("Column '{0}' was modified. Total count of records in the table: {1}.",
+                                   result.Column.Name, result.RecordCount));
+        message.show();
         var boxy = manager.get_columnEditor()
         boxy.hide();
     } else {
@@ -238,6 +242,7 @@ function onSuccess_UpdateColumn(result) {
     }
 }
 
+// rsult is instance of DeleteColumnResponse class.
 function onSuccess_DeleteColumn(result) {
     var manager = $find('CfcTestManager');
     $('#ColumnEditor2 span.Pauser').hide();
@@ -255,6 +260,10 @@ function onSuccess_DeleteColumn(result) {
                 jqThis.attr('class', className);
         });
 
+        var message = $(manager.get_spnRenameTableOK2Id());
+        message.text(String.format("Column '{0}' was deleted. Total count of records in the table: {1}.",
+                                   result.Column.Name, result.RecordCount));
+        message.show();
         var boxy = manager.get_columnEditor()
         boxy.hide();
     }
@@ -278,6 +287,10 @@ function onSuccess_RenameColumn(result) {
 
         var boxy = manager.get_columnEditor()
         boxy.hide();
+        var message = $(manager.get_spnRenameTableOK2Id());
+        message.text(String.format("New name of the column is '{0}'. Total count of records in the table: {1}.",
+                                   result.Column.Name, result.RecordCount));
+        message.show();
     }
     else {
         alert(result.ErrorMessage);
@@ -293,13 +306,17 @@ function onSuccess_InsertColumn(result) {
     if (result.IsSuccess) {
         var boxy = manager.get_columnEditor()
         boxy.hide();
-        //GetColumnInfo(null);
 
         var sb = new Sys.StringBuilder();
         var AppendRowToTableDelegate = Function.createDelegate(sb, AppendRowToTable);
         var rowNumber = $('div#DynamicTable2 table tbody tr').length;
         AppendRowToTableDelegate(result.Column, rowNumber, []);
         $('div#DynamicTable2 table tbody:last').append(sb.toString());
+
+        var message = $(manager.get_spnRenameTableOK2Id());
+        message.text(String.format("Column {0} was inserted. Total count of records in the table: {1}.", 
+                                   result.Column.Name, result.RecordCount));
+        message.show();
     }
     else {
         alert(result.ErrorMessage);

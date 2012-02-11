@@ -6,7 +6,7 @@ function TableListOnChange(dropDown) {
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').show();
     $(manager.get_hdnSelectedTable4Id()).val(tableName);
 
-    CfCServiceTester.WEBservice.CfcWebService.EnumerateIndexes(tableName, onSuccess_EnumerateIndexes, onFailure_GetIndex);
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateIndexes(tableName, onSuccess_EnumerateIndexes4, onFailure_GetIndex4);
 
     return false;
 }
@@ -22,7 +22,7 @@ function IndexListOnChange(dropDown) {
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').show();
     $(manager.get_hdnSelectedIndex4Id()).val(indexName);
     $(manager.get_hdnSelectedTable4Id()).val(tableName);
-    CfCServiceTester.WEBservice.CfcWebService.GetIndex(tableName, indexName, false, onSuccess_GetIndex, onFailure_GetIndex);
+    CfCServiceTester.WEBservice.CfcWebService.GetIndex(tableName, indexName, false, onSuccess_GetIndex4, onFailure_GetIndex4);
     return false;
 }
 
@@ -33,7 +33,7 @@ function CreateIndex(aButton) {
     $(manager.get_txtFillFactor5Id()).val('50');
 
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').show();
-    CfCServiceTester.WEBservice.CfcWebService.EnumerateColumns(tableName, onSuccess_EnumerateColumns4, onFailure_GetIndex);
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateColumns(tableName, onSuccess_EnumerateColumns4, onFailure_GetIndex4);
 
     return false;
 }
@@ -44,7 +44,7 @@ function EditIndex(aButton) {
     var indexName = $(manager.get_hdnSelectedIndex4Id()).val();
 
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').show();
-    CfCServiceTester.WEBservice.CfcWebService.GetIndex(tableName, indexName, true, onSuccess_GetIndex4, onFailure_GetIndex);
+    CfCServiceTester.WEBservice.CfcWebService.GetIndex(tableName, indexName, true, onSuccess_GetIndex4a, onFailure_GetIndex4);
 
     return false;
 }
@@ -61,7 +61,7 @@ function DeleteIndex(aButton) {
     request.TableName = $(manager.get_hdnSelectedTable4Id()).val();
     request.OldIndexName = request.IndexName = indexName;
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').show();
-    CfCServiceTester.WEBservice.CfcWebService.UpdateIndex(request, false, onSuccess_DeleteIndex4, onFailure_GetIndex);
+    CfCServiceTester.WEBservice.CfcWebService.UpdateIndex(request, false, onSuccess_DeleteIndex4, onFailure_GetIndex4);
 
     return false;
 }
@@ -96,12 +96,12 @@ function RenameIndex(aButton) {
         OldIndexName: indexName,
         IndexName: newIndexName
     };
-    CfCServiceTester.WEBservice.CfcWebService.UpdateIndex(request, false, onSuccess_UpdateIndex, onFailure_GetIndex);
+    CfCServiceTester.WEBservice.CfcWebService.UpdateIndex(request, false, onSuccess_UpdateIndex4, onFailure_GetIndex4);
     return false;
 }
 
 // result is instance of UpdateIndexResponse
-function onSuccess_UpdateIndex(result)
+function onSuccess_UpdateIndex4(result)
 {
     var manager = $find('CfcTestManager');
 
@@ -111,13 +111,14 @@ function onSuccess_UpdateIndex(result)
         var newName = result.Dbo.Name;
         selectedIndex.attr('value', newName);
         selectedIndex.html(newName);
+        $(manager.get_hdnSelectedIndex4Id()).val(newName);
     } else {
         alert(result.ErrorMessage); 
     }
 }
 
 // result is instance of GetIndexResponse class
-function onSuccess_GetIndex(result) {
+function onSuccess_GetIndex4(result) {
     var manager = $find('CfcTestManager');
 
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();
@@ -128,7 +129,7 @@ function onSuccess_GetIndex(result) {
     }
 }
 // result is instance of GetIndexResponse class
-function onSuccess_GetIndex4(result) {
+function onSuccess_GetIndex4a(result) {
     var manager = $find('CfcTestManager');
 
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();
@@ -154,7 +155,7 @@ function ProcessIndex(manager, dbo) {
 }
 
 // result is instance of EnumerateIndexesResponse class
-function onSuccess_EnumerateIndexes(result) {
+function onSuccess_EnumerateIndexes4(result) {
     var manager = $find('CfcTestManager');
 
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();
@@ -267,7 +268,7 @@ function AppendCheckBoxToList(element, index, array) {
 }
 
 
-function onFailure_GetIndex(result) {
+function onFailure_GetIndex4(result) {
     $('table#IndexDefinition4 tbody tr.Pauser td span.Pauser').hide();
     alert(result.get_message());
 }

@@ -51,7 +51,7 @@ function RenameForeignKey6(button) {
         OldForeignKeyName: fKeyName,
         ForeignKeyName: newForeignKeyName
     };
-    CfCServiceTester.WEBservice.CfcWebService.UpdateForeignKey(request, false, onSuccess_RenameForeignKey, onFailure_EnumerateForeignKeys);
+    CfCServiceTester.WEBservice.CfcWebService.UpdateForeignKey(request, false, onSuccess_RenameForeignKey6, onFailure_EnumerateForeignKeys);
     return false;
 }
 
@@ -86,6 +86,7 @@ function DeleteForeignKey(button) {
 function CreateForeignKey6(aButton) {
     var manager = $find('CfcTestManager');
 
+    $(manager.get_txtFkeyName7Id()).removeAttr("disabled");
     $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').show();
     CfCServiceTester.WEBservice.CfcWebService.EnumerateTables(onSuccess_EnumerateTables6, onFailure_EnumerateForeignKeys, true);
 
@@ -239,7 +240,7 @@ function onSuccess_DeleteForeignKey(result) {
 
 
 // result is instance of UpdateForeignKeyResponse
-function onSuccess_RenameForeignKey(result) {
+function onSuccess_RenameForeignKey6(result) {
     var manager = $find('CfcTestManager');
 
     $('table#FKeyDefinition6 tbody tr.Pauser td span.Pauser').hide();
@@ -248,6 +249,7 @@ function onSuccess_RenameForeignKey(result) {
         var newName = result.Dbo.Name;
         selectedForeignKey.attr('value', newName);
         selectedForeignKey.html(newName);
+        $(manager.get_hdnSelectedForeignKey6Id()).val(newName);
     } else {
         alert(result.ErrorMessage);
     }

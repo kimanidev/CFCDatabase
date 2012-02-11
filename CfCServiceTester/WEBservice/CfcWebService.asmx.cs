@@ -381,9 +381,15 @@ namespace CfCServiceTester.WEBservice
                     if (singleUserMode)
                         SetSingleMode(DatabaseName);
                     List<AlteredDependencyDbo> dependecies = RenameTheTable(oldName, newName);
+                    int recordCounter = CountRecords(newName);
 
                     trScope.Complete();
-                    return new RenameTableStatus() { IsSuccess = true, AlteredDependencies = dependecies };
+                    return new RenameTableStatus() 
+                    { 
+                        IsSuccess = true, 
+                        AlteredDependencies = dependecies,
+                        RecordCount = recordCounter
+                    };
                 }
             }
             catch (Exception ex)
@@ -516,9 +522,16 @@ namespace CfCServiceTester.WEBservice
                 {
                     DataColumnDbo column = InsertColumn(columnRequest.Table, columnRequest.Column, columnRequest.SingleUserMode,
                                                         columnRequest.DisableDependencies, out droppedForeignKeys);
+                    int recordCounter = CountRecords(columnRequest.Table);
 
                     trScope.Complete();
-                    return new InsertColumnResponse() { IsSuccess = true, Column = column, DroppedForeignKeys = droppedForeignKeys };
+                    return new InsertColumnResponse() 
+                    { 
+                        IsSuccess = true, 
+                        Column = column, 
+                        DroppedForeignKeys = droppedForeignKeys,
+                        RecordCount = recordCounter
+                    };
                 }
             }
             catch (Exception ex)
@@ -549,6 +562,7 @@ namespace CfCServiceTester.WEBservice
                                                         columnRequest.SingleUserMode, out alteredDependencies);
                     var rzlt = new RenameColumnResponse() { IsSuccess = true, Column = column };
                     rzlt.AlteredDependencies.AddRange(alteredDependencies);
+                    rzlt.RecordCount = CountRecords(columnRequest.Table);
 
                     trScope.Complete();
                     return rzlt;
@@ -581,7 +595,13 @@ namespace CfCServiceTester.WEBservice
                 {
                     DeleteColumn(columnRequest.Table, columnRequest.Column.Name, columnRequest.DisableDependencies,
                                                         columnRequest.SingleUserMode, out droppedDependencies);
-                    var rzlt = new DeleteColumnResponse() { IsSuccess = true, DroppedDependencies = droppedDependencies };
+                    var rzlt = new DeleteColumnResponse() 
+                    { 
+                        IsSuccess = true, 
+                        DroppedDependencies = droppedDependencies,
+                        RecordCount = CountRecords(columnRequest.Table),
+                        Column = columnRequest.Column,
+                    };
 
                     trScope.Complete();
                     return rzlt;
@@ -617,7 +637,8 @@ namespace CfCServiceTester.WEBservice
                     {
                         IsSuccess = true,
                         Column = dbo,
-                        DroppedForeignKeys = droppedDependencies
+                        DroppedForeignKeys = droppedDependencies,
+                        RecordCount = CountRecords(columnRequest.Table),
                     };
                     
                     trScope.Complete();
@@ -733,9 +754,16 @@ namespace CfCServiceTester.WEBservice
                             dependecies = UpdateTheIndex(request.TableName, request.IndexDescriptor, request.DisableDependencies, out dbo);
                             break;
                     }
+                    int recordCount = CountRecords(request.TableName);
 
                     trScope.Complete();
-                    return new UpdateIndexResponse() { IsSuccess = true, DroppedDependencies = dependecies, Dbo = dbo };
+                    return new UpdateIndexResponse() 
+                    { 
+                        IsSuccess = true, 
+                        DroppedDependencies = dependecies, 
+                        Dbo = dbo,
+                        RecordCount = recordCount
+                    };
                 }
             }
             catch (Exception ex)
@@ -852,8 +880,15 @@ namespace CfCServiceTester.WEBservice
                             dbo = CreateForeignKey(request.TableName, request.Dbo);
                             break;
                     }
+                    int recordCount = CountRecords(request.TableName);
+
                     trScope.Complete();
-                    return new UpdateForeignKeyResponse() { IsSuccess = true, Dbo = dbo };
+                    return new UpdateForeignKeyResponse() 
+                    { 
+                        IsSuccess = true, 
+                        Dbo = dbo, 
+                        RecordCount = recordCount
+                    };
                 }
             }
             catch (Exception ex)
