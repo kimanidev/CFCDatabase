@@ -15,8 +15,19 @@
     </tr>
     <tr>
         <td>Selected database</td>
-        <td colspan="2">
+        <td>
             <asp:TextBox ID="txtDatabaseName2" runat="server" Text="" ReadOnly="true" Width="98%" BackColor="#EAF7FB" />
+        </td>
+        <td>
+            <span style="white-space: nowrap" >
+                <span style="padding-right: 5px" >Version:</span>
+                <span style="padding-right: 1em" >
+                    <asp:TextBox ID="txtMajorDbVersion2" runat="server" Text='0' Width="4em" ReadOnly="true" 
+                                 ToolTip="DB version number: major value" />
+                </span>
+                <asp:TextBox ID="txtMinorDbVersion2" runat="server" Text='0' Width="4em" ReadOnly="true"
+                             ToolTip="DB version number: minor value" />
+            </span>
         </td>
     </tr>
 <%--
@@ -131,3 +142,10 @@
 <div id="ColumnEditor2" style="display: none; width: 26em; height:auto;" class='boxy' >
     <con:ColumnEditor ID="ColumnEditorBox2" runat="server" />
 </div>
+
+<script type="text/javascript">
+// <![CDATA[
+        $('#<%= txtMajorDbVersion2.ClientID %>').spinner({ min: 0, max: 10000, increment: 'fast' });
+        $('#<%= txtMinorDbVersion2.ClientID %>').spinner({ min: 0, max: 10000, increment: 'fast' });
+// ]]>
+</script>

@@ -41,8 +41,15 @@ function RenameTable(oldNameId, newNameId) {
     }
     var singleUserMode = false; // $(manager.get_chkSingleMode2Id()).attr('checked') == 'checked';
     $('span#SpanSelectTable2 span.Pauser').show();
-    CfCServiceTester.WEBservice.CfcWebService.RenameTable(oldName, newName, singleUserMode, 
-                                                          onSuccess_RenameTable, onFailure_EnumerateTables);
+    var request = {     // instance of the RenameTableRequest class
+        Operation: "Rename",
+        CFC_DB_Major_Version: $(manager.get_txtMajorDbVersion2Id()).val(),
+        CFC_DB_Minor_Version: $(manager.get_txtMinorDbVersion2Id()).val(),
+        Table: newName,
+        OldName: oldName,
+        SingleUserMode: singleUserMode
+    };
+    CfCServiceTester.WEBservice.CfcWebService.RenameTable(request, onSuccess_RenameTable, onFailure_EnumerateTables);
     return false;
 }
 
@@ -89,7 +96,13 @@ function CreateNewTable(aButton) {
         alert('Table name is not defined.')
         return false;
     }
-    CfCServiceTester.WEBservice.CfcWebService.CreateTable(tableName, onSuccess_EnumerateColumns, onFailure_EnumerateTables);
+    var request = {     // Instance of the DbModifyRequest class
+        Operation: "Insert",
+        CFC_DB_Major_Version: $(manager.get_txtMajorDbVersion2Id()).val(),
+        CFC_DB_Minor_Version: $(manager.get_txtMinorDbVersion2Id()).val(),
+        Table: tableName
+    };
+    CfCServiceTester.WEBservice.CfcWebService.CreateTable(request, onSuccess_EnumerateColumns, onFailure_EnumerateTables);
     return false;
 }
 
@@ -112,9 +125,17 @@ function DeleteTable(aButton) {
         alert('Table name is not defined.')
         return false;
     }
-    if (confirm("Are you sure to delete table '" + tableName + "'?"))
-        CfCServiceTester.WEBservice.CfcWebService.DeleteTable(tableName, true, onSuccess_DeleteTable, onFailure_EnumerateTables);
-    return false;
+    if (confirm("Are you sure to delete table '" + tableName + "'?")) {
+        var request = {     // Instance of the DeleteTableRequest class
+            Operation: "Delete",
+            CFC_DB_Major_Version: $(manager.get_txtMajorDbVersion2Id()).val(),
+            CFC_DB_Minor_Version: $(manager.get_txtMinorDbVersion2Id()).val(),
+            Table: tableName,
+            disableDependencies: true
+        };
+        CfCServiceTester.WEBservice.CfcWebService.DeleteTable(request, onSuccess_DeleteTable, onFailure_EnumerateTables);
+    }
+     return false;
 }
 
 function InsertNewColumn() {

@@ -362,12 +362,13 @@ namespace CfCServiceTester.WEBservice
         /// <see cref="http://msdn.microsoft.com/en-us/library/microsoft.sqlserver.management.smo.table.rename.aspx"/>
         /// <seealso cref="http://www.youdidwhatwithtsql.com/altering-database-objects-with-powershell/119"/>
         /// </summary>
-        /// <param name="oldName">Old table name</param>
+        /// <param name="request">Request for the renaming table <see cref="RenameTableRequest"/></param>
         /// <param name="newName">New table name</param>
         /// <param name="singleUserMode"><code>true</code> - set single user mode</param>
         /// <returns><see cref="RenameTableStatus"/></returns>
         [WebMethod(EnableSession = true)]
-        public RenameTableStatus RenameTable(string oldName, string newName, bool singleUserMode)
+//        public RenameTableStatus RenameTable(string oldName, string newName, bool singleUserMode)
+        public RenameTableStatus RenameTable(RenameTableRequest request)
         {
             try
             {
@@ -378,10 +379,14 @@ namespace CfCServiceTester.WEBservice
                 };
                 using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
                 {
-                    if (singleUserMode)
+                    if (request.SingleUserMode)
                         SetSingleMode(DatabaseName);
-                    List<AlteredDependencyDbo> dependecies = RenameTheTable(oldName, newName);
-                    int recordCounter = CountRecords(newName);
+                    List<AlteredDependencyDbo> dependecies = RenameTheTable(request.OldName, request.Table);
+                    int recordCounter = CountRecords(request.Table);
+
+                    string logMsg = String.Format("Name of the table '{0}' was changed to {1}.", request.OldName, request.Table);
+                    Guid historyRecordId = LogTableOperation(request.Table, logMsg, request.CFC_DB_Major_Version,
+                                                             request.CFC_DB_Minor_Version);
 
                     trScope.Complete();
                     return new RenameTableStatus() 
@@ -398,7 +403,7 @@ namespace CfCServiceTester.WEBservice
             }
             finally
             {
-                if (singleUserMode)
+                if (request.SingleUserMode)
                     SetMultiUserMode(DatabaseName);
             }
         }
@@ -437,10 +442,11 @@ namespace CfCServiceTester.WEBservice
         /// <summary>
         /// Creates new table and returns  empty list or description of all columns in the table when the table exists.
         /// </summary>
-        /// <param name="tableName">table name</param>
+        /// <param name="request">Request for creating new table <see cref="DbModifyRequest"/></param>
         /// <returns><see cref="EnumerateColumnsResponse"/></returns>
         [WebMethod(EnableSession = true)]
-        public EnumerateColumnsResponse CreateTable(string tableName)
+//        public EnumerateColumnsResponse CreateTable(string tableName)
+        public EnumerateColumnsResponse CreateTable(DbModifyRequest request)
         {
             try
             {
@@ -452,8 +458,12 @@ namespace CfCServiceTester.WEBservice
                 using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
                 {
                     var rzlt = new EnumerateColumnsResponse();
-                    rzlt.Columns.AddRange(GetTableColumns(tableName, true));
+                    rzlt.Columns.AddRange(GetTableColumns(request.Table, true));
                     rzlt.IsSuccess = true;
+
+                    string logMsg = String.Format("Table {0} was created.", request.Table);
+                    Guid historyRecordId = LogTableOperation(request.Table, logMsg, request.CFC_DB_Major_Version,
+                                                             request.CFC_DB_Minor_Version);
 
                     trScope.Complete();
                     return rzlt;
@@ -468,11 +478,10 @@ namespace CfCServiceTester.WEBservice
         /// <summary>
         /// Removes table from the database
         /// </summary>
-        /// <param name="tableName">table name</param>
-        /// <param name="disableDependencies"><code>true</code> - remove foreign keys that references the table</param>
+        /// <param name="request">Request for deleting the table <see cref="DeleteTableRequest"/></param>
         /// <returns><see cref="DeleteTableResponse"/></returns>
         [WebMethod(EnableSession = true)]
-        public DeleteTableResponse DeleteTable(string tableName, bool disableDependencies)
+        public DeleteTableResponse DeleteTable(DeleteTableRequest request)
         {
             try
             {
@@ -483,13 +492,17 @@ namespace CfCServiceTester.WEBservice
                 };
                 using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
                 {
-                    List<DroppedDependencyDbo> droppedKeys = DeleteTheTable(tableName, disableDependencies);
+                    List<DroppedDependencyDbo> droppedKeys = DeleteTheTable(request.Table, request.disableDependencies);
                     var rzlt = new DeleteTableResponse() 
                     { 
                         DroppedDependencies = droppedKeys ,
-                        ErrorMessage = String.Format("Table '{0}' is deleted.", tableName),
+                        ErrorMessage = String.Format("Table '{0}' is deleted.", request.Table),
                         IsSuccess = true
                     };
+
+                    string logMsg = String.Format("Table {0} was deleted.", request.Table);
+                    Guid historyRecordId = LogTableOperation(request.Table, logMsg, request.CFC_DB_Major_Version,
+                                                             request.CFC_DB_Minor_Version);
 
                     trScope.Complete();
                     return rzlt;
@@ -523,6 +536,13 @@ namespace CfCServiceTester.WEBservice
                     DataColumnDbo column = InsertColumn(columnRequest.Table, columnRequest.Column, columnRequest.SingleUserMode,
                                                         columnRequest.DisableDependencies, out droppedForeignKeys);
                     int recordCounter = CountRecords(columnRequest.Table);
+
+                    string logMsg = String.Format("Table {0}: inserted column '{1}' [{2}] {3} {4} {5} {6}.", columnRequest.Table,
+                                        columnRequest.Column.Name, columnRequest.Column.SqlDataType, columnRequest.Column.MaximumLength,
+                                        columnRequest.Column.NumericPrecision, columnRequest.Column.NumericScale,
+                                        columnRequest.Column.IsNullable ? "NULL" : "NOT NULL");
+                    Guid historyRecordId = LogTableOperation(columnRequest.Table, logMsg, columnRequest.CFC_DB_Major_Version,
+                                                             columnRequest.CFC_DB_Minor_Version);
 
                     trScope.Complete();
                     return new InsertColumnResponse() 
@@ -564,6 +584,11 @@ namespace CfCServiceTester.WEBservice
                     rzlt.AlteredDependencies.AddRange(alteredDependencies);
                     rzlt.RecordCount = CountRecords(columnRequest.Table);
 
+                    string logMsg = String.Format("Name of the column '{0}' was changed to {1}.", columnRequest.OldColumnName,
+                                                  columnRequest.Column.Name);
+                    Guid historyRecordId = LogTableOperation(columnRequest.Table, logMsg, columnRequest.CFC_DB_Major_Version,
+                                                             columnRequest.CFC_DB_Minor_Version);
+
                     trScope.Complete();
                     return rzlt;
                 }
@@ -603,6 +628,10 @@ namespace CfCServiceTester.WEBservice
                         Column = columnRequest.Column,
                     };
 
+                    string logMsg = String.Format("Column '{0}' was deleted.", columnRequest.Column.Name);
+                    Guid historyRecordId = LogTableOperation(columnRequest.Table, logMsg, columnRequest.CFC_DB_Major_Version,
+                                                             columnRequest.CFC_DB_Minor_Version);
+
                     trScope.Complete();
                     return rzlt;
                 }
@@ -640,7 +669,14 @@ namespace CfCServiceTester.WEBservice
                         DroppedForeignKeys = droppedDependencies,
                         RecordCount = CountRecords(columnRequest.Table),
                     };
-                    
+
+                    string logMsg = String.Format("Column '{0}' type is changed to [{1}] {2} {3} {4} {5}.",
+                                        columnRequest.Column.Name, columnRequest.Column.SqlDataType, columnRequest.Column.MaximumLength,
+                                        columnRequest.Column.NumericPrecision, columnRequest.Column.NumericScale,
+                                        columnRequest.Column.IsNullable ? "NULL" : "NOT NULL");
+                    Guid historyRecordId = LogTableOperation(columnRequest.Table, logMsg, columnRequest.CFC_DB_Major_Version,
+                                                             columnRequest.CFC_DB_Minor_Version);
+
                     trScope.Complete();
                     return rzlt;
                 }

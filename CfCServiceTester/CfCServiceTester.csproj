@@ -105,6 +105,8 @@
     <Content Include="Scripts\ModifyTableStepEventHandlers.js" />
     <Content Include="Scripts\RSA.js" />
     <Content Include="Scripts\RSA.min.js" />
+    <Content Include="Scripts\ui.spinner.js" />
+    <Content Include="Scripts\ui.spinner.min.js" />
     <Content Include="Styles\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Styles\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Styles\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -144,6 +146,7 @@
     <Content Include="Styles\ui-lightness\jquery-ui-1.8.2.custom.css" />
     <Content Include="Default.aspx" />
     <Content Include="Scripts\jquery-1.4.1-vsdoc.js" />
+    <Content Include="Styles\ui.spinner.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -232,6 +235,9 @@
     <Compile Include="WEBservice\CfcWebService_Internal.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WEBservice\CfcWebService_Logger.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="WEBservice\CfcWebService_Utilities.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -240,6 +246,7 @@
     </Compile>
     <Compile Include="WEBservice\DataObjects\AlteredDependencyDbo.cs" />
     <Compile Include="WEBservice\DataObjects\BackupRestoreStatus.cs" />
+    <Compile Include="WEBservice\DataObjects\CfcDbChangesDbo.cs" />
     <Compile Include="WEBservice\DataObjects\CreateDbConnectionResponse.cs" />
     <Compile Include="WEBservice\DataObjects\DatabaseDbo.cs" />
     <Compile Include="WEBservice\DataObjects\DataColumnDbo.cs" />

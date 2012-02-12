@@ -534,5 +534,38 @@ namespace CfCServiceTester.WEBservice
                 return rzlt;
             }
         }
+
+        public static CfcDbChangesDbo GetFirstCfcDbChanges()
+        {
+            const string queryString = "EXEC GetFirst_CFC_DB_Changes";
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                var da = new SqlDataAdapter(queryString, connection);
+                da.TableMappings.Add("Table", "CFC_DB_Changes");
+
+                var ds = new DataSet();
+                da.Fill(ds);
+                DataTable changeList = ds.Tables["CFC_DB_Changes"];
+                var rzlt = (
+                    from chng in changeList.AsEnumerable()
+                    select new CfcDbChangesDbo()
+                    {
+                        DB_Change_GUID = chng.Field<Guid>("DB_Change_GUID"),
+                        CFC_DB_Name = chng.Field<string>("CFC_DB_Name"),
+                        CFC_DB_Major_Version = chng.Field<short>("CFC_DB_Major_Version"),
+                        CFC_DB_Minor_Version = chng.Field<short>("CFC_DB_Minor_Version"),
+                        Seq_No = chng.Field<int>("Seq_No"),
+                        Table_Name = chng.Field<string>("Table_Name"),
+                        Change_Description = chng.Field<string>("Change_Description"),
+                        Created_By = chng.Field<string>("Created_By"),
+                        Created_Date = chng.Field<DateTime>("Created_Date"),
+                        Last_Update_By = chng.Field<string>("Last_Update_By"),
+                        Last_Update = chng.Field<DateTime>("Last_Update"),
+                    }).FirstOrDefault();
+                connection.Close();
+                return rzlt;
+            }
+        }
     }
 }

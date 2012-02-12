@@ -170,13 +170,17 @@ function CreateUpdateRequest(updateMode) {
     column.Default = $(manager.get_txtDefaultValue3Id()).val();
 
     var rzlt = {};
+
     rzlt.Operation = updateMode;
+    rzlt.CFC_DB_Major_Version = $(manager.get_txtMajorDbVersion2Id()).val();
+    rzlt.CFC_DB_Minor_Version = $(manager.get_txtMinorDbVersion2Id()).val();
     rzlt.Table = $(manager.get_txtTable2Id()).val();
+
     rzlt.OldColumnName = $(manager.get_hdnOldFieldName3Id()).val();
     rzlt.Column = column;
     rzlt.SingleUserMode = false; // $(manager.get_chkSingleMode2Id()).attr('checked') == 'checked';
     rzlt.DisableDependencies = $('#ColumnEditor2 input#chkDisableDependencies').attr('checked') == 'checked';
-    
+
     $('#ColumnEditor2 span.Pauser').show();
     return rzlt;
 }

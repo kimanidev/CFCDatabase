@@ -32,7 +32,8 @@ CfcServiceTestManager.CfcComponent = function () {
     this._txtNewTable2Id = '';              // Text box with new table name (Modify table tab)
     this._spnRenameTableError2Id = '';      // Span with error message (Modify table part)
     this._spnRenameTableOK2Id = '';         // Span with OK message (Modify table part)
-//    this._chkSingleMode2Id = '';            // Checkbox for switching to single user mode (Modify table part)
+    this._txtMajorDbVersion2Id = '';        // Database version number: major
+    this._txtMinorDbVersion2Id = '';        // Database version number: minor
 
     this._txtColumnName3Id = '';            // Column name (Column Edit window)
     this._ddlDatatype3Id = '';              // SQL data type dropdown (Column Edit window)
@@ -295,14 +296,21 @@ CfcServiceTestManager.CfcComponent.prototype = {
     set_spnRenameTableOK2Id: function (value) {
         this._spnRenameTableOK2Id = value;
     },
-/*
-    get_chkSingleMode2Id: function () {
-        return this._chkSingleMode2Id;
+
+    get_txtMajorDbVersion2Id: function () {
+        return this._txtMajorDbVersion2Id;
     },
-    set_chkSingleMode2Id: function (value) {
-        this._chkSingleMode2Id = value;
+    set_txtMajorDbVersion2Id: function (value) {
+        this._txtMajorDbVersion2Id = value;
     },
-*/
+
+    get_txtMinorDbVersion2Id: function () {
+        return this._txtMinorDbVersion2Id;
+    },
+    set_txtMinorDbVersion2Id: function (value) {
+        this._txtMinorDbVersion2Id = value;
+    },
+
     get_txtColumnName3Id: function () {
         return this._txtColumnName3Id;
     },

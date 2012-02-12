@@ -15,6 +15,13 @@
     <link href="Styles/Buttons.css" rel="stylesheet" type="text/css"/>
     <link href="Styles/boxy.css" rel="stylesheet" type="text/css"/>
     <link href="Styles/FormattedTable.css" rel="stylesheet" type="text/css"/>
+    <link href="Styles/ui.spinner.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/themes/ui-lightness/jquery-ui.css">
+
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="http://jqueryui.com/themeroller/themeswitchertool/"></script>
+
 </head>
 <body>
     <form id="form1" runat="server">
@@ -24,7 +31,9 @@
             </Services>
 
             <Scripts>
-                <asp:ScriptReference Path="~/Scripts/jquery-1.7.1.min.js" />
+                <%--<asp:ScriptReference Path="~/Scripts/jquery-1.7.1.min.js" />--%>
+
+
                 <asp:ScriptReference Path="~/Scripts/ConnectionStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/BackupStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/ModifyTableStepEventHandlers.js" />
@@ -34,6 +43,7 @@
                 <asp:ScriptReference Path="~/Scripts/ModifyForeignKeysStepEventHandler.js" />
                 <asp:scriptreference Path="~/Scripts/ForeignKeyEditorEventHandler.js" />
                 <asp:ScriptReference Path="~/Scripts/jquery.boxy.js" />
+                <asp:ScriptReference Path="~/Scripts/ui.spinner.js" />
                 <asp:ScriptReference Path="~/Scripts/RSA.min.js" />
 
                 <asp:ScriptReference Path="~/Scripts/CfcServiceTestManager.js" />
@@ -67,6 +77,9 @@
     <script type="text/javascript">
     // <![CDATA[
         Sys.Application.add_init(pageInit);
+//        jQuery().ready(function ($) {
+//            $('#updownfast').spinner({ min: -1000, max: 1000, increment: 'fast' });
+//        });
 
         function pageInit() {
             $create(CfcServiceTestManager.CfcComponent,
@@ -99,7 +112,8 @@
                         'txtNewTable2Id': '#<%= (GetThirdPageControlId("txtNewTable2")) %>',
                         'spnRenameTableError2Id': '#<%= (GetThirdPageControlId("spnRenameTableError2")) %>',
                         'spnRenameTableOK2Id': '#<%= (GetThirdPageControlId("spnRenameTableOK2")) %>',
-//                        'chkSingleMode2Id': '#<%= (GetThirdPageControlId("chkSingleMode2")) %>',
+                        'txtMajorDbVersion2Id': '#<%= (GetThirdPageControlId("txtMajorDbVersion2")) %>',
+                        'txtMinorDbVersion2Id': '#<%= (GetThirdPageControlId("txtMinorDbVersion2")) %>',
 
                         'txtColumnName3Id': '#<%= (GetEditColumnBoxControlId("txtColumnName3")) %>',
                         'ddlDatatype3Id': '#<%= (GetEditColumnBoxControlId("ddlDatatype3")) %>',
@@ -170,6 +184,8 @@
                         'rsaModulus': "<%= RsaModulus %>"
                     });
         }
+
+        var manager = $find('CfcTestManager');
 
     // ]]>
     </script>
