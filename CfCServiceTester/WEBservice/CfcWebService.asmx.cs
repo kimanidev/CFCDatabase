@@ -367,7 +367,6 @@ namespace CfCServiceTester.WEBservice
         /// <param name="singleUserMode"><code>true</code> - set single user mode</param>
         /// <returns><see cref="RenameTableStatus"/></returns>
         [WebMethod(EnableSession = true)]
-//        public RenameTableStatus RenameTable(string oldName, string newName, bool singleUserMode)
         public RenameTableStatus RenameTable(RenameTableRequest request)
         {
             try
@@ -445,7 +444,6 @@ namespace CfCServiceTester.WEBservice
         /// <param name="request">Request for creating new table <see cref="DbModifyRequest"/></param>
         /// <returns><see cref="EnumerateColumnsResponse"/></returns>
         [WebMethod(EnableSession = true)]
-//        public EnumerateColumnsResponse CreateTable(string tableName)
         public EnumerateColumnsResponse CreateTable(DbModifyRequest request)
         {
             try
@@ -773,24 +771,32 @@ namespace CfCServiceTester.WEBservice
 
                     var dependecies = new List<DroppedDependencyDbo>();
                     IndexDbo dbo = null;
+                    string logMsg= null;
 
-                    switch (request.OperationType)
+                    switch (request.Operation)
                     {
                         case UpdateColumnOperation.Rename:
-                            dbo = RenameTheIndex(request.TableName, request.OldIndexName, request.IndexName);
+                            dbo = RenameTheIndex(request.Table, request.OldIndexName, request.IndexName);
+                            logMsg = String.Format("Table '{0}': index '{1}' was renamed to '{2}'.",
+                                        request.Table, request.OldIndexName, request.IndexName);
                             break;
                         case UpdateColumnOperation.Insert:
-                            dbo = CreateTheIndex(request.TableName, request.IndexDescriptor);
+                            dbo = CreateTheIndex(request.Table, request.IndexDescriptor);
+                            logMsg = String.Format("Table '{0}': index '{1}' was created.", request.Table, request.IndexDescriptor.Name);
                             break;
                         case UpdateColumnOperation.Delete:
-                            dependecies = DeleteTheIndex(request.TableName, request.IndexName, request.DisableDependencies);
+                            dependecies = DeleteTheIndex(request.Table, request.IndexName, request.DisableDependencies);
                             dbo = new IndexDbo() { Name = request.IndexName, IsDisabled = true };
+                            logMsg = String.Format("Table '{0}': index '{1}' was deleted.", request.Table, request.IndexName);
                             break;
                         case UpdateColumnOperation.Modify:
-                            dependecies = UpdateTheIndex(request.TableName, request.IndexDescriptor, request.DisableDependencies, out dbo);
+                            dependecies = UpdateTheIndex(request.Table, request.IndexDescriptor, request.DisableDependencies, out dbo);
+                            logMsg = String.Format("Table '{0}': index '{1}' was modified.", request.Table, request.IndexDescriptor.Name);
                             break;
                     }
-                    int recordCount = CountRecords(request.TableName);
+                    int recordCount = CountRecords(request.Table);
+                    Guid historyRecordId = LogTableOperation(request.Table, logMsg, request.CFC_DB_Major_Version,
+                                                             request.CFC_DB_Minor_Version);
 
                     trScope.Complete();
                     return new UpdateIndexResponse() 
@@ -899,24 +905,33 @@ namespace CfCServiceTester.WEBservice
                         SetSingleMode(DatabaseName);
 
                     ForeignKeyDbo dbo = null;
-                    switch (request.OperationType)
+                    string logMsg = null;
+
+                    switch (request.Operation)
                     {
                         case UpdateColumnOperation.Rename:
-                            dbo = RenameTheForeignKey(request.TableName, request.OldForeignKeyName, request.ForeignKeyName);
-                            break;
-                        case UpdateColumnOperation.Delete:
-                            DeleteTheForeignKey(request.TableName, request.OldForeignKeyName);
-                            dbo = new ForeignKeyDbo() { Name = request.OldForeignKeyName };
+                            dbo = RenameTheForeignKey(request.Table, request.OldForeignKeyName, request.ForeignKeyName);
+                            logMsg = String.Format("Table '{0}': foreign key '{1}' was renamed to '{2}'.",
+                                        request.Table, request.OldForeignKeyName, request.ForeignKeyName);
                             break;
                         case UpdateColumnOperation.Insert:
-                            dbo = CreateForeignKey(request.TableName, request.Dbo);
+                            dbo = CreateForeignKey(request.Table, request.Dbo);
+                            logMsg = String.Format("Table '{0}': foreign key '{1}' was created.", request.Table, request.Dbo.Name);
+                            break;
+                        case UpdateColumnOperation.Delete:
+                            DeleteTheForeignKey(request.Table, request.OldForeignKeyName);
+                            dbo = new ForeignKeyDbo() { Name = request.OldForeignKeyName };
+                            logMsg = String.Format("Table '{0}': foreign key '{1}' was deleted.", request.Table, request.OldForeignKeyName);
                             break;
                         case UpdateColumnOperation.Modify:
-                            DeleteTheForeignKey(request.TableName, request.OldForeignKeyName);
-                            dbo = CreateForeignKey(request.TableName, request.Dbo);
+                            DeleteTheForeignKey(request.Table, request.OldForeignKeyName);
+                            dbo = CreateForeignKey(request.Table, request.Dbo);
+                            logMsg = String.Format("Table '{0}': foreign key '{1}' was modified.", request.Table, request.Dbo.Name);
                             break;
                     }
-                    int recordCount = CountRecords(request.TableName);
+                    int recordCount = CountRecords(request.Table);
+                    Guid historyRecordId = LogTableOperation(request.Table, logMsg, request.CFC_DB_Major_Version,
+                                                             request.CFC_DB_Minor_Version);
 
                     trScope.Complete();
                     return new UpdateForeignKeyResponse() 

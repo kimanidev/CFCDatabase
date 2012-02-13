@@ -30,6 +30,9 @@ namespace CfCServiceTester.CustomControls
             this.lstTableList6.DataSource = tableList = CfcWebService.GetAllTables();
             this.lblErrorMessage6.Text = String.Empty;
             this.lstTableList6.DataBind();
+            CfcDbChangesDbo dbo = CfcWebService.GetFirstCfcDbChanges();
+            txtMajorDbVersion6.Text = Math.Max((short)1, dbo.CFC_DB_Major_Version).ToString();
+            txtMinorDbVersion6.Text = dbo.CFC_DB_Minor_Version.ToString();
         }
 
         protected void TableList6_OnDataBound(Object sender, EventArgs e)

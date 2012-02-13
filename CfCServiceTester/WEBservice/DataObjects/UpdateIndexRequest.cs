@@ -10,20 +10,21 @@ namespace CfCServiceTester.WEBservice.DataObjects
     /// Request for updating index in the table
     /// </summary>
     [DataContract(Namespace = "CfCServiceNS")]
-    public class UpdateIndexRequest
+    public class UpdateIndexRequest : DbModifyRequest
     {
+/*
         /// <summary>
         /// Operation type, <see cref="UpdateColumnOperation"/>
         /// </summary>
         [DataMember]
-        public UpdateColumnOperation OperationType { get; set; }
+        public UpdateColumnOperation Operation { get; set; }
 
         /// <summary>
         /// Table name
         /// </summary>
         [DataMember]
-        public string TableName { get; set; }
-
+        public string Table { get; set; }
+*/
         /// <summary>
         /// Old name, for renaming operation only
         /// </summary>

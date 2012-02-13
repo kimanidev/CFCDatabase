@@ -49,6 +49,24 @@ namespace CfCServiceTester.CustomControls {
         protected global::System.Web.UI.WebControls.TextBox txtDatabaseName6;
         
         /// <summary>
+        /// txtMajorDbVersion6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtMajorDbVersion6;
+        
+        /// <summary>
+        /// txtMinorDbVersion6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtMinorDbVersion6;
+        
+        /// <summary>
         /// lstTableList6 control.
         /// </summary>
         /// <remarks>

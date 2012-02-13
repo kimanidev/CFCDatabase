@@ -29,6 +29,9 @@ namespace CfCServiceTester.CustomControls
             this.lstTableList4.DataSource = tableList = CfcWebService.GetAllTables();
             this.lblErrorMessage4.Text = String.Empty;
             this.lstTableList4.DataBind();
+            CfcDbChangesDbo dbo = CfcWebService.GetFirstCfcDbChanges();
+            txtMajorDbVersion4.Text = Math.Max((short)1, dbo.CFC_DB_Major_Version).ToString();
+            txtMinorDbVersion4.Text = dbo.CFC_DB_Minor_Version.ToString();
         }
 
         protected void TableList4_OnDataBound(Object sender, EventArgs e)
