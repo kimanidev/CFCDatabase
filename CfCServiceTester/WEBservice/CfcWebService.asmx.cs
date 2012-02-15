@@ -214,6 +214,16 @@ namespace CfCServiceTester.WEBservice
         }
 
         /// <summary>
+        /// Clear session state.
+        /// </summary>
+        [WebMethod(EnableSession = true)]
+        public void CloseSession()
+        {
+            HttpContext.Current.Session.Clear();
+            HttpContext.Current.Session.Abandon();
+        }
+
+        /// <summary>
         /// The function makes backup file of the database.
         /// There is no need for database locking because SQL 2008 performs all tasks itself.
         /// <see cref="http://home.clara.net/drdsl/MSSQL/backups.html"/>

@@ -23,7 +23,7 @@
 	<script type="text/javascript" src="http://jqueryui.com/themeroller/themeswitchertool/"></script>
 
 </head>
-<body>
+<body onunload="doUnload()">
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" runat="server">
             <Services>
@@ -50,7 +50,7 @@
             </Scripts>
         </asp:ScriptManager>
         <asp:Wizard ID="Wizard1" runat="server" HeaderText="Database Processor" Width="60em" 
-                    OnActiveStepChanged="Wizard1_OnActiveStepChanged" >
+                    OnActiveStepChanged="Wizard1_OnActiveStepChanged" StepNextButtonStyle-CssClass="oculto" >
             <WizardSteps>
                 <asp:WizardStep runat="server" title="Prepare Connection" ID="ConnectionStep" StepType="Start">
                     <con:StartPageContent ID="StartPageContent" runat="server" />
@@ -77,9 +77,10 @@
     <script type="text/javascript">
     // <![CDATA[
         Sys.Application.add_init(pageInit);
-//        jQuery().ready(function ($) {
-//            $('#updownfast').spinner({ min: -1000, max: 1000, increment: 'fast' });
-//        });
+
+        function doUnload() {
+            CfCServiceTester.WEBservice.CfcWebService.CloseSession();
+        }
 
         function pageInit() {
             $create(CfcServiceTestManager.CfcComponent,
@@ -189,7 +190,13 @@
                     });
         }
 
-        var manager = $find('CfcTestManager');
+        var isConnected = <%= IsUserConnected %>;
+        if (isConnected) {
+            //alert('Prisijunges');
+            $('input:submit[value="Next"]').show();
+        } else {
+            $('input:submit[value="Next"]').hide();
+        }
 
     // ]]>
     </script>

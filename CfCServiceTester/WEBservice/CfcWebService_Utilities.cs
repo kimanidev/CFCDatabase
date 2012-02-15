@@ -40,6 +40,11 @@ namespace CfCServiceTester.WEBservice
             get { return (string)HttpContext.Current.Session[ConnectionStringKey]; }
             set { HttpContext.Current.Session[ConnectionStringKey] = value; }
         }
+        public static bool IsConnected
+        {
+            get { return !String.IsNullOrEmpty(ConnectionString); }
+        }
+
         internal static List<string> RoleList
         {
             get { return (List<string>)HttpContext.Current.Session[RoleListKey]; }
@@ -92,7 +97,7 @@ namespace CfCServiceTester.WEBservice
             catch (Exception ex)
             {
                 isValid = false;
-                return ex.Message;
+                return ex.Message.StartsWith("Login failed for user") ? "Incorrect username or password entered." : ex.Message;
             }
         }
         

@@ -114,6 +114,7 @@ function onSuccess_CreateDbConnection(result) {
         loginName.attr('disabled', true);
         password.val('');
         password.attr('disabled', true);
+        $('input:submit[value="Next"]').show();
     }
 }
 

@@ -85,16 +85,28 @@ namespace CfCServiceTester
             var ctrl = ((ForeignKeyEditor)ctrlRoot).FindControl(controlName);
             return ctrl == null ? String.Empty : ctrl.ClientID;
         }
-
+        public static string IsUserConnected
+        {
+            get
+            {
+                string rzlt = CfcWebService.IsConnected.ToString().ToLower();
+                return rzlt;
+            }
+        }
 
         public _Default() : base()
         {
             this.PreInit += new EventHandler(_Default_PreInit);
+            this.PreRender += new System.EventHandler(_Default_PreRender);
         }
 
         protected void _Default_PreInit(object sender, EventArgs e)
         {
-                rsaParam = CfcWebService.GetPublicKey();
+            rsaParam = CfcWebService.GetPublicKey();
+        }
+        protected void _Default_PreRender(object sender, EventArgs e)
+        {
+            Wizard1.StepNextButtonStyle.CssClass = "oculto";
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -104,7 +116,7 @@ namespace CfCServiceTester
             Response.Cache.SetNoStore();
             Response.AddHeader("Pragma", "no-cache");
         }
-
+        
         public string LocalServersOnly
         {
             get

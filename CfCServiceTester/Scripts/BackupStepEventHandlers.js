@@ -29,10 +29,10 @@ function BackupDatabase(overwrite) {
 }
 
 function ValidateBackupFileName(manager, file) {
-    var rg = /^[a-z][a-z\d_\.]*bak$/i;
+    var rg = /^[a-z][a-z\d_\.\-]*bak$/i;
     if (!rg.test(file)) {
         var message = 'File name contains invalid characters.\n' +
-                      'The system accepts letters, digits and underscores only.\n' +
+                      'The system accepts letters, digits, underscores and hyphen only.\n' +
                       'File extension must be "bak".';
         alert(message);
         $(manager.get_txtBackupFileNameId()).focus();
