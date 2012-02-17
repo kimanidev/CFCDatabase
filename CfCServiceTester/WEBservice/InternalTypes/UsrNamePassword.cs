@@ -12,12 +12,12 @@ namespace CfCServiceTester.WEBservice.InternalTypes
         /// <summary>
         /// User's name
         /// </summary>
-        public string UserName { get; private set; }
+        public string UserName { get; internal set; }
 
         /// <summary>
         /// Password
         /// </summary>
-        public string Password { get; private set; }
+        public string Password { get; internal set; }
 
         public UsrNamePassword(string encUsername, string encPassword)
         {
@@ -33,6 +33,12 @@ namespace CfCServiceTester.WEBservice.InternalTypes
                 this.UserName = Encoding.UTF8.GetString(myRSA.Decrypt(CfcWebService.ToHexByte(encUsername), false));
                 this.Password = Encoding.UTF8.GetString(myRSA.Decrypt(CfcWebService.ToHexByte(encPassword), false));
             }
+        }
+
+        public UsrNamePassword()
+        {
+            UserName = String.Empty;
+            Password = String.Empty;
         }
     }
 }

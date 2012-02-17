@@ -35,6 +35,17 @@
         </td>
     </tr>
     <tr>
+        <td>Login name/password</td>
+        <td>
+            <asp:TextBox runat="server" ID="txtLoginName" Width="85%" 
+                ToolTip="Login name" />
+        </td>
+        <td>
+            <asp:TextBox runat="server" ID="txtLoginPasswd" Width="85%" ToolTip="Password" 
+                TextMode="Password" />
+        </td>
+    </tr>
+    <tr>
         <td>Select Database</td>
         <td>
             <span class="Nowrap" id="SpanSelectDatabase">
@@ -54,17 +65,6 @@
             <span id="DatabaseSelector" style="display:none;">
                 <select onchange='javascript:dbSelectionChanged(this);'/>
             </span>
-        </td>
-    </tr>
-    <tr>
-        <td>Login name/password</td>
-        <td>
-            <asp:TextBox runat="server" ID="txtLoginName" Width="85%" 
-                ToolTip="Login name" />
-        </td>
-        <td>
-            <asp:TextBox runat="server" ID="txtLoginPasswd" Width="85%" ToolTip="Password" 
-                TextMode="Password" />
         </td>
     </tr>
     <tr>

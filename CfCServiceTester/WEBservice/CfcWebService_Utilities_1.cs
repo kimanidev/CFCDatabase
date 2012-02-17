@@ -7,6 +7,7 @@ using Microsoft.SqlServer.Management.Smo;
 using System.Data;
 using System.Text;
 using CfCServiceTester.WEBservice.DataObjects;
+using Microsoft.SqlServer.Management.Common;
 
 namespace CfCServiceTester.WEBservice
 {
@@ -409,7 +410,7 @@ namespace CfCServiceTester.WEBservice
 
         private static void BuildListOfFields(string tableName, List<string> includedFields, IList<TableField> allFields)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
             var db = srv.Databases[DatabaseName];
@@ -496,7 +497,7 @@ namespace CfCServiceTester.WEBservice
 
         public static void KillUsers(string procedureName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[DatabaseName];
             StoredProcedure sp = db.StoredProcedures[procedureName];
 
@@ -564,8 +565,30 @@ namespace CfCServiceTester.WEBservice
                         Last_Update = chng.Field<DateTime>("Last_Update"),
                     }).FirstOrDefault();
                 connection.Close();
-                return rzlt;
+                return rzlt ?? new CfcDbChangesDbo()
+                                {
+                                    DB_Change_GUID = Guid.NewGuid(),
+                                    CFC_DB_Name = DatabaseName,
+                                    CFC_DB_Major_Version = 1,
+                                    CFC_DB_Minor_Version = 0,
+                                    Seq_No = 0,
+                                    Table_Name = String.Empty,
+                                    Change_Description = String.Empty,
+                                    Created_By = UserName,
+                                    Created_Date = DateTime.Now,
+                                    Last_Update_By = UserName,
+                                    Last_Update = DateTime.Now,
+                                };
             }
+        }
+
+        private static Server GetConnectedServer(string remoteSvrName, string sqlServerLogin, string password)
+        {
+            var srvConn2 = new ServerConnection(remoteSvrName);
+            srvConn2.LoginSecure = false;
+            srvConn2.Login = sqlServerLogin;
+            srvConn2.Password = password;
+            return new Server(srvConn2);
         }
     }
 }

@@ -23,10 +23,11 @@ namespace CfCServiceTester.CustomControls
 
         public void SetDefaultFileName()
         {
+            string serverName = CfcWebService.SqlServerName.Replace('\\', '_');
             if (!this.emptyFileTemplate && String.IsNullOrEmpty(this.txtBackupFileName.Text))
             {
                 this.txtBackupFileName.Text = String.Format("{0}_{1}_{2}.bak",
-                        CfcWebService.SqlServerName, CfcWebService.DatabaseName, DateTime.Now.ToString("yyyyMMdd_HHmm"));
+                        serverName, CfcWebService.DatabaseName, DateTime.Now.ToString("yyyyMMdd_HHmm"));
             }
             if (String.IsNullOrEmpty(this.txtServerName1.Text))
             {

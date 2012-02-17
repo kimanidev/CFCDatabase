@@ -122,7 +122,7 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         public static bool SetSingleMode(string dbName, string procedureName = null)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[dbName];
             // db == null for new databases; there is no need for switching to single mode in this case
             return db == null ? true : SetSingleMode(db, procedureName);
@@ -154,7 +154,7 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         public static void SetMultiUserMode(string dbName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[dbName];
             if (db != null)
                 SetMultiUserMode(db);
@@ -179,7 +179,7 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         public static List<AlteredDependencyDbo> RenameTheTable(string oldName, string newName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[DatabaseName];
             Table aTable = db.Tables[newName];
             if (aTable != null)
@@ -272,7 +272,7 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         public static IndexDbo RenameTheIndex(string tableName, string oldName, string newName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[DatabaseName];
             Table aTable = db.Tables[tableName];
             if (aTable == null)
@@ -295,7 +295,7 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         public static ForeignKeyDbo RenameTheForeignKey(string tableName, string oldName, string newName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[DatabaseName];
             Table aTable = db.Tables[tableName];
             if (aTable == null)
@@ -321,7 +321,7 @@ namespace CfCServiceTester.WEBservice
         private static List<DroppedDependencyDbo> UpdateTheIndex(string tableName, IndexDbo dbo, bool disableDependencies,
                                                                  out IndexDbo newDbo)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[DatabaseName];
             Table aTable = db.Tables[tableName];
             if (aTable == null)
@@ -343,7 +343,7 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         public static IndexDbo CreateTheIndex(string tableName, IndexDbo dbo, string uniqueInTable = null)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[DatabaseName];
             Table aTable = db.Tables[tableName];
             if (aTable == null)
@@ -374,7 +374,7 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         public static List<DroppedDependencyDbo> DeleteTheIndex(string tableName, string indexName, bool disableDependencies)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[DatabaseName];
             Table aTable = db.Tables[tableName];
             if (aTable == null)
@@ -403,7 +403,7 @@ namespace CfCServiceTester.WEBservice
         /// </summary>
         public static void DeleteTheForeignKey(string tableName, string fKeyName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[DatabaseName];
             Table aTable = db.Tables[tableName];
             if (aTable == null)
@@ -428,7 +428,7 @@ namespace CfCServiceTester.WEBservice
         /// <returns>Description of created foreign key</returns>
         public static ForeignKeyDbo CreateForeignKey(string tableName, ForeignKeyDbo dbo)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             var db = srv.Databases[DatabaseName];
             Table aTable = db.Tables[tableName];
             if (aTable == null)
@@ -441,7 +441,7 @@ namespace CfCServiceTester.WEBservice
 
         public static IEnumerable<DataColumnDbo> GetTableColumns(string tableName, bool createNewTable = false)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' was not found.", SqlServerName));
             var db = srv.Databases[DatabaseName];
@@ -476,7 +476,7 @@ namespace CfCServiceTester.WEBservice
         /// <param name="disableDependencies"><code>true</code> - remove foreign keys that references the table</param>
         public static List<DroppedDependencyDbo> DeleteTheTable(string tableName, bool disableDependencies)
         {
-           var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' was not found.", SqlServerName));
             var db = srv.Databases[DatabaseName];
@@ -690,7 +690,7 @@ namespace CfCServiceTester.WEBservice
 
         public static List<string> GetAllTables()
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
             var db = srv.Databases[DatabaseName];
@@ -705,7 +705,7 @@ namespace CfCServiceTester.WEBservice
 
         public static List<string> GetAllIndexes(string tableName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
             var db = srv.Databases[DatabaseName];
@@ -727,7 +727,7 @@ namespace CfCServiceTester.WEBservice
 
         public static List<ForeignKeyDbo> GetForeignKeys(string tableName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
             var db = srv.Databases[DatabaseName];
@@ -749,7 +749,7 @@ namespace CfCServiceTester.WEBservice
 
         public static ForeignKeyDbo GetThisForeignKey(string tableName, string foreignKeyName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
             var db = srv.Databases[DatabaseName];
@@ -769,7 +769,7 @@ namespace CfCServiceTester.WEBservice
 
         public static List<IndexDbo> GetTableIndexes(string tableName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
             var db = srv.Databases[DatabaseName];
@@ -813,7 +813,7 @@ namespace CfCServiceTester.WEBservice
 
         public static IndexDbo GetIndexDescription(string tableName, string indexName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
             var db = srv.Databases[DatabaseName];
@@ -828,7 +828,7 @@ namespace CfCServiceTester.WEBservice
 
         public static List<string> GetTargetColumns(string tableName)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' is not accessible.", SqlServerName));
             var db = srv.Databases[DatabaseName];
@@ -841,6 +841,38 @@ namespace CfCServiceTester.WEBservice
             var rzlt = new List<string>(GetPrimaryKeyColumns(table));
             rzlt.AddRange(GetColumnsInUniqueConstraints(table));
 
+            return rzlt;
+        }
+
+        public static IEnumerable<DatabaseDbo> EnumerateDatabases(string serverName,  string loginName, string password,
+                                                                  string namePattern, bool accessibleOnly)
+        {
+            Server server = GetConnectedServer(serverName, loginName, password);
+            
+            var rzlt = new List<DatabaseDbo>();
+            if (server.Databases != null || server.Databases.Count > 0)
+            {
+                DatabaseDbo dbo;
+                string dbsName;
+
+                foreach (Database dbs in server.Databases)
+                {
+                    dbsName = dbs.Name;
+                    if ((!String.IsNullOrEmpty(dbsName) || String.IsNullOrEmpty(namePattern) ||
+                          dbsName.ToUpper().Contains(namePattern.ToUpper())) &&
+                        (!accessibleOnly || dbs.IsAccessible))
+                    {
+                        dbo = new DatabaseDbo()
+                        {
+                            Name = dbsName,
+                            ID = dbs.ID,
+                            IsAccessible = dbs.IsAccessible,
+                            Size = dbs.Size
+                        };
+                        rzlt.Add(dbo);
+                    }
+                }
+            }
             return rzlt;
         }
     }

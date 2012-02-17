@@ -33,15 +33,38 @@ function PickDatabases() {
     var manager = $find('CfcTestManager');
 
     var serverName = $(manager.get_txtServerNameId()).val();
+    var uName = $(manager.get_txtLoginNameId()).val();
+    var uPasswd = $(manager.get_txtLoginPasswdId()).val();
     if (!serverName) {
         alert('Server is not selected.')
         return false;
     }
-    var template = $(manager.get_txtDatabaseNameId()).val();
+    if (!uName) {
+        alert('Login name is not defined.');
+        $(manager.get_txtLoginNameId()).focus();
+        return false;
+    }
+    if (!uPasswd) {
+        alert('Password is not defined.');
+        $(manager.get_txtLoginNameId()).focus();
+        return false;
+    }
+    var rsa = new RSAKey();
+    rsa.setPublic(manager.get_rsaModulus(), manager.get_rsaExponent());
+    var username = rsa.encrypt(uName);
+    var pass = rsa.encrypt(uPasswd);
+
+    var request = { // Instance of the EnumerateDatabasesRequest class
+        ServerName: serverName,
+        LoginName: username,
+        Password: pass,
+        NamePattern: $(manager.get_txtDatabaseNameId()).val(),
+        AccessibleOnly: manager.get_accessibleDatabasesOnly()
+    };
+
     $('span#SpanSelectDatabase span.Magnifier').hide();
     $('span#SpanSelectDatabase span.Pauser').show();
-    CfCServiceTester.WEBservice.CfcWebService.EnumerateDatabases(
-                serverName, template, manager.get_accessibleDatabasesOnly(), onSuccess_PickDatabases, onFailure_PickDatabases);
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateDatabases(request, onSuccess_PickDatabases, onFailure_PickDatabases);
     return false;
 }
 
@@ -51,15 +74,19 @@ function ConnectDatabase() {
 
     var rsa = new RSAKey();
     rsa.setPublic(manager.get_rsaModulus(), manager.get_rsaExponent());
-    var serverName = $(manager.get_txtServerNameId()).val();
-    var databaseName = $(manager.get_txtDatabaseNameId()).val();
     var uName = $(manager.get_txtLoginNameId()).val();
     var uPasswd = $(manager.get_txtLoginPasswdId()).val();
     var username = rsa.encrypt(uName);
     var pass = rsa.encrypt(uPasswd);
 
-    CfCServiceTester.WEBservice.CfcWebService.CreateDbConnection(
-                serverName, databaseName, username, pass, onSuccess_CreateDbConnection, onFailure_CreateDbConnection);
+    var request = { // Instance of CreateDbConnectionRequest class
+        ServerName: $(manager.get_txtServerNameId()).val(),
+        LoginName: username,
+        Password: pass,
+        InitialCatalog: $(manager.get_txtDatabaseNameId()).val()
+    };
+
+    CfCServiceTester.WEBservice.CfcWebService.CreateDbConnection(request, onSuccess_CreateDbConnection, onFailure_CreateDbConnection);
     return false;
 }
 

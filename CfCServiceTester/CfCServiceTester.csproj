@@ -254,6 +254,7 @@
     <Compile Include="WEBservice\DataObjects\DbLogicalFileNames.cs" />
     <Compile Include="WEBservice\DataObjects\EnumerateBackupFilesResponse.cs" />
     <Compile Include="WEBservice\DataObjects\EnumerateColumnsResponse.cs" />
+    <Compile Include="WEBservice\DataObjects\EnumerateDatabasesRequest.cs" />
     <Compile Include="WEBservice\DataObjects\ForeignKeyDbo.cs" />
     <Compile Include="WEBservice\DataObjects\IndexDbo.cs" />
     <Compile Include="WEBservice\DataObjects\TableField.cs" />
@@ -271,6 +272,7 @@
     <Content Include="Images\Images.zip" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

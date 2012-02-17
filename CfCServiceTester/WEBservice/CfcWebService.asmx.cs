@@ -95,7 +95,7 @@ namespace CfCServiceTester.WEBservice
         /// <param name="accessibleOnly"><code>true</code> - return accessible databases only</param>
         /// <returns>List of available databases</returns>
         [WebMethod(EnableSession = true)]
-        public IEnumerable<DatabaseDbo> EnumerateDatabases(string serverName, string namePattern, bool accessibleOnly)
+        public IEnumerable<DatabaseDbo> EnumerateDatabases(EnumerateDatabasesRequest request)
         {
             try
             {
@@ -106,30 +106,17 @@ namespace CfCServiceTester.WEBservice
                 };
                 using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
                 {
-                    Server server = new Server(serverName);
-                    var rzlt = new List<DatabaseDbo>();
-                    if (server.Databases == null || server.Databases.Count < 1)
-                        return rzlt;
-                    DatabaseDbo dbo;
-                    string dbsName;
-
-                    foreach (Database dbs in server.Databases)
+                    UsrNamePassword credentials;
+                    if (String.IsNullOrEmpty(request.LoginName) || String.IsNullOrEmpty(request.Password))
                     {
-                        dbsName = dbs.Name;
-                        if ((!String.IsNullOrEmpty(dbsName) || String.IsNullOrEmpty(namePattern) || dbsName.ToUpper().Contains(namePattern.ToUpper())) &&
-                            (!accessibleOnly || dbs.IsAccessible))
-                        {
-                            dbo = new DatabaseDbo()
-                            {
-                                Name = dbsName,
-                                ID = dbs.ID,
-                                IsAccessible = dbs.IsAccessible,
-                                Size = dbs.Size
-                            };
-                            rzlt.Add(dbo);
-                        }
+                        credentials = new UsrNamePassword();    // Take credentials from the session
+                        credentials.UserName = UserName;
+                        credentials.Password = Password;
                     }
-
+                    else
+                        credentials = new UsrNamePassword(request.LoginName, request.Password);
+                    IEnumerable<DatabaseDbo> rzlt = EnumerateDatabases(request.ServerName, credentials.UserName, credentials.Password,
+                                                                       request.NamePattern, request.AccessibleOnly);
                     trScope.Complete();
                     return rzlt;
                 }
@@ -137,7 +124,54 @@ namespace CfCServiceTester.WEBservice
             catch (Exception ex)
             {
                 string msg = ex.Message;
-                return new List<DatabaseDbo>(); ;
+                return new List<DatabaseDbo>();
+            }
+        }
+
+        /// <summary>
+        /// Makes DB connection
+        /// </summary>
+        /// <param name="dataSource">SQL server's name</param>
+        /// <param name="initialCatalog">Database name</param>
+        /// <param name="encUsername">Encrypted login name</param>
+        /// <param name="encPassword">Encrypted password</param>
+        /// <returns>List with roles, <see cref="CreateDbConnectionResponse"/>.</returns>
+        [WebMethod(EnableSession = true)]
+        public CreateDbConnectionResponse CreateDbConnection(CreateDbConnectionRequest request)
+        {
+            var credentials = new UsrNamePassword(request.LoginName, request.Password);
+            bool loginIsOk;
+
+            string message = BuildSqlConnection(request.ServerName, request.InitialCatalog, credentials.UserName, credentials.Password, 
+                                                out loginIsOk);
+            if (!loginIsOk)
+                return new CreateDbConnectionResponse() { Connected = false, ErrorMessage = message };
+            else
+            {
+                var rzlt = new CreateDbConnectionResponse()
+                {
+                    Connected = true,
+                    CurrentServer = request.ServerName,
+                    CurrentDatabase = request.InitialCatalog,
+                };
+                try
+                {
+                    var options = new TransactionOptions()
+                    {
+                        IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                        Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                    };
+                    using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                    {
+                        rzlt.Roles = GetUsersRoles(credentials.UserName);
+                        trScope.Complete();
+                        return rzlt;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return new CreateDbConnectionResponse() { Connected = false, ErrorMessage = ex.Message };
+                }
             }
         }
 
@@ -169,51 +203,6 @@ namespace CfCServiceTester.WEBservice
         }
 
         /// <summary>
-        /// Makes DB connection
-        /// </summary>
-        /// <param name="dataSource">SQL server's name</param>
-        /// <param name="initialCatalog">Database name</param>
-        /// <param name="encUsername">Encrypted login name</param>
-        /// <param name="encPassword">Encrypted password</param>
-        /// <returns>List with roles, <see cref="CreateDbConnectionResponse"/>.</returns>
-        [WebMethod(EnableSession = true)]
-        public CreateDbConnectionResponse CreateDbConnection(string dataSource, string initialCatalog, string encUsername, string encPassword)
-        {
-            var credentials = new UsrNamePassword(encUsername, encPassword);
-            bool loginIsOk;
-
-            string message = BuildSqlConnection(dataSource, initialCatalog, credentials.UserName, credentials.Password, out loginIsOk);
-            if (!loginIsOk)
-                return new CreateDbConnectionResponse() { Connected = false, ErrorMessage = message };
-            else
-            {
-                var rzlt = new CreateDbConnectionResponse() {
-                    Connected = true,
-                    CurrentServer = dataSource,
-                    CurrentDatabase = initialCatalog,
-                };
-                try
-                {
-                    var options = new TransactionOptions()
-                    {
-                        IsolationLevel = System.Transactions.IsolationLevel.Serializable,
-                        Timeout = new TimeSpan(0, TransactionTimeout, 0)
-                    };
-                    using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
-                    {
-                        rzlt.Roles = GetUsersRoles(credentials.UserName);
-                        trScope.Complete();
-                        return rzlt;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return new CreateDbConnectionResponse() { Connected = false, ErrorMessage = ex.Message };
-                }
-            }
-        }
-
-        /// <summary>
         /// Clear session state.
         /// </summary>
         [WebMethod(EnableSession = true)]
@@ -238,6 +227,9 @@ namespace CfCServiceTester.WEBservice
         [WebMethod(EnableSession = true)]
         public BackupStatus BackupDatabase(string directory, string file, bool overWriteMode, bool singleUserMode)
         {
+#if DEBUG
+            string account = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+#endif
             bool isSingleMode = false;
             try
             {

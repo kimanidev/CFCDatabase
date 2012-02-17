@@ -50,11 +50,17 @@ function PickDatabases1() {
         alert('Server is not selected.')
         return false;
     }
-    var template = $(manager.get_txtDatabaseName1Id()).val();
+    var request = { // Object is instance of the EnumerateDatabasesRequest
+        ServerName: serverName,
+        LoginName: '',
+        Password: '',
+        NamePattern: $(manager.get_txtDatabaseName1Id()).val(),
+        AccessibleOnly: manager.get_accessibleDatabasesOnly()
+    };
+
     $('span#SpanSelectDatabase1 span.Magnifier').hide();
     $('span#SpanSelectDatabase1 span.Pauser').show();
-    CfCServiceTester.WEBservice.CfcWebService.EnumerateDatabases(
-                serverName, template, manager.get_accessibleDatabasesOnly(), onSuccess_PickDatabases1, onFailure_PickDatabases1);
+    CfCServiceTester.WEBservice.CfcWebService.EnumerateDatabases(request, onSuccess_PickDatabases1, onFailure_PickDatabases1);
     return false;
 }
 

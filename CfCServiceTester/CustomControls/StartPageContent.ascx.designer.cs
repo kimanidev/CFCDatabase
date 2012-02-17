@@ -40,6 +40,24 @@ namespace CfCServiceTester.CustomControls {
         protected global::System.Web.UI.WebControls.Image WaitImage;
         
         /// <summary>
+        /// txtLoginName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtLoginName;
+        
+        /// <summary>
+        /// txtLoginPasswd control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtLoginPasswd;
+        
+        /// <summary>
         /// txtDatabaseName control.
         /// </summary>
         /// <remarks>
@@ -65,24 +83,6 @@ namespace CfCServiceTester.CustomControls {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Image WaitImage1;
-        
-        /// <summary>
-        /// txtLoginName control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtLoginName;
-        
-        /// <summary>
-        /// txtLoginPasswd control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtLoginPasswd;
         
         /// <summary>
         /// spnConnectionError control.

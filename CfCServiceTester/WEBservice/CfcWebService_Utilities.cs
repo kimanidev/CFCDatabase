@@ -34,6 +34,14 @@ namespace CfCServiceTester.WEBservice
         /// Database name
         /// </summary>
         public static readonly string DatabaseNameKey = "{93CA56A2-3CE6-456D-86E6-0C9849CF363E}";
+        /// <summary>
+        /// Connected user's name
+        /// </summary>
+        public static string UserNameKey = "{9635AA12-EEA1-486D-A510-3E536BD0617E}";
+        /// <summary>
+        /// Current password
+        /// </summary>
+        public static string PasswordKey = "{E06CA12A-F31C-4193-A0C3-62047750CD17}";
 
         internal static string ConnectionString
         {
@@ -58,6 +66,16 @@ namespace CfCServiceTester.WEBservice
         {
             get { return (string)HttpContext.Current.Session[DatabaseNameKey]; }
             set { HttpContext.Current.Session[DatabaseNameKey] = value; }
+        }
+        public static string UserName
+        {
+            get { return (string)HttpContext.Current.Session[UserNameKey]; }
+            set { HttpContext.Current.Session[UserNameKey] = value; }
+        }
+        public static string Password
+        {
+            get { return (string)HttpContext.Current.Session[PasswordKey]; }
+            set { HttpContext.Current.Session[PasswordKey] = value; }
         }
 
         /// <summary>
@@ -89,6 +107,8 @@ namespace CfCServiceTester.WEBservice
                 ConnectionString = csb.ConnectionString;
                 SqlServerName = dataSource;
                 DatabaseName = initialCatalog;
+                UserName = userName;
+                Password = password;
 
                 isValid = true;
                 sqlConnection.Close();
@@ -148,7 +168,7 @@ namespace CfCServiceTester.WEBservice
         /// <returns>File size</returns>
         public static long MakeBackup(string fileName)
         {
-            var server = new Server(SqlServerName);
+            var server = GetConnectedServer(SqlServerName, UserName, Password);
             var backup = new Backup()
                 {
                     Database = DatabaseName,
@@ -174,7 +194,7 @@ namespace CfCServiceTester.WEBservice
         {
 
             string sourceLogFileName = databaseName + "_log";
-            var server = new Server(SqlServerName);
+            var server = GetConnectedServer(SqlServerName, UserName, Password);
             string rootPath = server.MasterDBPath;
             if (!rootPath.EndsWith(@"\"))
                 rootPath += @"\";
@@ -828,7 +848,7 @@ namespace CfCServiceTester.WEBservice
         /// <returns><see cref="Table"/></returns>
         public static Table GetTable(string tableName, out Database db)
         {
-            var srv = new Server(SqlServerName);
+            var srv = GetConnectedServer(SqlServerName, UserName, Password);
             if (srv == null)
                 throw new Exception(String.Format("Server '{0}' was not found.", SqlServerName));
 
