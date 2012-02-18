@@ -29,11 +29,8 @@ namespace CfCServiceTester.CustomControls
                 this.txtBackupFileName.Text = String.Format("{0}_{1}_{2}.bak",
                         serverName, CfcWebService.DatabaseName, DateTime.Now.ToString("yyyyMMdd_HHmm"));
             }
-            if (String.IsNullOrEmpty(this.txtServerName1.Text))
-            {
-                this.txtServerName1.Text = CfcWebService.SqlServerName;
-                this.txtCurrentDatabaseName1.Text = CfcWebService.DatabaseName;
-            }
+            this.txtServerName1.Text = CfcWebService.SqlServerName;
+            this.txtCurrentDatabaseName1.Text = CfcWebService.DatabaseName;
         }
     }
 }

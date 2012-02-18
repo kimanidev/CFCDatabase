@@ -23,7 +23,8 @@
 	<script type="text/javascript" src="http://jqueryui.com/themeroller/themeswitchertool/"></script>
 
 </head>
-<body onunload="doUnload()">
+<%--<body onunload="doUnload()">--%>
+<body>
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" runat="server">
             <Services>
@@ -77,11 +78,11 @@
     <script type="text/javascript">
     // <![CDATA[
         Sys.Application.add_init(pageInit);
-
+/*
         function doUnload() {
             CfCServiceTester.WEBservice.CfcWebService.CloseSession();
         }
-
+*/
         function pageInit() {
             $create(CfcServiceTestManager.CfcComponent,
                     { 'id': 'CfcTestManager',
