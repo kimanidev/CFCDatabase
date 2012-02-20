@@ -859,8 +859,8 @@ namespace CfCServiceTester.WEBservice
                 {
                     dbsName = dbs.Name;
                     if ((!String.IsNullOrEmpty(dbsName) || String.IsNullOrEmpty(namePattern) ||
-                          dbsName.ToUpper().Contains(namePattern.ToUpper())) &&
-                        (!accessibleOnly || dbs.IsAccessible))
+                          dbsName.ToUpper().Contains(namePattern.ToUpper())) && String.Compare(dbsName, "master", true) != 0 &&
+                        (!accessibleOnly || dbs.Users.Contains(loginName)))
                     {
                         dbo = new DatabaseDbo()
                         {
