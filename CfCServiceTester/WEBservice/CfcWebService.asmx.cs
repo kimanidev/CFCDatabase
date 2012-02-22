@@ -252,12 +252,8 @@ namespace CfCServiceTester.WEBservice
 
                 long fileSize;
                 if (singleUserMode)
-                {
                     isSingleMode = SetSingleMode(DatabaseName);
-                    fileSize = MakeBackup(fileName);
-                }
-                else
-                    fileSize = MakeBackup(fileName);
+                fileSize = MakeBackup(fileName);
 
                 return new BackupStatus() { IsSuccess = true, FileSize = fileSize };
             }

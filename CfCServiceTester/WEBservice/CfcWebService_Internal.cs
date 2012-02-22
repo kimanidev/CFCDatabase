@@ -857,19 +857,22 @@ namespace CfCServiceTester.WEBservice
 
                 foreach (Database dbs in server.Databases)
                 {
-                    dbsName = dbs.Name;
-                    if ((!String.IsNullOrEmpty(dbsName) || String.IsNullOrEmpty(namePattern) ||
-                          dbsName.ToUpper().Contains(namePattern.ToUpper())) && String.Compare(dbsName, "master", true) != 0 &&
-                        (!accessibleOnly || dbs.Users.Contains(loginName)))
+                    if (!dbs.IsAccessible || dbs.IsSystemObject)
+                        continue;
+                    if (dbs.Users.Contains(loginName))
                     {
-                        dbo = new DatabaseDbo()
+                        dbsName = dbs.Name;
+                        if (String.IsNullOrEmpty(namePattern) || dbsName.ToUpper().Contains(namePattern.ToUpper()))
                         {
-                            Name = dbsName,
-                            ID = dbs.ID,
-                            IsAccessible = dbs.IsAccessible,
-                            Size = dbs.Size
-                        };
-                        rzlt.Add(dbo);
+                            dbo = new DatabaseDbo()
+                            {
+                                Name = dbsName,
+                                ID = dbs.ID,
+                                IsAccessible = dbs.IsAccessible,
+                                Size = dbs.Size
+                            };
+                            rzlt.Add(dbo);
+                        }
                     }
                 }
             }

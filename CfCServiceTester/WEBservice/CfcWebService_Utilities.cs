@@ -163,6 +163,7 @@ namespace CfCServiceTester.WEBservice
         /// <summary>
         /// Writes SQL backup into file defined in the parameter. Procedure is using SMO data objects.
         /// <see cref="http://msdn.microsoft.com/en-us/library/microsoft.sqlserver.management.smo.backup.aspx"/>
+        /// <see cref="http://www.codeproject.com/Articles/127065/SMO-Tutorial-1-of-n-Programming-data-storage-objec#DBBackup"/>
         /// </summary>
         /// <param name="fileName">File name</param>
         /// <returns>File size</returns>
@@ -174,6 +175,7 @@ namespace CfCServiceTester.WEBservice
                     Database = DatabaseName,
                     Action = BackupActionType.Database,
                     Initialize = true,
+                    ContinueAfterError = true
                 };
             
             backup.Devices.AddDevice(fileName, DeviceType.File);
@@ -184,7 +186,7 @@ namespace CfCServiceTester.WEBservice
         }
 
         /// <summary>
-        /// /// Resdtores database from file.
+        /// /// Restores database from file.
         /// <see cref="http://msdn.microsoft.com/en-us/library/microsoft.sqlserver.management.smo.restore.sqlrestore.aspx"/>
         /// </summary>
         /// <param name="fileName">File name</param>

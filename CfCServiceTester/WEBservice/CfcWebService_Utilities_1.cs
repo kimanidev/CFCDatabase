@@ -8,6 +8,7 @@ using System.Data;
 using System.Text;
 using CfCServiceTester.WEBservice.DataObjects;
 using Microsoft.SqlServer.Management.Common;
+using System.Transactions;
 
 namespace CfCServiceTester.WEBservice
 {
@@ -539,47 +540,65 @@ namespace CfCServiceTester.WEBservice
         public static CfcDbChangesDbo GetFirstCfcDbChanges()
         {
             const string queryString = "EXEC GetFirst_CFC_DB_Changes";
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                connection.Open();
-                var da = new SqlDataAdapter(queryString, connection);
-                da.TableMappings.Add("Table", "CFC_DB_Changes");
+            CfcDbChangesDbo rzlt = null;
 
-                var ds = new DataSet();
-                da.Fill(ds);
-                DataTable changeList = ds.Tables["CFC_DB_Changes"];
-                var rzlt = (
-                    from chng in changeList.AsEnumerable()
-                    select new CfcDbChangesDbo()
+            try
+            {
+                var options = new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.Serializable,
+                    Timeout = new TimeSpan(0, TransactionTimeout, 0)
+                };
+                using (var trScope = new TransactionScope(TransactionScopeOption.Required, options))
+                {
+                    using (var connection = new SqlConnection(ConnectionString))
                     {
-                        DB_Change_GUID = chng.Field<Guid>("DB_Change_GUID"),
-                        CFC_DB_Name = chng.Field<string>("CFC_DB_Name"),
-                        CFC_DB_Major_Version = chng.Field<short>("CFC_DB_Major_Version"),
-                        CFC_DB_Minor_Version = chng.Field<short>("CFC_DB_Minor_Version"),
-                        Seq_No = chng.Field<int>("Seq_No"),
-                        Table_Name = chng.Field<string>("Table_Name"),
-                        Change_Description = chng.Field<string>("Change_Description"),
-                        Created_By = chng.Field<string>("Created_By"),
-                        Created_Date = chng.Field<DateTime>("Created_Date"),
-                        Last_Update_By = chng.Field<string>("Last_Update_By"),
-                        Last_Update = chng.Field<DateTime>("Last_Update"),
-                    }).FirstOrDefault();
-                connection.Close();
-                return rzlt ?? new CfcDbChangesDbo()
-                                {
-                                    DB_Change_GUID = Guid.NewGuid(),
-                                    CFC_DB_Name = DatabaseName,
-                                    CFC_DB_Major_Version = 1,
-                                    CFC_DB_Minor_Version = 0,
-                                    Seq_No = 0,
-                                    Table_Name = String.Empty,
-                                    Change_Description = String.Empty,
-                                    Created_By = UserName,
-                                    Created_Date = DateTime.Now,
-                                    Last_Update_By = UserName,
-                                    Last_Update = DateTime.Now,
-                                };
+                        connection.Open();
+                        var da = new SqlDataAdapter(queryString, connection);
+                        da.TableMappings.Add("Table", "CFC_DB_Changes");
+
+                        var ds = new DataSet();
+                        da.Fill(ds);
+                        DataTable changeList = ds.Tables["CFC_DB_Changes"];
+                        rzlt = (
+                            from chng in changeList.AsEnumerable()
+                            select new CfcDbChangesDbo()
+                            {
+                                DB_Change_GUID = chng.Field<Guid>("DB_Change_GUID"),
+                                CFC_DB_Name = chng.Field<string>("CFC_DB_Name"),
+                                CFC_DB_Major_Version = chng.Field<short>("CFC_DB_Major_Version"),
+                                CFC_DB_Minor_Version = chng.Field<short>("CFC_DB_Minor_Version"),
+                                Seq_No = chng.Field<int>("Seq_No"),
+                                Table_Name = chng.Field<string>("Table_Name"),
+                                Change_Description = chng.Field<string>("Change_Description"),
+                                Created_By = chng.Field<string>("Created_By"),
+                                Created_Date = chng.Field<DateTime>("Created_Date"),
+                                Last_Update_By = chng.Field<string>("Last_Update_By"),
+                                Last_Update = chng.Field<DateTime>("Last_Update"),
+                            }).FirstOrDefault();
+                        connection.Close();
+                    }
+                    trScope.Complete();
+                }
             }
+            catch (Exception ex)
+            {
+                string msg = ex.Message;
+            }
+            return rzlt ?? new CfcDbChangesDbo()
+            {
+                DB_Change_GUID = Guid.NewGuid(),
+                CFC_DB_Name = DatabaseName,
+                CFC_DB_Major_Version = 1,
+                CFC_DB_Minor_Version = 0,
+                Seq_No = 0,
+                Table_Name = String.Empty,
+                Change_Description = String.Empty,
+                Created_By = UserName,
+                Created_Date = DateTime.Now,
+                Last_Update_By = UserName,
+                Last_Update = DateTime.Now,
+            };
         }
 
         private static Server GetConnectedServer(string remoteSvrName, string sqlServerLogin, string password)
@@ -590,5 +609,25 @@ namespace CfCServiceTester.WEBservice
             srvConn2.Password = password;
             return new Server(srvConn2);
         }
+
+        public static int SafeConvertToInt(object intValue, int undefinedValue = -1)
+        {
+            try
+            {
+                if (intValue == null)
+                    return undefinedValue;
+                else
+                    return (int)intValue;
+            }
+            catch (Exception)
+            {
+                string tmp = intValue.ToString();
+                int rzlt;
+                if (!Int32.TryParse(tmp, out rzlt))
+                    rzlt = undefinedValue;
+                return rzlt;
+            }
+        }
+
     }
 }
