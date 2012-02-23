@@ -10,6 +10,7 @@ using CfCServiceTester.WEBservice.DataObjects;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Text;
+using System.Threading;
 
 namespace CfCServiceTester.WEBservice
 {
@@ -18,6 +19,11 @@ namespace CfCServiceTester.WEBservice
     /// </summary>
     public partial class CfcWebService
     {
+        /// <summary>
+        /// Wait handle for finishing backup operation
+        /// </summary>
+        private static ManualResetEvent mre = new ManualResetEvent(false);
+
         /// <summary>
         /// The application stores connection string in <code>Session[ConnectionStringKey]</code> and verifies credentials.
         /// </summary>
@@ -175,16 +181,33 @@ namespace CfCServiceTester.WEBservice
                     Database = DatabaseName,
                     Action = BackupActionType.Database,
                     Initialize = true,
-                    ContinueAfterError = true
+                    ContinueAfterError = true,
+                    PercentCompleteNotification = 20,
                 };
-            
+
+            backup.Devices.Clear();
             backup.Devices.AddDevice(fileName, DeviceType.File);
+            backup.PercentComplete += new PercentCompleteEventHandler(ProgressEventHandler);
+
+            mre.Reset();
             backup.SqlBackup(server);
+            mre.WaitOne(new TimeSpan(0, 1, 0));
 
-            var fInfo = new FileInfo(fileName);
-            return fInfo.Length;
+            try
+            {
+                var fInfo = new FileInfo(fileName);
+                return fInfo.Length;
+            }
+            catch (Exception)   // There is no need for processing error here
+            {
+                return 0L;
+            }
         }
-
+        static void ProgressEventHandler(object sender, PercentCompleteEventArgs e)
+        {
+            if (e.Percent > 90)
+                mre.Set();
+        }
         /// <summary>
         /// /// Restores database from file.
         /// <see cref="http://msdn.microsoft.com/en-us/library/microsoft.sqlserver.management.smo.restore.sqlrestore.aspx"/>
