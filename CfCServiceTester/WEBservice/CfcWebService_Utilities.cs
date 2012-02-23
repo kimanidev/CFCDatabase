@@ -170,6 +170,7 @@ namespace CfCServiceTester.WEBservice
         /// Writes SQL backup into file defined in the parameter. Procedure is using SMO data objects.
         /// <see cref="http://msdn.microsoft.com/en-us/library/microsoft.sqlserver.management.smo.backup.aspx"/>
         /// <see cref="http://www.codeproject.com/Articles/127065/SMO-Tutorial-1-of-n-Programming-data-storage-objec#DBBackup"/>
+        /// First call to SQL server Express is crashing after backup . Production and developer's editions are working.
         /// </summary>
         /// <param name="fileName">File name</param>
         /// <returns>File size</returns>
