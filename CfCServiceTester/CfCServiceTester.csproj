@@ -86,6 +86,7 @@
     <Content Include="CustomControls\ModifyTableContent.ascx" />
     <Content Include="CustomControls\StartPageContent.ascx" />
     <Content Include="Images\ajax-loader.gif" />
+    <Content Include="Images\application_exit_32.png" />
     <Content Include="Images\boxy-ne.png" />
     <Content Include="Images\boxy-nw.png" />
     <Content Include="Images\boxy-se.png" />

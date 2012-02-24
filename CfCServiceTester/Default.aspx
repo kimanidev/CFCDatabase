@@ -50,39 +50,65 @@
                 <asp:ScriptReference Path="~/Scripts/CfcServiceTestManager.js" />
             </Scripts>
         </asp:ScriptManager>
-        <asp:Wizard ID="Wizard1" runat="server" HeaderText="Database Processor" Width="60em" 
-                    OnActiveStepChanged="Wizard1_OnActiveStepChanged" StepNextButtonStyle-CssClass="oculto" >
-            <WizardSteps>
-                <asp:WizardStep runat="server" title="Prepare Connection" ID="ConnectionStep" StepType="Start">
-                    <con:StartPageContent ID="StartPageContent" runat="server" />
-                </asp:WizardStep>
-                <asp:WizardStep runat="server" title="Backup and Restore">
-                    <con:BackupPageContent ID="BackupPageContent" runat="server" />
-                </asp:WizardStep>
-                <asp:WizardStep runat="server" title="Modify table">
-                    <con:ModifyTablePageContent ID="ModifyTablePageContent" runat="server" />
-                </asp:WizardStep>
-                <asp:WizardStep runat="server" title="Indexes">
-                    <con:ModifyIndexesContent ID="ModifyIndexesContent" runat="server" />
-                </asp:WizardStep>
-                <asp:WizardStep runat="server" title="Foreign keys">
-                    <con:ModifyFKeysContent ID="ModifyForeignKeysContent" runat="server" />
-                </asp:WizardStep>
-            </WizardSteps>
-            <navigationbuttonstyle borderwidth="1" width="80" borderstyle="Solid" backcolor="lightgray" /> 
-            <headerstyle horizontalalign="Right" font-bold="true" font-size="120%" /> 
-            <sidebarstyle backcolor="" borderwidth="0" font-names="Arial" Width="15em" CssClass="WizardSideBar" />
-        </asp:Wizard>
+        <div class="TitleBar">
+            <span class="LeftText" >Database Processor</span>
+            <span class="RightText" >
+                <asp:ImageButton ID="ExitButton" runat="server" ImageUrl="~/Images/application_exit_32.png" 
+                        ToolTip="Exit application" OnClientClick="return doUnload();" />
+            </span>
+        </div>
+        <div>
+            <asp:Wizard ID="Wizard1" runat="server" Width="60em" 
+                        OnActiveStepChanged="Wizard1_OnActiveStepChanged" StepNextButtonStyle-CssClass="oculto" >
+                <WizardSteps>
+                    <asp:WizardStep runat="server" title="Prepare Connection" ID="ConnectionStep" StepType="Start">
+                        <con:StartPageContent ID="StartPageContent" runat="server" />
+                    </asp:WizardStep>
+                    <asp:WizardStep runat="server" title="Backup and Restore">
+                        <con:BackupPageContent ID="BackupPageContent" runat="server" />
+                    </asp:WizardStep>
+                    <asp:WizardStep runat="server" title="Modify table">
+                        <con:ModifyTablePageContent ID="ModifyTablePageContent" runat="server" />
+                    </asp:WizardStep>
+                    <asp:WizardStep runat="server" title="Indexes">
+                        <con:ModifyIndexesContent ID="ModifyIndexesContent" runat="server" />
+                    </asp:WizardStep>
+                    <asp:WizardStep runat="server" title="Foreign keys">
+                        <con:ModifyFKeysContent ID="ModifyForeignKeysContent" runat="server" />
+                    </asp:WizardStep>
+                </WizardSteps>
+                <navigationbuttonstyle borderwidth="1" width="80" borderstyle="Solid" backcolor="lightgray" /> 
+                <headerstyle horizontalalign="Right" font-bold="true" font-size="120%" /> 
+                <sidebarstyle backcolor="" borderwidth="0" font-names="Arial" Width="15em" CssClass="WizardSideBar" />
+            </asp:Wizard>
+        </div>
     </form>
 
     <script type="text/javascript">
     // <![CDATA[
         Sys.Application.add_init(pageInit);
-/*
+
+        // Closing window without message box 
+        //      http://blogs.x2line.com/al/articles/350.aspx
+        //      http://www.guyfromchennai.com/?p=18
         function doUnload() {
-            CfCServiceTester.WEBservice.CfcWebService.CloseSession();
+            if (confirm("Do you want to close the application?"))
+            {
+                CfCServiceTester.WEBservice.CfcWebService.CloseSession();
+                if (navigator.appName == "Microsoft Internet Explorer") {
+                    this.focus();
+                    self.opener = this;
+                    self.close(); 
+                } else if (navigator.appName == "Netscape"){
+                    window.location = "http://www.google.com/"; // Netscape does not allow closing window
+                } else {
+                    window.opener='x';
+                    window.close();
+                }
+            }
+            return false;
         }
-*/
+
         function pageInit() {
             $create(CfcServiceTestManager.CfcComponent,
                     { 'id': 'CfcTestManager',
