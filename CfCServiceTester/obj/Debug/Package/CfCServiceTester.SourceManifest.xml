@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <sitemanifest>
-  <IisApp path="C:\Repo.git\CFCDatabase\CfCServiceTester\obj\Debug\Package\PackageTmp" />
-  <setAcl path="C:\Repo.git\CFCDatabase\CfCServiceTester\obj\Debug\Package\PackageTmp" setAclResourceType="Directory" />
-  <setAcl path="C:\Repo.git\CFCDatabase\CfCServiceTester\obj\Debug\Package\PackageTmp" setAclUser="anonymousAuthenticationUser" setAclResourceType="Directory" />
+  <IisApp path="C:\Gedimino\Training\Norman\CfCServiceTester\obj\Debug\Package\PackageTmp" managedRuntimeVersion="v4.0" />
+  <setAcl path="C:\Gedimino\Training\Norman\CfCServiceTester\obj\Debug\Package\PackageTmp" setAclResourceType="Directory" />
+  <setAcl path="C:\Gedimino\Training\Norman\CfCServiceTester\obj\Debug\Package\PackageTmp" setAclUser="anonymousAuthenticationUser" setAclResourceType="Directory" />
 </sitemanifest>

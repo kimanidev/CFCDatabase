@@ -8,3 +8,13 @@ C:\Repo.git\CFCDatabase\CfCServiceTester\bin\Microsoft.SqlServer.SqlEnum.dll
 C:\Repo.git\CFCDatabase\CfCServiceTester\obj\Debug\ResolveAssemblyReference.cache
 C:\Repo.git\CFCDatabase\CfCServiceTester\obj\Debug\CfCServiceTester.dll
 C:\Repo.git\CFCDatabase\CfCServiceTester\obj\Debug\CfCServiceTester.pdb
+C:\Gedimino\Training\Norman\CfCServiceTester\bin\CfCServiceTester.dll
+C:\Gedimino\Training\Norman\CfCServiceTester\bin\CfCServiceTester.pdb
+C:\Gedimino\Training\Norman\CfCServiceTester\bin\Microsoft.SqlServer.ConnectionInfo.dll
+C:\Gedimino\Training\Norman\CfCServiceTester\bin\Microsoft.SqlServer.Management.Sdk.Sfc.dll
+C:\Gedimino\Training\Norman\CfCServiceTester\bin\Microsoft.SqlServer.Smo.dll
+C:\Gedimino\Training\Norman\CfCServiceTester\bin\Microsoft.SqlServer.SmoExtended.dll
+C:\Gedimino\Training\Norman\CfCServiceTester\bin\Microsoft.SqlServer.SqlEnum.dll
+C:\Gedimino\Training\Norman\CfCServiceTester\obj\Debug\ResolveAssemblyReference.cache
+C:\Gedimino\Training\Norman\CfCServiceTester\obj\Debug\CfCServiceTester.dll
+C:\Gedimino\Training\Norman\CfCServiceTester\obj\Debug\CfCServiceTester.pdb
