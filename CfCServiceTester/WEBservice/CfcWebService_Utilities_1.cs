@@ -10,6 +10,8 @@ using CfCServiceTester.WEBservice.DataObjects;
 using Microsoft.SqlServer.Management.Common;
 using System.Transactions;
 using System.Threading;
+using System.IO;
+using System.Reflection;
 
 namespace CfCServiceTester.WEBservice
 {
@@ -631,5 +633,27 @@ namespace CfCServiceTester.WEBservice
             }
         }
 
+        private static void VerifyDatabase(SqlConnection sqlConnection)
+        {
+            string sql = "SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dbo.CFC_DB_Changes'";
+            SqlCommand cmd = new SqlCommand(sql, sqlConnection);
+            bool tableExists = (Int32)cmd.ExecuteScalar() > 0;
+            if (tableExists)
+                return;
+
+            string prepareDbSql;
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CfCServiceTester.WEBservice.CFC_DB_Setup.Auto.sql"))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                prepareDbSql = reader.ReadToEnd();
+            }
+
+            string[] commands = prepareDbSql.Split(new string[] { "GO\r\n", "GO ", "GO\t" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string c in commands)
+            {
+                cmd.CommandText = c;
+                cmd.ExecuteNonQuery();
+            }
+        }
     }
 }

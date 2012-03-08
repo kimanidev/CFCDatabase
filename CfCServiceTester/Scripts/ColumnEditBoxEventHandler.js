@@ -254,7 +254,18 @@ function onSuccess_DeleteColumn(result) {
     if (result.IsSuccess) {
         var oldColumnName = $(manager.get_hdnOldFieldName3Id()).val().trim();
         var queryString = String.format("div#DynamicTable2 table tbody tr td.ColumnName:contains({0})", oldColumnName);
-        $(queryString).parent().remove();
+
+        var tableRow = null;
+        $(queryString).each(function (index, value) {
+            if ($(this).text() == oldColumnName) {
+                tableRow = this.parentNode;
+                return false;
+            }
+        });
+        if (tableRow)
+            tableRow.parentNode.removeChild(tableRow);
+
+        //parent().remove();
         
         // Recreate 'Zebra';
         $('div#DynamicTable2 table tbody tr').each(function (index) {

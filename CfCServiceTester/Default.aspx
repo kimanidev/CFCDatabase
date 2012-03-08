@@ -23,7 +23,6 @@
 	<script type="text/javascript" src="http://jqueryui.com/themeroller/themeswitchertool/"></script>
 
 </head>
-<%--<body onunload="doUnload()">--%>
 <body>
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" runat="server">
@@ -32,9 +31,6 @@
             </Services>
 
             <Scripts>
-                <%--<asp:ScriptReference Path="~/Scripts/jquery-1.7.1.min.js" />--%>
-
-
                 <asp:ScriptReference Path="~/Scripts/ConnectionStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/BackupStepEventHandlers.js" />
                 <asp:ScriptReference Path="~/Scripts/ModifyTableStepEventHandlers.js" />

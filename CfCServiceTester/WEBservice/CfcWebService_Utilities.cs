@@ -109,6 +109,7 @@ namespace CfCServiceTester.WEBservice
             {
                 var sqlConnection = new SqlConnection(csb.ConnectionString);
                 sqlConnection.Open();   // Verify connection
+                VerifyDatabase(sqlConnection);
                 sqlConnection.Close();
                 ConnectionString = csb.ConnectionString;
                 SqlServerName = dataSource;
