@@ -1,0 +1,10 @@
+C:\Gedimino\Training\Norman\CfC_DB_Changer\bin\CfCServiceTester.dll
+C:\Gedimino\Training\Norman\CfC_DB_Changer\bin\CfCServiceTester.pdb
+C:\Gedimino\Training\Norman\CfC_DB_Changer\bin\Microsoft.SqlServer.ConnectionInfo.dll
+C:\Gedimino\Training\Norman\CfC_DB_Changer\bin\Microsoft.SqlServer.Management.Sdk.Sfc.dll
+C:\Gedimino\Training\Norman\CfC_DB_Changer\bin\Microsoft.SqlServer.Smo.dll
+C:\Gedimino\Training\Norman\CfC_DB_Changer\bin\Microsoft.SqlServer.SmoExtended.dll
+C:\Gedimino\Training\Norman\CfC_DB_Changer\bin\Microsoft.SqlServer.SqlEnum.dll
+C:\Gedimino\Training\Norman\CfC_DB_Changer\obj\Release\ResolveAssemblyReference.cache
+C:\Gedimino\Training\Norman\CfC_DB_Changer\obj\Release\CfCServiceTester.dll
+C:\Gedimino\Training\Norman\CfC_DB_Changer\obj\Release\CfCServiceTester.pdb

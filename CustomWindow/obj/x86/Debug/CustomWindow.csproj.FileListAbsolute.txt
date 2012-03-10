@@ -1,0 +1,9 @@
+C:\Gedimino\Training\Norman\CustomWindow\bin\Debug\CustomWindow.exe
+C:\Gedimino\Training\Norman\CustomWindow\bin\Debug\CustomWindow.pdb
+C:\Gedimino\Training\Norman\CustomWindow\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Gedimino\Training\Norman\CustomWindow\obj\x86\Debug\CustomWindow.Form1.resources
+C:\Gedimino\Training\Norman\CustomWindow\obj\x86\Debug\CustomWindow.Properties.Resources.resources
+C:\Gedimino\Training\Norman\CustomWindow\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Gedimino\Training\Norman\CustomWindow\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Gedimino\Training\Norman\CustomWindow\obj\x86\Debug\CustomWindow.exe
+C:\Gedimino\Training\Norman\CustomWindow\obj\x86\Debug\CustomWindow.pdb

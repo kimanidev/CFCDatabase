@@ -1,0 +1,7 @@
+C:\Gedimino\Training\Norman\CustomActions\bin\Release\CustomActions.dll
+C:\Gedimino\Training\Norman\CustomActions\bin\Release\CustomActions.pdb
+C:\Gedimino\Training\Norman\CustomActions\bin\Release\CustomWindow.exe
+C:\Gedimino\Training\Norman\CustomActions\bin\Release\CustomWindow.pdb
+C:\Gedimino\Training\Norman\CustomActions\obj\Release\ResolveAssemblyReference.cache
+C:\Gedimino\Training\Norman\CustomActions\obj\Release\CustomActions.dll
+C:\Gedimino\Training\Norman\CustomActions\obj\Release\CustomActions.pdb
